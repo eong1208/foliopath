@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="kr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1014,6 +1014,7 @@ function deleteRoomOnExit() {
 
 window.addEventListener('pagehide', deleteRoomOnExit);
 window.addEventListener('beforeunload', function(e) {
+  if (endingReached) return;
   e.preventDefault();
   e.returnValue = '';
 });
@@ -1775,16 +1776,16 @@ var ENDINGS = {
 };
 
 
+
 /* ════════════════════════════════════════════════════
    페이지 이탈 경고 (홈 버튼)
-════════════════════════════════════════════════════ 
+════════════════════════════════════════════════════ */
 function confirmHome() {
-  if (confirm('진행 중인 게임이 저장되지 않습니다. 홈으로 돌아가시겠습니까?')) {
-    window.onbeforeunload = null;
-    deleteRoomOnExit();
-    location.href = 'library.html';
-  }
-}*/
+  window.onbeforeunload = null;
+  deleteRoomOnExit();
+  location.href = 'library.html';
+}
+
 
 
 /* ════════════════════════════════════════════════════
