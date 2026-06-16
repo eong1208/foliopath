@@ -2176,9 +2176,15 @@ function startTyping(lines, onDone) {
     if (typingTimer) clearTimeout(typingTimer);
     finishNow();
   }
-  setTimeout(function() {
+  var skipRegisterTimer = setTimeout(function() {
     document.body.addEventListener('click', skipHandler, { once: true });
   }, 0);
+
+  /* 타이핑이 끝났을 때(스킵이든 자연 완료든) 스킵 리스너를 확실히 제거 */
+  function removeSkipHandler() {
+    if (skipRegisterTimer) clearTimeout(skipRegisterTimer);
+    document.body.removeEventListener('click', skipHandler);
+  }
 
   function tick() {
     if (i < fullText.length) {
@@ -2197,12 +2203,14 @@ function startTyping(lines, onDone) {
       var delay = ch === '.' ? 400 : speed;
       typingTimer = setTimeout(tick, delay);
     } else {
+      removeSkipHandler();
       cursor.style.display = 'none';
       if (onDone) onDone();
     }
   }
 
   function finishNow() {
+    removeSkipHandler();
     if (typingTimer) clearTimeout(typingTimer);
     container.innerHTML = '';
     lines.forEach(function(line, idx) {
@@ -2240,11 +2248,18 @@ function typeAppend(text, onDone) {
     if (appendTimer) clearTimeout(appendTimer);
     finishNow();
   }
-  setTimeout(function() {
+  var skipRegisterTimer = setTimeout(function() {
     document.body.addEventListener('click', skipHandler, { once: true });
   }, 0);
 
+  /* 타이핑이 끝났을 때(스킵이든 자연 완료든) 스킵 리스너를 확실히 제거 */
+  function removeSkipHandler() {
+    if (skipRegisterTimer) clearTimeout(skipRegisterTimer);
+    document.body.removeEventListener('click', skipHandler);
+  }
+
   function finishNow() {
+    removeSkipHandler();
     done = true;
     /* 남은 글자 한꺼번에 채우기 */
     while (i < text.length) {
@@ -2282,6 +2297,7 @@ function typeAppend(text, onDone) {
       i++;
       appendTimer = setTimeout(tick, speed);
     } else {
+      removeSkipHandler();
       done = true;
       cursor.style.display = 'none';
       if (onDone) onDone();
