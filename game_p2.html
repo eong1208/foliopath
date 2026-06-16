@@ -1,0 +1,2580 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Folio Path - 파트 2 왕자</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://hangeul.pstatic.net/hangeul_static/css/maru-buri.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://webfontbox.github.io/Arita/font.css">
+  <link rel="stylesheet" type="text/css" href="https://webfontbox.github.io/Arita/font.min.css">
+
+  <style>
+
+    /* ══════════════════════════════
+       기본 설정
+    ══════════════════════════════ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #e8dfc8;
+      font-family: 'MaruBuri', serif;
+      position: relative;
+      cursor: default;
+    }
+
+    /* ══════════════════════════════
+       배경 레이어
+    ══════════════════════════════ */
+    #bg-parchment {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    #bg-illust {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+    #bg-illust.reveal { opacity: 1; }
+
+    /* ══════════════════════════════
+       씬 컨테이너
+    ══════════════════════════════ */
+    #scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ══════════════════════════════
+       좌상단 홈 버튼
+    ══════════════════════════════ */
+    #btn-home {
+      position: absolute;
+      top: 2%;
+      left: 2%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      padding: 4px;
+      transition: filter 0.15s;
+    }
+    #btn-home:hover {
+      filter: invert(19%) sepia(28%) saturate(800%) hue-rotate(345deg) brightness(90%) contrast(95%);
+    }
+    #btn-home img { width: 28px; height: auto; display: block; }
+
+    /* ══════════════════════════════
+       우상단 설정 버튼
+    ══════════════════════════════ */
+    #btn-setting {
+      position: absolute;
+      top: 2%;
+      right: 2%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      padding: 4px;
+      transition: filter 0.15s;
+    }
+    #btn-setting:hover {
+      filter: invert(19%) sepia(28%) saturate(800%) hue-rotate(345deg) brightness(90%) contrast(95%);
+    }
+    #btn-setting img { width: 28px; height: auto; display: block; }
+
+    /* ══════════════════════════════
+       씬 이미지
+    ══════════════════════════════ */
+    #scene-img-wrap {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    #scene-img-wrap.reveal { opacity: 1; }
+
+    #scene-img {
+      left: 50%;
+      transform: translateX(-50%);
+      height: 100%;
+      position: absolute;
+      display: block;
+    }
+
+    /* ══════════════════════════════
+       본문 텍스트 영역
+    ══════════════════════════════ */
+    #script-area {
+      position: absolute;
+      top: 52%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      max-height: 25vh;
+      overflow-y: auto;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    #script-area::-webkit-scrollbar {
+      width: 6px;
+      background: transparent;
+    }
+    #script-area::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 3px;
+    }
+    #script-area:hover::-webkit-scrollbar-thumb,
+    #script-area:active::-webkit-scrollbar-thumb {
+      background: rgba(180, 154, 80, 0.35);
+    }
+    #script-area:hover {
+      scrollbar-color: rgba(180, 154, 80, 0.35) transparent;
+    }
+    #script-area.reveal { opacity: 1; }
+
+    #script-text {
+      font-family: 'MaruBuri', serif;
+      font-size: 1rem;
+      color: #2a1e08;
+      line-height: 1.95;
+      word-break: keep-all;
+      padding-left: 5%;
+    }
+
+    /* 타이핑 커서 */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ══════════════════════════════
+       선택지 카드 영역
+    ══════════════════════════════ */
+    #choices-wrap {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 62%;
+      height: 12%;
+      display: flex;
+      gap: 2%;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+    }
+    #choices-wrap.reveal {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #choices-wrap.hidden {
+      opacity: 0 !important;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(10px);
+    }
+
+    .choice-card {
+      flex: 1;
+      background-image: url('images/btn_choice.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-color: transparent;
+      border: none;
+      padding: 16px 18px 16px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      transition: filter 0.18s ease, transform 0.18s ease;
+      min-height: 80px;
+    }
+    .choice-card:hover { filter: brightness(0.92); transform: translateY(-2px); }
+    .choice-card:active { transform: translateY(0); }
+
+    .choice-icon { width: 50px; flex-shrink: 0; }
+
+    .choice-text-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .choice-label {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      color: #9a8060;
+      margin-bottom: 8%;
+    }
+
+    .choice-body {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.95rem;
+      color: #2a1e08;
+      line-height: 1.4;
+    }
+
+    .choice-arrow {
+      font-size: 1rem;
+      color: #9a8060;
+      flex-shrink: 0;
+      margin-right: 2%;
+    }
+
+    /* ══════════════════════════════
+       하단 안내 문구
+    ══════════════════════════════ */
+    #next-hint {
+      position: absolute;
+      bottom: 3%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 0.7rem;
+      color: #9a8060;
+      letter-spacing: 0.08em;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    #next-hint.visible { opacity: 1; }
+
+    /* ══════════════════════════════
+       씬 전환: 텍스트/선택지 영역만 페이드
+    ══════════════════════════════ */
+    /* 일반 씬 전환 — 검은 화면 없이 텍스트+선택지만 스르륵 */
+    #script-area.scene-out  { opacity: 0; transition: opacity 0.3s ease; }
+    #script-area.scene-in   { opacity: 0; }
+    #script-area.scene-in.reveal { opacity: 1; transition: opacity 0.5s ease 0.1s; }
+
+    #choices-wrap.scene-out { opacity: 0 !important; transition: opacity 0.2s ease; }
+
+    /* 엔딩 전환용 검은 overlay (엔딩 진입 시에만 사용) */
+    #ending-transition {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      z-index: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+    #ending-transition.fade-in  { opacity: 1;  pointer-events: auto; }
+    #ending-transition.fade-out { opacity: 0;  pointer-events: none; }
+
+    /* ══════════════════════════════
+       인트로 오버레이
+    ══════════════════════════════ */
+    #intro-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    #intro-overlay.fade-out {
+      animation: introFadeOut 1.6s ease forwards;
+    }
+    @keyframes introFadeOut {
+      0%   { opacity: 1; }
+      100% { opacity: 0; pointer-events: none; }
+    }
+
+    .intro-line {
+      opacity: 0;
+      color: #c8b98a;
+      text-align: center;
+      animation: introFadeIn 1s ease forwards;
+    }
+    @keyframes introFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #intro-tale {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
+      color: #8a7450;
+      animation-delay: 0.3s;
+      margin-bottom: 10px;
+    }
+    #intro-part {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      color: #8a7450;
+      animation-delay: 0.3s;
+      margin-bottom: 28px;
+    }
+    #intro-title {
+      font-family: 'Aritaburi', serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #e8d9b0;
+      animation-delay: 0.6s;
+      margin-bottom: 16px;
+    }
+    #intro-quote {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.95rem;
+      color: #a09070;
+      animation-delay: 1s;
+      margin-bottom: 24px;
+    }
+    #intro-divider {
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #6a5830, transparent);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: introFadeIn 1s ease 1.3s forwards;
+    }
+    #intro-player {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      color: #7a6a4a;
+      animation-delay: 1.5s;
+    }
+
+    /* ══════════════════════════════
+       씬 이미지 등장 애니메이션
+    ══════════════════════════════ */
+    #scene-img-wrap.reveal {
+      animation: sceneReveal 1.8s ease forwards;
+    }
+    @keyframes sceneReveal {
+      0%   { opacity: 0; filter: blur(12px) brightness(0.4); transform: translateX(-50%) scale(1.04); }
+      60%  { filter: blur(2px) brightness(0.85); }
+      100% { opacity: 1; filter: blur(0) brightness(1); transform: translateX(-50%) scale(1); }
+    }
+
+    /* ══════════════════════════════
+       ★ 엔딩 화면
+    ══════════════════════════════ */
+    #ending-screen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 50;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-y: auto;
+      padding: 3% 0 4%;
+    }
+    #ending-screen.active { display: flex; }
+
+    /* 엔딩 넘버 라벨 */
+    .ending-number {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.45em;
+      color: #9a7d40;
+      margin-top: 2%;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ending-number::before,
+    .ending-number::after {
+      content: '✦';
+      font-size: 0.55rem;
+      color: #b89a50;
+    }
+
+    /* 엔딩 제목 */
+    .ending-title {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: #2a1e08;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    /* 조개 라인 장식 */
+    .ending-arch-line {
+      width: 38%;
+      margin-bottom: 22px;
+    }
+
+    /* 엔딩 일러스트 */
+    .ending-illust {
+      width: 38%;
+      max-width: 560px;
+      border-radius: 2px;
+      margin-bottom: 26px;
+    }
+
+    /* 엔딩 본문 텍스트 박스 */
+    .ending-text-box {
+      width: 52%;
+      max-width: 720px;
+      max-height: 28vh;
+      position: relative;
+      padding: 28px 36px;
+      margin-bottom: 28px;
+      overflow-y: auto;
+
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    .ending-text-box::-webkit-scrollbar {
+      width: 6px;
+      background: transparent;
+    }
+    .ending-text-box::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 3px;
+    }
+    .ending-text-box:hover::-webkit-scrollbar-thumb,
+    .ending-text-box:active::-webkit-scrollbar-thumb {
+      background: rgba(180, 154, 80, 0.35);
+    }
+    .ending-text-box:hover {
+      scrollbar-color: rgba(180, 154, 80, 0.35) transparent;
+    }
+
+    /* 모서리 장식선 */
+    .ending-text-box::before,
+    .ending-text-box::after {
+      content: '';
+      position: absolute;
+      border-color: #b89a50;
+      border-style: solid;
+      width: 18px;
+      height: 18px;
+    }
+    .ending-text-box::before {
+      top: 8px; left: 8px;
+      border-width: 1px 0 0 1px;
+    }
+    .ending-text-box::after {
+      bottom: 8px; right: 8px;
+      border-width: 0 1px 1px 0;
+    }
+
+    /* 내부 추가 장식 (top-right, bottom-left) */
+    .ending-text-box .corner-tr,
+    .ending-text-box .corner-bl {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-color: #b89a50;
+      border-style: solid;
+    }
+    .ending-text-box .corner-tr {
+      top: 8px; right: 8px;
+      border-width: 1px 1px 0 0;
+    }
+    .ending-text-box .corner-bl {
+      bottom: 8px; left: 8px;
+      border-width: 0 0 1px 1px;
+    }
+
+    .ending-text-paragraph {
+      font-family: 'MaruBuri', serif;
+      font-size: 0.92rem;
+      color: #2a1e08;
+      line-height: 2;
+      text-align: center;
+      word-break: keep-all;
+      margin-bottom: 16px;
+    }
+    .ending-text-paragraph:last-child { margin-bottom: 0; }
+
+    /* 엔딩명 입력 영역 */
+    .ending-name-wrap {
+      width: 52%;
+      max-width: 720px;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      border: 1px solid #c4a96a;
+      border-radius: 2px;
+      overflow: hidden;
+      background: rgba(248, 242, 228, 0.6);
+    }
+
+    .ending-name-label {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 0.65rem;
+      color: #9a8060;
+      letter-spacing: 0.1em;
+      padding: 10px 14px 0;
+      white-space: nowrap;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      flex-shrink: 0;
+    }
+
+    .ending-name-input-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 14px 10px 0;
+    }
+
+    .ending-name-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.92rem;
+      color: #2a1e08;
+      width: 100%;
+      padding: 4px 0;
+    }
+    .ending-name-input::placeholder { color: #b8a888; }
+
+    .ending-name-btn {
+      background: #2a1e08;
+      border: none;
+      color: #c8b070;
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      padding: 0 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .ending-name-btn:hover { background: #3d2e12; }
+
+    /* ══════════════════════════════
+       모바일 반응형
+    ══════════════════════════════ */
+    @media (max-width: 768px) {
+      #scene-img-wrap { width: 88%; top: 3%; }
+      #script-area    { width: 88%; top: 50%; }
+      #choices-wrap   { width: 94%; flex-direction: column; gap: 2%; bottom: 3%; height: auto; }
+      #script-text    { font-size: 0.82rem; }
+
+      .ending-title       { font-size: 1.8rem; }
+      .ending-arch-line   { width: 80%; }
+      .ending-illust      { width: 85%; }
+      .ending-text-box    { width: 88%; padding: 20px 22px; }
+      .ending-name-wrap   { width: 88%; }
+    }
+
+
+    /* ══════════════════════════════
+       파트 완료 오버레이
+    ══════════════════════════════ */
+    #part-end-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(10, 6, 0, 0.78);
+      z-index: 300;
+      justify-content: center;
+      align-items: center;
+      animation: partEndBgIn 0.8s ease both;
+    }
+    #part-end-overlay.active { display: flex; }
+
+    @keyframes partEndBgIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    #part-end-box {
+      position: relative;
+      width: min(560px, 84vw);
+      max-height: 80vh;
+      background: #f5eedd;
+      border: 1px solid #c4a86a;
+      border-radius: 3px;
+      padding: 52px 52px 44px;
+      text-align: center;
+      animation: partEndBoxIn 0.7s cubic-bezier(0.34,1.3,0.64,1) 0.15s both;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #part-end-text-area {
+      overflow-y: auto;
+      max-height: 50vh;
+      margin-bottom: 24px;
+
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    #part-end-text-area::-webkit-scrollbar {
+      width: 6px;
+      background: transparent;
+    }
+    #part-end-text-area::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 3px;
+    }
+    #part-end-text-area:hover::-webkit-scrollbar-thumb,
+    #part-end-text-area:active::-webkit-scrollbar-thumb {
+      background: rgba(180, 154, 80, 0.35);
+    }
+    #part-end-text-area:hover {
+      scrollbar-color: rgba(180, 154, 80, 0.35) transparent;
+    }
+
+    @keyframes partEndBoxIn {
+      from { opacity: 0; transform: scale(0.88) translateY(16px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* 네 모서리 장식 */
+    #part-end-box::before,
+    #part-end-box::after,
+    #part-end-box .corner-tr,
+    #part-end-box .corner-bl {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      border-color: #b89a50;
+      border-style: solid;
+    }
+    #part-end-box::before  { top:10px; left:10px;   border-width:1px 0 0 1px; }
+    #part-end-box::after   { bottom:10px; right:10px; border-width:0 1px 1px 0; }
+    #part-end-box .corner-tr { top:10px; right:10px;  border-width:1px 1px 0 0; }
+    #part-end-box .corner-bl { bottom:10px; left:10px; border-width:0 0 1px 1px; }
+
+    .part-end-label {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.35em;
+      color: #9a7d40;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 18px;
+    }
+    .part-end-label::before,
+    .part-end-label::after { content: '✦'; font-size: 0.5rem; color: #c4a050; }
+
+    #part-end-summary {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.92rem;
+      color: #3a2800;
+      line-height: 2;
+      margin-bottom: 16px;
+      word-break: keep-all;
+    }
+    #part-end-summary em {
+      font-style: normal;
+      color: #7a5a18;
+      font-weight: 700;
+    }
+
+    #part-end-notice {
+      font-family: 'MaruBuri', serif;
+      font-size: 0.78rem;
+      color: #9a8060;
+      line-height: 1.85;
+      margin-bottom: 0;
+      word-break: keep-all;
+    }
+
+    .part-end-complete-btn {
+      display: block;
+      width: 100%;
+      padding: 13px 24px;
+      background: #2a1e08;
+      border: 1px solid #c4a96a;
+      border-radius: 2px;
+      color: #e8d8a0;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: background 0.2s ease, filter 0.2s ease;
+    }
+    .part-end-complete-btn:hover {
+      background: #3a2e18;
+      filter: brightness(1.15);
+    }
+    .part-end-complete-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+
+    /* ══════════════════════════════
+       설정 오버레이 (공통)
+    ══════════════════════════════ */
+    .overlay-panel {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay-box {
+      background: #f5ead0;
+      border: 3px solid #8b6914;
+      border-radius: 12px;
+      padding: 32px 28px;
+      min-width: 300px;
+      text-align: center;
+      font-family: 'Nanum Myeongjo', serif;
+      color: #3a2a00;
+      position: relative;
+    }
+
+    .overlay-close {
+      position: absolute;
+      top: 12px; right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #8b6914;
+    }
+
+    .overlay-box h2 { margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+
+<!-- 배경 -->
+<img id="bg-parchment" src="images/bg_parchment.png" alt="배경" />
+<img id="bg-illust"    src="images/bg_illust_game.png" alt="배경 일러스트" />
+
+<!-- 배경음 -->
+<audio id="bgm" src="sound/back.mp3" loop preload="auto"></audio>
+<!-- 클릭음 -->
+<audio id="sfx-click" src="sound/mouse.mp3" preload="auto"></audio>
+
+<!-- 엔딩 전환용 검은 overlay -->
+<div id="ending-transition"></div>
+
+<!-- ══ 인트로 오버레이 ══ -->
+<div id="intro-overlay">
+  <p  id="intro-tale"   class="intro-line">TALE 01</p>
+  <p  id="intro-part"   class="intro-line">PART 2 &nbsp;✦&nbsp; 왕자</p>
+  <h1 id="intro-title"  class="intro-line">왕자</h1>
+  <p  id="intro-quote"  class="intro-line">"왕자는 그날 해변에서 구해준 소녀의 얼굴을 잊을 수가 없었다."</p>
+  <div id="intro-divider"></div>
+  <p  id="intro-player" class="intro-line"><span id="intro-name">플레이어</span>님의 이야기가 시작됩니다.</p>
+</div>
+
+<!-- ══ 게임 씬 ══ -->
+<div id="scene">
+
+  <button id="btn-home" onclick="confirmHome()">
+    <img src="images/icon_home.png" alt="홈으로" />
+  </button>
+
+  <button id="btn-setting" onclick="openOverlay('overlay-setting')">
+    <img src="images/icon_setting.png" alt="설정" />
+  </button>
+
+  <div id="scene-img-wrap">
+    <img id="scene-img" src="images/p2_scene_01.png" alt="씬 이미지" />
+  </div>
+
+  <div id="script-area">
+    <p id="script-text"></p>
+  </div>
+
+  <div id="choices-wrap"></div>
+
+  <div id="next-hint">▶&nbsp; 화면을 누르면 다음으로 이동합니다.</div>
+
+</div><!-- /scene -->
+
+<!-- ══ 엔딩 화면 ══ -->
+<div id="ending-screen">
+  <!-- 홈 버튼 (엔딩화면용) -->
+  <button id="ending-btn-home" onclick="confirmHome()"
+    style="position:fixed;top:2%;left:2%;background:none;border:none;cursor:pointer;z-index:60;">
+    <img src="images/icon_home.png" alt="홈으로" style="width:28px;" />
+  </button>
+
+  <!-- 설정 버튼 (엔딩화면용) -->
+  <button id="ending-btn-setting" onclick="openOverlay('overlay-setting')"
+    style="position:fixed;top:2%;right:2%;background:none;border:none;cursor:pointer;z-index:60;">
+    <img src="images/icon_setting.png" alt="설정" style="width:28px;" />
+  </button>
+
+  <div class="ending-number" id="ending-number-label">ENDING 01</div>
+  <h2 class="ending-title" id="ending-title-text">보이지 않은 생일</h2>
+  <img class="ending-arch-line" id="ending-arch-img" src="images/arch_ed1.png" alt="" />
+  <img class="ending-illust"    id="ending-illust-img" src="images/game_ed1.png" alt="엔딩 일러스트" />
+
+  <div class="ending-text-box">
+    <div class="corner-tr"></div>
+    <div class="corner-bl"></div>
+    <div id="ending-text-content"></div>
+  </div>
+
+  <!-- ── 최초 달성자용: 엔딩명 입력 + 완료 버튼 ── -->
+  <div class="ending-name-wrap" id="ending-name-wrap-first" style="display:none;">
+    <div class="ending-name-label">나만의 엔딩명을 작성할 수 있어요</div>
+    <div class="ending-name-input-col">
+      <input class="ending-name-input" id="ending-name-input"
+             type="text" placeholder="여기에 입력하세요" maxlength="30" />
+    </div>
+    <button class="ending-name-btn" id="btn-ending-complete-first" onclick="completeEnding()">
+      ✦ &nbsp;완료&nbsp; ✦
+    </button>
+  </div>
+
+  <!-- ── 일반(비최초) 플레이어용: 안내문구 + 완료 버튼 ── -->
+  <div class="ending-complete-wrap" id="ending-complete-wrap-normal" style="display:none; flex-direction:column; gap:14px; align-items:center;">
+    <p id="ending-normal-notice" style="font-family:'MaruBuri',serif; font-size:0.78rem; color:#9a8060; line-height:1.85; text-align:center; word-break:keep-all; margin:0;"></p>
+    <button class="ending-name-btn" id="btn-ending-complete-normal" onclick="completeEnding()">
+      ✦ &nbsp;완료&nbsp; ✦
+    </button>
+  </div>
+</div><!-- /ending-screen -->
+
+<!-- ══ 파트 완료 오버레이 ══ -->
+<div id="part-end-overlay">
+  <div id="part-end-box">
+    <div class="corner-tr"></div>
+    <div class="corner-bl"></div>
+    <div class="part-end-label" id="part-end-label">PART 2 — END</div>
+    <div id="part-end-text-area">
+      <p id="part-end-summary"></p>
+      <p id="part-end-notice"></p>
+    </div>
+    <button class="part-end-complete-btn" id="btn-part-end-complete" onclick="goToLibraryFromPartEnd()">
+      ✦ &nbsp;완료&nbsp; ✦
+    </button>
+  </div>
+</div>
+
+<!-- 설정 오버레이 (공통 설정 UI) -->
+<div id="overlay-setting" class="overlay-panel">
+  <div class="overlay-box" style="max-width: 420px; width: 90%; text-align: left;">
+    <button class="overlay-close" onclick="closeOverlay('overlay-setting')">✕</button>
+    <h2>설정</h2>
+
+    <!-- 배경음 크기 -->
+    <div style="margin-bottom: 22px;">
+      <label style="display:flex; justify-content:space-between; font-size:0.88rem; margin-bottom:8px;">
+        <span>배경음 크기</span>
+        <span id="setting-bgm-volume-label">35%</span>
+      </label>
+      <input type="range" id="setting-bgm-volume" min="0" max="100" step="5"
+             value="35" style="width:100%;"
+             oninput="onBgmVolumeChange(this.value)" />
+    </div>
+
+    <!-- 클릭음 on/off -->
+    <div style="margin-bottom: 22px; display:flex; align-items:center; justify-content:space-between;">
+      <label for="setting-click-toggle" style="font-size:0.88rem;">마우스 클릭음</label>
+      <input type="checkbox" id="setting-click-toggle" checked
+             style="width:20px; height:20px; cursor:pointer;"
+             onchange="onClickToggleChange(this.checked)" />
+    </div>
+
+    <!-- 텍스트 출력 속도 -->
+    <div>
+      <label style="display:block; font-size:0.88rem; margin-bottom:10px;">텍스트 출력 속도</label>
+      <div style="display:flex; gap:14px; font-size:0.85rem;">
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="slow"
+                 onchange="onTextSpeedChange(this.value)" /> 느리게
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="normal" checked
+                 onchange="onTextSpeedChange(this.value)" /> 보통
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="fast"
+                 onchange="onTextSpeedChange(this.value)" /> 빠르게
+        </label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+    // 우클릭 방지
+    document.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+    });
+
+    // 드래그 및 블록 선택 방지
+    document.addEventListener('dragstart', function(event) {
+        event.preventDefault();
+    });
+    document.addEventListener('selectstart', function(event) {
+        event.preventDefault();
+    });
+</script>
+
+<!-- ════════════════════════════════════════════════════
+     공통 사운드 & 설정 엔진
+════════════════════════════════════════════════════ -->
+<script>
+/* ════════════════════════════════════════════════════
+   공통 사운드 & 설정 엔진
+   - 모든 페이지(index, library, archive, game_p1~3)에
+     동일하게 삽입한다.
+   - localStorage로 설정값을 공유하고,
+     배경음 재생 위치를 이어받아 끊김을 최소화한다.
+════════════════════════════════════════════════════ */
+
+/* ── 설정값 불러오기 (없으면 기본값) ── */
+function getSetting(key, def) {
+  var v = localStorage.getItem(key);
+  return (v === null) ? def : v;
+}
+
+var SETTINGS = {
+  bgmVolume: parseInt(getSetting('folio_bgmVolume', '35'), 10),   // 0~100
+  clickEnabled: getSetting('folio_clickEnabled', 'on') === 'on',  // on/off
+  textSpeed: getSetting('folio_textSpeed', 'normal'),             // slow/normal/fast
+};
+
+/* 텍스트 출력 속도 → 1글자당 ms (typeAppend 등에서 사용) */
+var TEXT_SPEED_MS = { slow: 65, normal: 40, fast: 18 };
+function getTypeSpeed() {
+  return TEXT_SPEED_MS[SETTINGS.textSpeed] || TEXT_SPEED_MS.normal;
+}
+
+/* ── 사운드 엘리먼트 ── */
+var bgm      = document.getElementById('bgm');
+var sfxClick = document.getElementById('sfx-click');
+var bgmStarted = false;
+
+/* 배경음 시작 + 이어듣기 위치 복원 */
+function startBgm() {
+  if (bgmStarted) return;
+  bgmStarted = true;
+  bgm.volume = SETTINGS.bgmVolume / 100;
+
+  var savedTime = parseFloat(sessionStorage.getItem('folio_bgmTime') || '0');
+  if (savedTime > 0 && isFinite(savedTime)) {
+    bgm.currentTime = savedTime;
+  }
+  bgm.play().catch(function(){});
+}
+
+/* 클릭음 재생 (설정에서 꺼져있으면 재생 안 함) */
+function playClick() {
+  if (!SETTINGS.clickEnabled) return;
+  sfxClick.currentTime = 0;
+  sfxClick.play().catch(function(){});
+}
+
+/* 첫 클릭 시 배경음 시작 + 매 클릭마다 클릭음 재생 */
+document.addEventListener('click', function() {
+  startBgm();
+  playClick();
+}, true);
+
+/* 1초마다 배경음 재생 위치를 저장 (다음 페이지에서 이어 듣기 위함) */
+setInterval(function() {
+  if (bgm && !bgm.paused) {
+    sessionStorage.setItem('folio_bgmTime', String(bgm.currentTime));
+  }
+}, 1000);
+
+/* 페이지를 벗어나기 직전에도 한 번 더 저장 */
+window.addEventListener('pagehide', function() {
+  if (bgm) {
+    sessionStorage.setItem('folio_bgmTime', String(bgm.currentTime));
+  }
+});
+
+
+/* ════════════════════════════════════════════════════
+   설정 오버레이 — 공통 UI
+════════════════════════════════════════════════════ */
+function openOverlay(id) {
+  var el = document.getElementById(id);
+  el.classList.add('active');
+  el.style.display = 'flex';
+
+  if (id === 'overlay-setting') {
+    syncSettingUI();
+  }
+}
+
+function closeOverlay(id) {
+  var el = document.getElementById(id);
+  el.classList.remove('active');
+  el.style.display = 'none';
+}
+
+/* 오버레이 바깥 클릭하면 닫히게 (.overlay, .overlay-panel 둘 다 지원) */
+document.querySelectorAll('.overlay, .overlay-panel').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      closeOverlay(overlay.id);
+    }
+  });
+});
+
+/* 설정창 UI를 현재 SETTINGS 값으로 동기화 */
+function syncSettingUI() {
+  var volSlider = document.getElementById('setting-bgm-volume');
+  var volLabel  = document.getElementById('setting-bgm-volume-label');
+  var clickToggle = document.getElementById('setting-click-toggle');
+  var speedRadios = document.querySelectorAll('input[name="setting-text-speed"]');
+
+  if (volSlider) {
+    volSlider.value = SETTINGS.bgmVolume;
+    if (volLabel) volLabel.textContent = SETTINGS.bgmVolume + '%';
+  }
+  if (clickToggle) {
+    clickToggle.checked = SETTINGS.clickEnabled;
+  }
+  speedRadios.forEach(function(radio) {
+    radio.checked = (radio.value === SETTINGS.textSpeed);
+  });
+}
+
+/* 배경음 크기 변경 */
+function onBgmVolumeChange(value) {
+  SETTINGS.bgmVolume = parseInt(value, 10);
+  localStorage.setItem('folio_bgmVolume', String(SETTINGS.bgmVolume));
+  bgm.volume = SETTINGS.bgmVolume / 100;
+  var volLabel = document.getElementById('setting-bgm-volume-label');
+  if (volLabel) volLabel.textContent = SETTINGS.bgmVolume + '%';
+}
+
+/* 클릭음 on/off 변경 */
+function onClickToggleChange(checked) {
+  SETTINGS.clickEnabled = checked;
+  localStorage.setItem('folio_clickEnabled', checked ? 'on' : 'off');
+}
+
+/* 텍스트 속도 변경 */
+function onTextSpeedChange(value) {
+  SETTINGS.textSpeed = value;
+  localStorage.setItem('folio_textSpeed', value);
+}
+</script>
+
+<!-- ════════════════════════════════════════════════════
+     Supabase 연결
+════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://tflyktyphhotsmvmxgyl.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_ah-o7ASSLP-4q4jKEQXP9g_L7ZQbd3S';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════
+   수치 & 플래그 — 이전 파트(P1)에서 이어받음
+════════════════════════════════════════════════════ */
+var savedStats = JSON.parse(sessionStorage.getItem('stats') || 'null');
+var savedFlags = JSON.parse(sessionStorage.getItem('flags') || 'null');
+
+var stats = savedStats || { A: 0, B: 0, C: 0, D: 0, count: 0 };
+var flags = savedFlags || {
+  hairColor: '',
+  shellGiven: false,
+  painRemoved: false,
+};
+
+/* ════════════════════════════════════════════════════
+   방(room) 정보 — library.html에서 넘어온 값
+════════════════════════════════════════════════════ */
+var ROOM_ID    = sessionStorage.getItem('roomId');
+var LINEAGE_ID = sessionStorage.getItem('lineageId');
+var endingReached = false;
+var partEndNextHref = 'library.html';
+
+/* ════════════════════════════════════════════════════
+   생존 신호: 일정 간격으로 last_active 갱신
+════════════════════════════════════════════════════ */
+var heartbeatTimer = null;
+function startHeartbeat() {
+  if (!ROOM_ID) return;
+  heartbeatTimer = setInterval(function() {
+    db.from('rooms')
+      .update({ last_active: new Date().toISOString() })
+      .eq('id', ROOM_ID)
+      .then(function(){});
+  }, 30000);
+}
+
+/* ════════════════════════════════════════════════════
+   이탈 시 방 삭제
+════════════════════════════════════════════════════ */
+function deleteRoomOnExit() {
+  if (!ROOM_ID || endingReached) return;
+  var url = SUPABASE_URL + '/rest/v1/rooms?id=eq.' + ROOM_ID;
+  var blob = new Blob([JSON.stringify({})], { type: 'application/json' });
+  try {
+    navigator.sendBeacon(url + '&apikey=' + SUPABASE_KEY, blob);
+  } catch(e) {}
+  fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+    },
+    keepalive: true
+  }).catch(function(){});
+}
+
+window.addEventListener('pagehide', deleteRoomOnExit);
+window.addEventListener('beforeunload', function(e) {
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+
+function addStats(a, b, c, d, cnt) {
+  stats.A += (a || 0);
+  stats.B += (b || 0);
+  stats.C += (c || 0);
+  stats.D += (d || 0);
+  stats.count += (cnt || 0);
+}
+
+
+/* ════════════════════════════════════════════════════
+   씬 데이터 정의
+   각 씬: { img, lines[], choices[], next }
+   choices: { label, body, stats:[a,b,c,d,cnt], next, flag(선택) }
+   next: 씬ID 또는 함수
+════════════════════════════════════════════════════ */
+
+var SCENES_KEY = "p2";
+var SCENES = {
+
+  /* ══ P2 씬 1-1 ~ 1-3 : 소녀 첫 발견 ══ */
+  /* 이미지: p2_scene_01.png */
+  's1': {
+    img: 'p2_scene_01.png',
+    lines: [
+      '눈을 뜨기 전, 마지막으로 기억나는 것은 거센 파도였다.',
+      '부서지는 배, 쏟아지는 물, 그리고 누군가의 손.',
+      '분명 누군가가 나를 붙잡고 있었는데, 그 얼굴은 흐릿하게 흐려져 더 이상 떠오르지 않는다.',
+      '물속에서 들려오던 어딘가 슬프게 울리던 노래. 그리고 조개 껍데기...',
+      '그 기억은 손을 뻗으면 닿을 듯하면서도 끝내 잡히지 않은 채 멀어져 간다.',
+      '',
+      '눈을 뜬 뒤에도 그 잔상이 쉽게 사라지지 않는다.',
+      '가슴 한편이 묘하게 가라앉은 채로 이유 모를 답답함이 남아 있다.',
+      '나는 잠시 숨을 고르다가, 아무도 없는 곳으로 걸음을 옮긴다.',
+    ],
+    choices: [],
+    next: 's1b'
+  },
+
+  's1b': {
+    img: 'p2_scene_01.png',
+    lines: [
+      '문을 지나, 길을 따라 걷다 보니 어느새 사람의 발길이 드문 숲 가장자리에 닿는다.',
+      '바람이 나뭇잎 사이를 스치고 멀리서 잔잔한 물소리가 들려온다.',
+      '그곳에서 눈앞에 슬픈 눈동자를 한 한 소녀를 발견한다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '"누구냐."',
+        result: '소녀는 잠시 멈칫하지만 아무 말도 하지 않는다.',
+        stats: [0,0,1,0,0], next: 's1c' },
+      { label: '선택 B', body: '"이곳엔 어떻게 왔지?"',
+        result: '그녀는 시선을 피하며 조용히 숨을 골랐다.',
+        stats: [0,0,2,0,0], next: 's1c' },
+      { label: '선택 C', body: '"...어디가 아픈 건가?"',
+        result: '미세하게 고개를 젓는다.',
+        stats: [0,0,0,2,0], next: 's1c' },
+      { label: '선택 D', body: '"혹시, 전에 본 적이..."',
+        result: '소녀의 눈이 순간 흔들린다. 살짝 기뻐보이는 듯 하다.',
+        stats: [0,0,1,2,0], next: function(){ goTo1X(); } },
+    ]
+  },
+
+  /* 씬 1-X: 조개 껍데기 — 엔딩5 직행 */
+  's1X': {
+    img: 'p2_scene_01.png',
+    lines: [
+      '눈 앞에 소녀는 품에서 빛나는 조개 껍데기를 꺼내서 보여준다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '"이건...!"',
+        result: '',
+        stats: [0,0,0,2,0], next: function(){ triggerEnding(5); } },
+    ]
+  },
+
+  's1c': {
+    img: 'p2_scene_01.png',
+    lines: [
+      '말을 걸었지만 소녀는 아무 대답도 하지 않는다.',
+      '낯선 옷차림, 어딘가 어색한 걸음걸이.',
+      '보호하지 않으면 안 될 것 같은 묘한 감정이 스며든다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '손을 내밀어 이끈다',
+        result: '잠시 고민하다가 그녀를 성으로 데려가기로 한다. 소녀가 잠시 망설이다가 조심스럽게 따라온다.',
+        stats: [0,0,0,2,0], next: 's2' },
+      { label: '선택 B', body: '거리를 두고 안내한다',
+        result: '잠시 고민하다가 그녀를 성으로 데려가기로 한다. 소녀는 일정한 간격을 유지하며 뒤따라온다.',
+        stats: [0,0,1,0,0], next: 's2' },
+      { label: '선택 C', body: '주변을 먼저 살핀다',
+        result: '잠시 고민하다가 그녀를 성으로 데려가기로 한다. 위험 요소는 보이지 않는다.',
+        stats: [0,0,2,0,0], next: 's2X' },
+    ]
+  },
+
+  /* 씬 2-X: 의심 분기 */
+  's2X': {
+    img: 'p2_scene_01.png',
+    lines: [
+      '소녀에게 말을 걸었지만, 그녀가 입을 뻐끔거리자 말을 할 수 없는 상태인지',
+      '뽀글거리는 거품 소리만 목에서 울려퍼진다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '살짝 의심한다',
+        result: '타국에서 보낸 첩자일 수도 있다는 가능성을 배제하지 않기로 한다.',
+        stats: [0,0,2,-1,1], next: 's2' },
+      { label: '선택 B', body: '약간의 거리를 둔다',
+        result: '스파이라기엔 너무 허술해보이나, 작은 가능성을 배제하지 않았다.',
+        stats: [0,0,1,0,0], next: 's2' },
+      { label: '선택 C', body: '감정에 휘둘리지 말자',
+        result: '',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(6); } },
+      { label: '선택 D', body: '걱정이 앞선다',
+        result: '목을 다친 걸까? 성으로 돌아가서 의사를 불러봐야할 것 같아.',
+        stats: [0,0,0,2,0], next: 's2' },
+    ]
+  },
+
+  /* ══ P2 씬 2-1 ~ 2-3 : 성으로, 소녀의 상태 ══ */
+  /* 이미지: p2_scene_02.png */
+  's2': {
+    img: 'p2_scene_02.png',
+    lines: [
+      '계속해서 안내를 이어가기 얼마 지나지 않아, 소녀의 걸음이 불안정해진다.',
+      '몇 걸음마다 중심을 잃고 비틀거린다. 자세히 보니 발끝이 상처로 물들어 있다.',
+      '피가 천천히 모래 위로 번진다. 그럼에도 소녀는 아무 말 없이 계속 나를 따라온다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '급히 옆으로 가 부축해준다',
+        result: '몸이 가볍게 떨린다. 긴장하는 건가?',
+        stats: [0,0,0,3,0], next: 's3' },
+      { label: '선택 B', body: '근처의 그늘을 찾아 잠시 쉬게 한다',
+        result: '잠시 숨을 고르지만 여전히 불안정하다.',
+        stats: [0,0,1,2,0], next: 's3' },
+      { label: '선택 C', body: '걸음을 멈추고 이유를 묻는다',
+        result: '대답 대신 소녀는 발을 꼼지락거리며 시선이 흔들린다.',
+        stats: [0,0,2,0,0], next: 's3' },
+    ]
+  },
+
+  /* ══ P2 씬 3-1 ~ 3-2 : 궁정 의사, 소녀 머뭄 ══ */
+  /* 이미지: p2_scene_03.png */
+  's3': {
+    img: 'p2_scene_03.png',
+    lines: [
+      '왕궁에 도착한 뒤, 손님 방으로 소녀를 이끌고 궁정 의사를 불렀다.',
+      '',
+      '"죄송합니다, 왕자님. 사고가 있었는지 혀가 잘려있으시더군요.',
+      '또한... 아무래도 기억을 잃으신 듯합니다."',
+    ],
+    choices: [],
+    next: 's3b'
+  },
+
+  's3b': {
+    img: 'p2_scene_03.png',
+    lines: [
+      '반쯤 짐작하고 있었던 탓일까. 그리 놀라지 않았다.',
+      '나는 소녀에게 화려한 실크와 면사를 촘촘하게 엮어 만든 드레스를 내어주며',
+      '"길에서 찾은 사랑스러운 여인"이라 부르며 궁전에 머물게 했다.',
+      '그리고 소녀는 얼마 지나지 않아 성에서 가장 유명하고 아름다운 여인으로 불렸다.',
+    ],
+    choices: [],
+    next: 's4'
+  },
+
+  /* ══ P2 씬 4-1 ~ 4-3 : 연회 ══ */
+  /* 이미지: p2_scene_04.png */
+  's4': {
+    img: 'p2_scene_04.png',
+    lines: [
+      '연회날이 되자 소녀를 이끌고 무도회장으로 이끌었다.',
+      '내 옆을 거품처럼 가볍게 걷는 소녀에게서 모두 눈을 떼지 못하는 게 느껴진다.',
+      '앞에는 실크와 황금빛 옷을 입은 아름다운 무희들이 노래를 부르며 춤을 추기 시작했다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '흥에 맞춰 박수를 친다',
+        result: '어쩐지 소녀의 기분이 좋아보이지 않는다.',
+        stats: [0,1,0,0,0], next: 's4b' },
+      { label: '선택 B', body: '가만히 감상한다',
+        result: '소녀는 무언가를 생각하는 듯 나의 손을 힘을 주어 잡는다.',
+        stats: [0,0,1,1,0], next: 's4b' },
+    ]
+  },
+
+  's4b': {
+    img: 'p2_scene_04.png',
+    lines: [
+      '문득 소녀는 하얀 팔을 들고는 발끝으로 일어서 앞으로 걸어 나갔다.',
+      '한 걸음, 한 걸음 새의 깃털처럼 가볍게 신비로운 동작을 보여주었다.',
+      '이곳의 그 누구도 소녀보다 춤을 잘 추지는 못했다.',
+      '발걸음을 움직일 때마다 더 아름답게 춤추며 그 어떤 무희보다 눈으로, 마음으로 말하는 것 같았다.',
+      '모두가 소녀에게 넋을 잃고 말았다.',
+    ],
+    choices: [],
+    next: 's4c'
+  },
+
+  's4c': {
+    img: 'p2_scene_04.png',
+    lines: [
+      '소녀 덕분에 연회는 성황리에 마무리 되었다.',
+      '밤이 깊어지고, 성 안은 고요해진다. 모두가 잠든 시간. 방으로 돌아가기 전에...',
+    ],
+    choices: [
+      { label: '선택 A', body: '혼자만의 시간을 즐기며 복도를 걸어본다',
+        result: '조용한 복도를 걸으며 생각을 정리한다.',
+        stats: [0,1,0,0,0], next: 's5' },
+      { label: '선택 B', body: '인사를 하기 위해 소녀의 방으로 향한다',
+        result: '소녀의 방으로 향하지만 아무 응답이 없다.',
+        stats: [0,0,0,2,0], next: 's6' },
+      { label: '선택 C', body: '찾아볼 것이 생겨 잠깐 서재에 들린다',
+        result: '복도 끝에 있는 서재로 간다.',
+        stats: [0,0,2,0,0], next: 's7' },
+    ]
+  },
+
+  /* ══ P2 씬 5-1 : 복도, 소녀 발견 ══ */
+  /* 이미지: p2_scene_05.png */
+  's5': {
+    img: 'p2_scene_05.png',
+    lines: [
+      '문득 복도를 지나가다 창가 쪽에서 인기척이 느껴진다.',
+      '조심스럽게 다가가 보니, 소녀가 조용히 밖을 바라보고 있다.',
+      '달빛 아래에서 그녀의 모습은 어딘가 쓸쓸해 보인다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '조심스럽게 말을 건다. "저기..."',
+        result: '소녀가 내쪽으로 시선을 돌린다. 잠깐 놀란 눈으로 바라보더니, 작게 손을 흔들고 급히 내 옆을 지나쳐간다.',
+        stats: [0,0,0,2,0], next: 's8' },
+      { label: '선택 B', body: '조용히 뒷모습을 지켜본다',
+        result: '그녀는 달빛을 받으며 바다쪽으로 몸을 돌리고 있었다.',
+        stats: [0,0,1,1,0], next: 's8' },
+      { label: '선택 C', body: '자리를 비켜준다',
+        result: '왠지 모르겠지만 혼자만의 시간을 가질 수 있도록 자리를 피해주는 게 좋을 것 같다.',
+        stats: [1,0,0,0,0], next: 's8' },
+    ]
+  },
+
+  /* ══ P2 씬 6-1 : 방 노크 ══ */
+  /* 이미지: p2_scene_06.png */
+  's6': {
+    img: 'p2_scene_06.png',
+    lines: [
+      '그녀의 방을 찾아가 두어번의 노크를 한다. ...',
+      '그러나 아무 응답이 없다. ...연회는 끝났는데, 이 시간에 어디에 있는 걸까.',
+    ],
+    choices: [
+      { label: '선택 A', body: '방으로 돌아간다',
+        result: '이 시간에 찾아다니는 건 실례일 수도 있다.',
+        stats: [0,0,0,0,0], next: 's8' },
+    ]
+  },
+
+  /* ══ P2 씬 7-1 ~ 7-4 : 서재 ══ */
+  /* 이미지: p2_scene_07.png */
+  's7': {
+    img: 'p2_scene_07.png',
+    lines: [
+      '복도 끝에 있는 서재로 간다.',
+      '낡고 두꺼운 문을 열고 들어가보면 책먼지 냄새가 코끝을 스친다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '오래된 설화집을 찾는다',
+        result: '낡은 삽화가 그려진 설화집 한 권이 눈에 들어온다. "바다 사람들은 삼백 년을 살지만 죽으면 거품이 되어 사라진다"는 구절 위로 누군가의 손때가 묻어 있다.',
+        stats: [0,0,2,0,0], next: 's7b' },
+      { label: '선택 B', body: '이웃나라와 관련된 서신을 검토한다',
+        result: '접혀있던 종이를 펼치자 은인을 찾기 위해 기억에 의존하여 화가에게 의뢰했던 초상화가 나온다.',
+        stats: [0,0,3,1,0], next: 's7c' },
+      { label: '선택 C', body: '오래된 항해 일지를 찾는다',
+        result: '"바다 거품 속에서 하얀 팔이 바다속에서 나오는 것을 보았다"는 선원의 증언. 문득 낮에 본 소녀의 가냘픈 팔이 떠오른다.',
+        stats: [0,0,3,0,0], next: 's7' },
+    ]
+  },
+
+  's7b': {
+    img: 'p2_scene_07.png',
+    lines: [
+      '책을 덮는다. 시간이 늦었으니 이만 자러 가야겠지.',
+      '책장에 다시 책을 넣어두고 소득 없이 서재를 떠나려던 찰나,',
+      '창문 밖의 파도 소리가 날카롭게 귓가를 스친다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '방으로 돌아간다',
+        result: '서재의 문을 닫고 방으로 돌아가서 잠을 청한다.',
+        stats: [0,0,0,0,0], next: 's8' },
+    ]
+  },
+
+  's7c': {
+    img: 'p2_scene_07.png',
+    lines: [
+      '서신을 챙기고 서재를 떠나려던 찰나,',
+      '창문 밖의 파도 소리가 날카롭게 귓가를 스친다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '방으로 돌아간다',
+        result: '서재의 문을 닫고 방으로 돌아가서 잠을 청한다.',
+        stats: [0,0,0,0,0], next: 's8' },
+    ]
+  },
+
+  /* ══ P2 씬 8-1 ~ 8-3 : 밤의 노래 ══ */
+  /* 이미지: p2_scene_08.png */
+  's8': {
+    img: 'p2_scene_08.png',
+    lines: [
+      '방으로 돌아와 침대에 몸을 눕혔지만 쉽게 잠들 수 없었다.',
+      '낮 동안 쫓아다닌 흔적들과 사람들의 말이 머릿속을 맴돌다 이내 파도 소리에 묻혀 사라진다.',
+    ],
+    choices: [],
+    next: 's8b'
+  },
+
+  's8b': {
+    img: 'p2_scene_08.png',
+    lines: [
+      '연회가 있던 그날 이후로, 밤이 되면 어딘가에서 노래 같은 소리가 들려온다.',
+      '정확히 들리는 것은 아니고, 물결처럼 부서지는 음이 귓가를 스친다.',
+      '분명히 기억 어딘가를 건드리는 소리인데 붙잡히지 않는다.',
+      '밤마다 그 방향을 향해 몇 번이나 발걸음을 옮긴다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '소리를 따라간다',
+        result: '소리는 점점 희미해진다. 그럼에도 놓치지 않고 끝까지 따라간다.',
+        stats: [0,0,2,1,0], next: 's8c' },
+      { label: '선택 B', body: '포기하고 방으로 돌아간다',
+        result: '내일의 일정을 생각해보면 오늘은 조금 일찍 자는 게 좋을 것 같았다. 그러나 왠지 모르게 마음 한 구석이 불편한 밤을 보낸다.',
+        stats: [1,0,0,0,0], next: 's9' },
+      { label: '선택 C', body: '소녀를 떠올린다',
+        result: '문득 전에 복도에서 본 소녀의 모습이 허공에 겹쳐졌다. 어쩌면, 하는 생각을 하기도 전에 발은 이미 그곳으로 향했다.',
+        stats: [0,0,0,3,0], next: 's8c' },
+    ]
+  },
+
+  's8c': {
+    img: 'p2_scene_08.png',
+    lines: [
+      '소리의 끝에는... 활짝 열린 창문 너머를 바라보고 있는 소녀의 뒷모습이 있었다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '전에 하지 못했던 이야기를 꺼낸다',
+        result: '지금이 가장 최적의 타이밍인 것 같다는 생각과 함께, 소녀를 왕궁으로 데려온 이유를 설명한다.',
+        stats: [0,0,1,2,0], next: 's9' },
+      { label: '선택 B', body: '조용히 뒷모습을 지켜보며 방으로 돌아간다',
+        result: '그녀는 달빛을 받으며 바다쪽으로 몸을 돌리고 있었다. 혼자만의 시간을 가질 수 있도록 자리를 피해주는 게 좋을 것 같다.',
+        stats: [1,0,0,0,0], next: 's9' },
+    ]
+  },
+
+  /* ══ P2 씬 9-1 ~ 9-3 : 은인 이야기 ══ */
+  /* 이미지: p2_scene_09.png */
+  's9': {
+    img: 'p2_scene_09.png',
+    lines: [
+      '시간이 조금 흐른 어느 날, 나는 소녀에게 이야기를 꺼낸다.',
+      '',
+      '"...그때의 감각은 분명한데, 얼굴만은 떠오르지 않아."',
+      '"젊은 여인들이 나를 살리기 위해 열심히 간호해주었지.',
+      '가장 어린 소녀가 바닷가에서 나를 찾아서 목숨을 구해줬다고 해."',
+      '',
+      '"아마 그 소녀가 내가 사랑할 수 있는 이 세상의 유일한 여인일 거야."',
+      '',
+      '말을 하며도 스스로 답답함이 밀려온다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '소녀의 반응을 지켜본다',
+        result: '이야기를 듣던 소녀의 표정이 미묘하게 흔들린다.',
+        stats: [0,0,2,1,0], next: 's9b' },
+    ]
+  },
+
+  's9b': {
+    img: 'p2_scene_09.png',
+    lines: [
+      '"네가 그 사람과 닮아서 이상하게 마음이 가는 것 같아."',
+      '',
+      '그 순간, 소녀는 작게 숨을 들이쉰다.',
+      '그러나 이내 아무 일도 없다는 듯 시선을 돌린다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '이유를 묻는다',
+        result: '소녀는 약하게 고개를 저었다.',
+        stats: [0,0,0,0,0], next: 's9c' },
+      { label: '선택 B', body: '잠시 침묵한다',
+        result: '........',
+        stats: [0,0,0,1,0], next: 's9c' },
+    ]
+  },
+
+  's9c': {
+    img: 'p2_scene_09.png',
+    lines: [
+      '대화가 끝난 후 소녀의 옆에 나란히 서며 같은 곳을 바라본다.',
+      '다만 한 가지 알 수 있었던 것은, 그녀는 내가 모르는 무언가를 알고 있을지도 모른다는 것이었다.',
+    ],
+    choices: [],
+    next: 's10'
+  },
+
+  /* ══ P2 씬 10-1 ~ 10-3 : 여행 준비 ══ */
+  /* 이미지: p2_scene_10.png */
+  's10': {
+    img: 'p2_scene_10.png',
+    lines: [
+      '며칠 뒤, 부모님의 명으로 이웃 왕국에 다녀와야 한다는 소식을 들었다.',
+      '정치적인 이유가 담긴 방문. 나는 준비를 하며도 어딘가 마음이 무겁다.',
+      '마음 한 구석에서는 수도원에서 본 소녀보다, 옆에 있는 소녀가 신경 쓰였다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '짧지 않은 일정이므로 방문 목적까지 함께 알린다',
+        result: '소녀는 조용히 고개를 끄덕인다. 나는 이상하게도 안심이 된다.',
+        stats: [0,0,1,2,0], next: 's10b' },
+      { label: '선택 B', body: '괜히 걱정시킬 필욘 없다. 자세하게 말하지 않는다',
+        result: '',
+        stats: [0,0,0,0,0], next: 's11' },
+      { label: '선택 C', body: '함께 갈지 말지 고민한다',
+        result: '',
+        stats: [0,1,1,1,0], next: 's10b' },
+    ]
+  },
+
+  's10b': {
+    img: 'p2_scene_10.png',
+    lines: [
+      '"여행을 떠나야 해. 이웃나라의 공주를 보러 가야 하거든. 부모님의 바람이야.',
+      '하지만 신부가 내 뜻과 다르다면 난 공주를 집으로 데려오지 않을 거야.',
+      '그래서 말인데..."',
+    ],
+    choices: [
+      { label: '선택 A', body: '같이 가자고 권유한다',
+        result: '그러자 소녀는 전보다 밝아진 표정으로 고갤 끄덕인다. 나는 소녀의 머리카락에 입을 맞추고 머리카락을 쓰담아주었다.',
+        stats: [0,1,0,3,0], next: 's11' },
+      { label: '선택 B', body: '소녀를 이곳에 두고 혼자 간다',
+        result: '소녀는 아직 기억을 못 찾았기 때문에 궁에 있는 편이 더 안전할 수 있다. 소녀의 슬퍼하는 눈을 바라보며, 걱정하지 말라는 뜻으로 머리카락에 입을 맞추었다.',
+        stats: [1,0,0,1,0], next: function(){ triggerEnding(7); } },
+    ]
+  },
+
+  /* ══ P2 씬 11-1 ~ 11-5 : 배 위에서 ══ */
+  /* 이미지: p2_scene_11.png */
+  's11': {
+    img: 'p2_scene_11.png',
+    lines: [
+      '날이 밝자 결국 소녀와 함께 배에 오른다.',
+      '파도가 잔잔히 흔들리는 가운데, 바다는 평온하다.',
+      '바람이 불어와 머리칼을 스친다. 문득, 익숙한 느낌이 스쳐 지나간다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '바다를 본다',
+        result: '바다를 바라보니 문득 전의 서재에서 읽었던 재미난 얘기들이 떠오른다.',
+        stats: [0,0,2,0,0], next: 's11b' },
+      { label: '선택 B', body: '소녀를 본다',
+        result: '바다와 닮은 눈동자를 보니 문득 전의 서재에서 읽었던 재미난 얘기들이 떠오른다.',
+        stats: [0,0,0,2,0], next: 's11b' },
+      { label: '선택 C', body: '앞으로의 일을 생각한다',
+        result: '배에 파도가 부딪히는 소리로 모든 생각이 허물없어진다. 전의 서재에서 읽었던 재미난 얘기들이 떠오르며 소녀를 바라본다.',
+        stats: [0,1,1,0,0], next: 's11b' },
+    ]
+  },
+
+  's11b': {
+    img: 'p2_scene_11.png',
+    lines: [
+      '바다와 관련된 여러 이야기를 들려준다.',
+      '무서운 폭풍과 신비로운 전설, 깊은 곳의 이야기들.',
+      '소녀는 말을 하지 않지만 조용히 듣고 있다. 그리고 아주 미묘하게 빙그레 미소 짓는다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '계속 얘기한다',
+        result: '나는 신이나서 얘기를 이어갔다. 배보다 더 큰 고래가 물을 뿜는 풍경, 멋부리기 위해 굴껍질을 비늘에 붙이는 물고기들의 이야기들... 소녀는 계속해서 빙그레 웃을 뿐이었지만, 그것이 이야기에 대한 감탄이라 생각했다.',
+        stats: [0,1,0,1,0], next: 's11c' },
+      { label: '선택 B', body: '반응을 살핀다',
+        result: '평소보다 차분한 반응에 이야기를 멈추고 소녀의 눈을 가만히 들여보았다. 그곳에는 가늠할 수 없는 고요한 무언가가 잠겨 있는 듯 했다.',
+        stats: [0,0,3,0,0], next: 's11c' },
+      { label: '선택 C', body: '화제를 바꾼다',
+        result: '곧 있을 꽃 축제 이야기를 하자 아이처럼 반짝이는 눈으로 바라보았다. ...내 바다 이야기는 재미가 없던 걸까?',
+        stats: [0,1,0,1,0], next: 's11c' },
+    ]
+  },
+
+  's11c': {
+    img: 'p2_scene_11.png',
+    lines: [
+      '밤이 되면 소녀는 늘 난간 근처에 서 있다.',
+      '바다를 바라보며, 손을 살짝 내민다.',
+      '마치 무언가를 그리워하는 듯한 모습이다.',
+    ],
+    choices: [],
+    next: 's12'
+  },
+
+  /* ══ P2 씬 12-1 ~ 12-3 : 이웃나라 도착, 공주 등장 ══ */
+  /* 이미지: p2_scene_12.png */
+  's12': {
+    img: 'p2_scene_12.png',
+    lines: [
+      '그리고 얼마 지나지 않아 배는 이웃 왕국의 항구에 도착했다.',
+      '무도회와 알현식이 이어졌지만 며칠이 지나도 공주는 여전히 나타나지 않았다.',
+      '사람들이 말하기를, 멀리 있는 수도원에서 예의범절을 배우고 있다고 했다.',
+    ],
+    choices: [],
+    next: 's12b'
+  },
+
+  's12b': {
+    img: 'p2_scene_12.png',
+    lines: [
+      '그리고 마침내, 이웃 나라의 공주가 돌아오고 마주한다.',
+      '눈부시게 아름다운 모습. 그 순간, 머릿속에 번개처럼 스치는 생각이 있다.',
+      '이 사람이 나를 구해준 사람이 아닐까. 확신에 가까운 착각이 마음속에서 빠르게 자리 잡는다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '확신한다',
+        result: '"당신이었군요! 내가 바닷가에 휩쓸려왔을 때 나를 구해준 사람이...!"',
+        stats: [0,0,0,-1,1], next: 's13' },
+      { label: '선택 B', body: '의심한다',
+        result: '"전에... 어디에서 본 적 있지 않나요?"',
+        stats: [0,0,3,0,0], next: 's13' },
+      { label: '선택 C', body: '보류한다',
+        result: '"은인을 이렇게 뵙게 되다니. 운명이라는 건 실존하나봅니다."',
+        stats: [0,0,1,0,0], next: 's13' },
+      { label: '선택 D', body: '소녀의 반응을 살핀다',
+        result: '왕자는 머뭇거리며 내쪽의 반응을 살핀다. 배려를 해주는 걸까.',
+        stats: [0,0,2,1,0], next: 's13' },
+    ]
+  },
+
+  /* ══ P2 씬 13-1 ~ 13-3 : 소개, 연회 ══ */
+  /* 이미지: p2_scene_13.png */
+  's13': {
+    img: 'p2_scene_13.png',
+    lines: [
+      '이웃나라 공주는 잠시 놀란 듯 눈을 동그랗게 뜨더니, 환하게 웃으며 고개를 끄덕인다.',
+      '공주는 소개를 부탁한다는 듯 눈을 접어 웃었다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '곧장 소개한다',
+        result: '"\'길에서 찾은 사랑스러운 여인\'이라... 정말 아름다운 소녀네요."',
+        stats: [0,0,0,2,0], next: 's13b' },
+      { label: '선택 B', body: '머뭇거린다',
+        result: '옆에서 소녀가 내 소매를 잡아당기자 그제서야 소개했다.',
+        stats: [0,0,1,1,0], next: 's13b' },
+    ]
+  },
+
+  's13b': {
+    img: 'p2_scene_13.png',
+    lines: [
+      '공주가 돌아온 뒤 이웃 나라 성에서의 첫날 밤, 화려한 연회가 열린다.',
+      '공주와 대화하며 은인인지 확인하려 하지만, 시선은 자꾸만 구석에서 홀로 춤추는 소녀에게 향한다.',
+      '그녀의 춤은 지금까지 보았던 것 중에서 가장 멋지고 아름다운 춤을 추고 있었다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '공주와 과거 이야기를 나눈다',
+        result: '수도원에서 들었던 은인과 인상착의가 동일한 것을 알게 된다.',
+        stats: [0,0,2,-1,1], next: 's13c' },
+      { label: '선택 B', body: '소녀와 대화할 수 있도록 자리를 만든다',
+        result: '두 여인은 정원을 산책하러 잠시 자리를 떠났다.',
+        stats: [0,1,0,1,0], next: 's13c' },
+      { label: '선택 C', body: '무언가의 위화감을 느낀다',
+        result: '그러나 그 기시감은 다른 사람들과 얘기하는 사이 물 녹듯 사라진다.',
+        stats: [0,0,2,0,0], next: 's13c' },
+    ]
+  },
+
+  's13c': {
+    img: 'p2_scene_13.png',
+    lines: [
+      '날이 밝고 본격적으로 결혼 이야기가 오가는 며칠을 보낸다.',
+      '분명 공주는 자신의 은인이 맞고, 나라에도 좋을 선택이라는 것을 알고 있지만',
+      '왠지 모르게 가슴이 답답해져 잠이 오지 않았다.',
+      '복도를 걸어가고 있었다. 그때, 쨍그랑! 공주의 방 날카로운 소리가 들린다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '확인하러 가볼까?',
+        result: '',
+        stats: [0,0,2,0,1], next: 's14' },
+      { label: '선택 B', body: '창문 너머 익숙한 인영을 바라본다. 저 사람은...',
+        result: '성벽 너머에서 훤칠한 청년과 즐겁게 대화하는 소녀를 바라보며 이율 모를 답답함은 더 커져만갔다.',
+        stats: [0,0,0,2,0], next: 's15' },
+    ]
+  },
+
+  /* ══ P2 씬 14-1 ~ 14-2 : 공주의 방 ══ */
+  /* 이미지: p2_scene_14.png */
+  's14': {
+    img: 'p2_scene_14.png',
+    lines: [
+      '문앞에 다다르자 반사적으로 숨을 죽였다.',
+      '무거운 무언가가 떨어지는 둔탁한 소리가 들려오자',
+      '새어나오는 호기심을 억지로 억누르고 조심스럽게 문고리를 돌려 아주 작은 틈을 만들었다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '문고리 안을 바라본다',
+        result: '',
+        stats: [0,0,3,0,1], next: 's14b' },
+      { label: '선택 B', body: '염탐하는 건 실례다. 돌아가자',
+        result: '아무리 결혼할 사이라고 해도 비밀은 존중해줘야하는 법.',
+        stats: [1,0,0,0,0], next: 's15' },
+    ]
+  },
+
+  's14b': {
+    img: 'p2_scene_14.png',
+    lines: [
+      '방 안에는 화려한 비단 옷들이 바닥에 어지럽게 널려 있었다.',
+      '거울 앞에 서 있는 것은 천사처럼 환하게 웃던 이웃 나라의 공주였다.',
+      '하지만 그녀는 평소 입던 신부의 치맛자락을 거칠게 걷어내고 있었는데,',
+      '곧이어 눈을 의심케 하는 광경이 펼쳐졌다.',
+      '',
+      '"그래서, 왕자는 아직 모른다는 거지? 이 거추장스러운 연극도 며칠 남지 않았군."',
+      '',
+      '낮에 들려준 가냘픈 목소리와는 전혀 다른, 낮고 굵직한 남성의 목소리였다.',
+      '거울 속에는 부드러운 여인의 곡선 대신 탄탄한 근육이 잡힌 남성의 상체가 있었다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '당장 문을 열고 들어가 진실을 추궁한다',
+        result: '',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(8); } },
+      { label: '선택 B', body: '아무 말 없이 물러나 파혼을 계획한다',
+        result: '',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(9); } },
+    ]
+  },
+
+  /* ══ P2 씬 15-1 ~ 15-4 : 약혼식 ══ */
+  /* 이미지: p2_scene_15.png */
+  's15': {
+    img: 'p2_scene_15.png',
+    lines: [
+      '이튿날 망설임은 줄어들었다. 부모님의 뜻을 따라, 마음의 움직임을 따라',
+      '이웃 나라 공주와의 결혼을 추진하기로 한다.',
+      '그러자 주변은 빠르게 움직이기 시작한다. 모든 것이 순식간에 진행된다.',
+    ],
+    choices: [],
+    next: 's15b'
+  },
+
+  's15b': {
+    img: 'p2_scene_15.png',
+    lines: [
+      '약혼식 준비는 순식간에 끝난다.',
+      '도시 전체에 종소리가 울려 퍼지고, 축하의 분위기가 가득하다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '공주의 손을 잡는다',
+        result: '그것을 무시하며, 눈 앞의 은인의 손을 잡아 손등에 부드럽게 입을 맞춘다.',
+        stats: [1,0,0,-1,0], next: 's15c' },
+      { label: '선택 B', body: '바쁘게 움직이는 사람 사이로 소녀를 찾는다',
+        result: '그러나 바람과 달리 소녀는 끝내 보이지 않았다. 약혼식이 시작되기 전까지.',
+        stats: [0,0,0,3,0], next: 's15c' },
+    ]
+  },
+
+  's15c': {
+    img: 'p2_scene_15.png',
+    lines: [
+      '그리고 다가온 약혼식 날, 도시는 온통 금빛과 은빛으로 물들었다.',
+      '교회 종소리가 수평선 끝까지 울려 퍼졌고 제단마다 값비싼 향유가 피어오른다.',
+      '정작 제단 앞에 선 나의 가슴 속에는 설명할 수 없는 공허함이 자리 잡았다.',
+      '하루동안 이어진 성대한 약혼식이 끝나고, 나는 공주와 함께 귀환하기 위해 배에 올랐다.',
+    ],
+    choices: [],
+    next: 's16'
+  },
+
+  /* ══ P2 씬 16-1 & 16-X : 귀환 밤, 최종 분기 ══ */
+  /* 이미지: p2_scene_16.png */
+  's16': {
+    img: 'p2_scene_16.png',
+    lines: [
+      '밤이 깊어지자 뱃사람들의 축제가 시작된다.',
+      '문득 한 가지 장면이 뇌리를 스쳤다. 항상 조용히 내 곁을 지키던 존재, 그 소녀.',
+      '그녀가 추는 춤은 평소보다 더 아름답고 처절해 보였다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '뒤늦게 소녀가 머물던 자리를 살핀다',
+        result: '뒤늦게 소녀를 찾았지만, 그녀가 떠나간 자리엔 아무 것도 남지 않았다.',
+        stats: [0,0,1,2,0], next: 's16b' },
+    ]
+  },
+
+  's16b': {
+    img: 'p2_scene_16.png',
+    lines: [
+      '에스코트하듯 공주의 손을 잡고 천막 안으로 들어가 푹신한 침대에 몸을 눕는다.',
+      '침대에 몸을 눕자마자 몰려오는 잠을 이기지 못하고 눈을 감는다.',
+    ],
+    choices: [],
+    next: function(){ goTo16X(); }
+  },
+
+  /* 씬 16-X: 해피엔딩 선택지 4회 이상일 때만 등장 */
+  's16X': {
+    img: 'p2_scene_16.png',
+    lines: [
+      '얼마나 시간이 흘렀을까. 파도에 부딪히는 물결 소리에 문득 눈이 떠진다.',
+      '옆을 돌아보니 공주는 이미 깊은 잠에 빠져 있다.',
+      '오늘 하루는 분명 행복해야 할 날이었다.',
+      '하지만 이상하게도 마음 한구석이 계속 무거웠다. 자꾸만 한 사람이 떠오른다.',
+      '나는 계속 그녀를 찾고 있었다.',
+      '...이건 아니다. 소녀에게도, 공주에게도. 그리고 나 자신에게도.',
+      '왕자는 마지막으로 공주를 바라본 뒤, 조용히 천막 밖으로 발걸음을 옮겼다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '소녀를 찾으러 간다',
+        result: '반드시 확인해야 할 것이 있다.',
+        stats: [0,0,0,2,0], next: 'p2end' },
+    ]
+  },
+
+};
+
+/* ════════════════════════════════════════════════════
+   분기 함수들
+════════════════════════════════════════════════════ */
+
+/* 씬 1-X 분기: 조개 껍데기 플래그 있으면 엔딩5 루트 */
+function goTo1X() {
+  var savedFlags = JSON.parse(sessionStorage.getItem('flags') || '{}');
+  if (savedFlags.shellGiven) {
+    loadScene('s1X');
+  } else {
+    loadScene('s1c');
+  }
+}
+
+/* 씬 16-X 분기: 해피엔딩 선택지 횟수 4 이상이면 16-X */
+function goTo16X() {
+  var savedFlags = JSON.parse(sessionStorage.getItem('flags') || '{}');
+  var happyCount = savedFlags.happyCount || 0;
+  if (happyCount >= 4) {
+    loadScene('s16X');
+  } else {
+    p2end();
+  }
+}
+
+/* P2 완료 → 파트 완료 오버레이 */
+function p2end() {
+  var savedFlags = JSON.parse(sessionStorage.getItem('flags') || '{}');
+  var summary = '왕자는 소녀를 곁에 두고 이웃 나라로의 여행을 마쳤습니다.';
+  if (savedFlags.shellGiven) {
+    summary = '조개 껍데기의 비밀을 품은 채 여행을 마친 왕자는, 언젠가 그 기억이 되살아오리라 믿었습니다.';
+  }
+  showPartEnd(2, summary, 'library.html');
+}
+
+
+
+/* ════════════════════════════════════════════════════
+   파트 완료 처리
+   - 현재 방을 cleared로 변경 + 최종 수치/플래그 저장
+   - 같은 lineage_id로 다음 파트 방을 새로 생성(waiting)
+════════════════════════════════════════════════════ */
+async function showPartEnd(partNum, choiceSummary, nextHref) {
+  endingReached = true;
+  if (heartbeatTimer) clearInterval(heartbeatTimer);
+
+  sessionStorage.setItem('stats', JSON.stringify(stats));
+  sessionStorage.setItem('flags', JSON.stringify(flags));
+
+  partEndNextHref = nextHref || 'library.html';
+
+  document.getElementById('part-end-label').textContent = 'PART ' + partNum + ' — END';
+  document.getElementById('part-end-summary').innerHTML = choiceSummary;
+  document.getElementById('part-end-notice').innerHTML =
+    '파트 ' + partNum + '이 마무리되었습니다.<br>' +
+    '당신의 이야기와 선택의 결과는 다음 플레이어에게 계승됩니다.<br>' +
+    '완료 버튼을 눌러 이야기 선택창으로 나갈 수 있습니다.';
+
+  document.getElementById('part-end-overlay').classList.add('active');
+  window.onbeforeunload = null;
+
+  var btn = document.getElementById('btn-part-end-complete');
+  btn.disabled = true;
+  btn.innerHTML = '✦ &nbsp;기록하는 중...&nbsp; ✦';
+
+  try {
+    if (ROOM_ID) {
+      await db.from('rooms')
+        .update({
+          status: 'cleared',
+          stats_a: stats.A,
+          stats_b: stats.B,
+          stats_c: stats.C,
+          stats_d: stats.D,
+          stats_count: stats.count,
+          flags: flags
+        })
+        .eq('id', ROOM_ID);
+    }
+
+    if (LINEAGE_ID && partNum < 3) {
+      await db.from('rooms').insert({
+        lineage_id: LINEAGE_ID,
+        part: partNum + 1,
+        status: 'waiting',
+        stats_a: stats.A,
+        stats_b: stats.B,
+        stats_c: stats.C,
+        stats_d: stats.D,
+        stats_count: stats.count,
+        flags: flags
+      });
+    }
+  } catch (err) {
+    console.error('파트 완료 DB 처리 실패:', err);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✦ &nbsp;완료&nbsp; ✦';
+}
+
+/* 파트 완료 화면의 "완료" 버튼 클릭 → library.html로 이동 */
+function goToLibraryFromPartEnd() {
+  location.href = partEndNextHref || 'library.html';
+}
+
+/* ════════════════════════════════════════════════════
+   엔딩 데이터
+════════════════════════════════════════════════════ */
+var ENDINGS = {
+  5: {
+    label: 'ENDING 05', title: '약속된 재회',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed5.png',
+    paragraphs: [
+      '인어 공주는 누구보다 빠르게 왕자와 재회했다.',
+      '망설임 없이 기회를 붙잡았고, 왕자 역시 그녀를 특별하게 여기기 시작했다.\n함께 보내는 시간은 점점 늘어났고, 두 사람은 서로를 당연한 존재처럼 받아들이게 되었다.',
+      '수많은 선택과 우연이 겹친 끝에, 마침내 두 사람은 결혼에 이르렀다.\n약속대로 인어 공주의 목소리도 돌아왔다.\n처음으로 자신의 목소리로 왕자의 이름을 부르는 순간, 그녀는 긴 여정이 끝났음을 실감했다.',
+    ]
+  },
+  6: {
+    label: 'ENDING 06', title: '독이 된 조심성',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed6.png',
+    paragraphs: [
+      '왕자는 끝내 소녀에게 다가가지 않았다.',
+      '처음에는 그저 조심스러운 성격 때문이었다. 정체를 알 수 없는 소녀를 경계했고, 괜한 오해를 만들고 싶지 않았다.',
+      '하지만 시간은 생각보다 빠르게 흘러갔다.\n그렇게 평범한 하루들이 쌓여갔고,\n훗날 왕자가 타고 있던 배는 예상치 못한 폭풍우를 만나 크게 파손되었다.\n그를 구해줄 소녀는 더 이상 곁에 없었다.',
+    ]
+  },
+  7: {
+    label: 'ENDING 07', title: '직면의 중요성',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed7.png',
+    paragraphs: [
+      '이웃 나라에서 공주를 만난 순간, 왕자는 확신했다. 눈앞의 공주야말로 자신을 구해준 은인이라고.',
+      '의심할 사람도, 그의 착각을 바로잡아줄 사람도 없었다. 이야기는 놀라울 정도로 빠르게 진행되었다.',
+      '하지만 모든 일이 끝난 뒤 문득 소녀가 떠올랐다.\n뒤늦게 그녀를 찾았을 때, 이미 그녀는 흔적도 없이 사라진 뒤였다.\n그리고 훗날, 왕자는 다시 바다를 건너기 위해 배에 올랐다.\n그 사고가 우연이었는지, 운명이었는지는 끝내 아무도 알지 못했다.',
+    ]
+  },
+  8: {
+    label: 'ENDING 08', title: '감이 좋았던 왕자',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed8.png',
+    paragraphs: [
+      '왕자는 쉽게 납득하지 못했다. 그는 끈질기게 의문을 품었고, 결국 스스로 진실을 확인하기 위해 움직이기 시작했다.',
+      '그러나 모든 진실이 밝혀져야만 하는 것은 아니었다.\n어떤 사실은 알지 못하는 편이 더 안전할 수도 있다.',
+      '왕자는 자신의 호기심이 향하는 곳을 끝까지 따라갔고,\n결국 타국에서 목숨을 잃고 말았다. 원인조차 명확히 밝혀지지 않은 갑작스러운 죽음이었다.',
+    ]
+  },
+  9: {
+    label: 'ENDING 09', title: '한정된 결말',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed9.png',
+    paragraphs: [
+      '사랑은 성별을 넘어설 수 있을까. 왕자는 후자를 선택했다.',
+      '이웃 나라의 공주와 예정되어 있던 결혼은 조용히 무산되었다.',
+      '그 빈자리는 자연스럽게 인어 공주에게 돌아왔다.\n오랫동안 왕자의 곁을 지켜온 사람도, 누구보다 많은 애정을 받아온 사람도 그녀였기 때문이다.\n하지만 그것이 진정한 사랑의 결말이었는지는 아무도 알 수 없다.',
+    ]
+  },
+  1: {
+    label: 'ENDING 01',
+    title: '보이지 않은 생일',
+    archImg: 'arch_ed1.png',
+    illustImg: 'game_ed1.png',
+    paragraphs: [
+      '오늘은 인어 공주의 생일이었습니다.',
+      '언니들이 예쁘게 꾸며준 산호 정원에서 가족들과 함께 웃고 노래하며,\n그녀의 마음은 잔잔한 행복으로 가득 찼습니다.',
+      '언젠가 육지 위에서의 삶에 대한 호기심이 그녀의 마음을 끌었지만,\n이 선택으로 인해 그녀는 그 호기심을 접고 바닷속에서 가족들과 함께\n평화롭고 긴 삶을 누렸습니다.',
+      '육지에서의 이야기는 이제 먼 전설이 되었지만,\n바다 속에서의 사랑과 추억은 그녀의 마음에 영원히 빛났습니다.',
+    ]
+  },
+  2: {
+    label: 'ENDING 02',
+    title: '침몰한 배',
+    archImg: 'arch_ed1.png',
+    illustImg: 'game_ed2.png',
+    paragraphs: [
+      '거센 폭풍우가 바다를 뒤흔들던 밤, 인어 공주는 끝내 수면 위로 올라가지 않았습니다.',
+      '왕자는 다른 누군가의 도움으로 목숨을 건졌을 수도,\n혹은 그러지 못했을 수도 있습니다.',
+      '하지만 적어도 두 사람의 운명은 결코 교차하지 않았습니다.',
+      '그날 밤의 진실은 파도 아래로 가라앉았고,\n바다는 끝내 아무에게도 대답해주지 않았습니다.',
+    ]
+  },
+  3: {
+    label: 'ENDING 03',
+    title: '왕국의 계승자',
+    archImg: 'arch_ed1.png',
+    illustImg: 'game_ed3.png',
+    paragraphs: [
+      '위험을 감수하지 않기로 결정한 인어 공주는 다시 바닷속 궁전으로 돌아갔습니다.',
+      '육지에 대한 호기심은 여전히 남아 있었지만,\n그것이 자신의 모든 것을 걸 만큼 중요한 것은 아니었습니다.',
+      '그녀는 조금씩 왕국의 일들을 배우기 시작했습니다.\n아버지를 도와 국정을 살피고, 할머니에게서 오래된 지혜를 배우며,\n언니들과 함께 바다를 순찰했습니다.',
+      '그렇게 인어 공주는 평범하지만 안정된 미래를 손에 넣었고,\n모두의 기대 속에서 바다의 내일을 준비해 나갔습니다.',
+    ]
+  },
+  4: {
+    label: 'ENDING 04',
+    title: '심연으로',
+    archImg: 'arch_ed1.png',
+    illustImg: 'game_ed4.png',
+    paragraphs: [
+      '마녀의 제안을 거절한 순간, 인어 공주는 자신이 돌이킬 수 없는 선택을 했음을 깨달았습니다.',
+      '육지로 향할 길은 완전히 사라졌습니다.\n그렇다고 이전처럼 아무 일도 없었던 것처럼 살아갈 수도 없었습니다.\n한 번 품어버린 동경은 쉽게 사라지지 않았기 때문입니다.',
+      '결국 어느 날, 인어 공주는 아무 말 없이 궁전을 떠났습니다.',
+      '언니들은 오랫동안 그녀를 찾아다녔지만 흔적조차 발견하지 못했습니다.\n심연의 어둠만이 마지막 행방을 알고 있을 뿐입니다.',
+    ]
+  },
+};
+
+
+/* ════════════════════════════════════════════════════
+   페이지 이탈 경고 (홈 버튼)
+════════════════════════════════════════════════════ 
+function confirmHome() {
+  if (confirm('진행 중인 게임이 저장되지 않습니다. 홈으로 돌아가시겠습니까?')) {
+    window.onbeforeunload = null;
+    deleteRoomOnExit();
+    location.href = 'library.html';
+  }
+}*/
+
+
+/* ════════════════════════════════════════════════════
+   닉네임
+════════════════════════════════════════════════════ */
+var playerName = sessionStorage.getItem('playerName') || '플레이어';
+document.getElementById('intro-name').textContent = playerName;
+
+
+/* ════════════════════════════════════════════════════
+   인트로 → 게임화면 전환
+════════════════════════════════════════════════════ */
+var INTRO_DURATION = 4200;
+
+setTimeout(function() {
+  var overlay = document.getElementById('intro-overlay');
+  overlay.classList.add('fade-out');
+  setTimeout(function() {
+    overlay.style.display = 'none';
+    revealGameScene();
+    loadScene('s1');
+    startHeartbeat();
+  }, 1600);
+}, INTRO_DURATION);
+
+function revealGameScene() {
+  document.getElementById('bg-illust').classList.add('reveal');
+  setTimeout(function() {
+    document.getElementById('scene-img-wrap').classList.add('reveal');
+  }, 300);
+  setTimeout(function() {
+    document.getElementById('script-area').classList.add('reveal');
+  }, 800);
+}
+
+
+/* ════════════════════════════════════════════════════
+   씬 로더
+════════════════════════════════════════════════════ */
+var currentScene = null;
+var typingTimer = null;
+var typingDone = false;
+var waitingForNext = false;
+var nextTarget = null;
+
+function loadScene(sceneId) {
+  currentScene = sceneId;
+  typingDone = false;
+  waitingForNext = false;
+  nextTarget = null;
+
+  var scene = SCENES[sceneId];
+  if (!scene) { console.warn('씬 없음:', sceneId); return; }
+
+  /* onEnter 콜백 (플래그 설정 등) */
+  if (scene.onEnter) scene.onEnter();
+
+  /* 이미지 교체 */
+  var imgEl = document.getElementById('scene-img');
+  if (imgEl.getAttribute('data-src') !== scene.img) {
+    imgEl.setAttribute('data-src', scene.img);
+    imgEl.src = 'images/' + scene.img;
+  }
+
+  /* 선택지 초기화 */
+  var choicesWrap = document.getElementById('choices-wrap');
+  choicesWrap.innerHTML = '';
+  choicesWrap.classList.remove('reveal', 'hidden');
+
+  /* 안내문구 숨기기 */
+  document.getElementById('next-hint').classList.remove('visible');
+
+  /* 본문 타이핑 시작 */
+  startTyping(scene.lines, function() {
+    typingDone = true;
+    if (scene.choices && scene.choices.length > 0) {
+      /* 선택지 렌더링 */
+      renderChoices(scene.choices);
+      setTimeout(function() {
+        choicesWrap.classList.add('reveal');
+      }, 300);
+    } else {
+      /* 선택지 없으면 "클릭해서 다음으로" */
+      var nxt = scene.next;
+      nextTarget = nxt;
+      document.getElementById('next-hint').classList.add('visible');
+      waitingForNext = true;
+    }
+  });
+}
+
+/* 선택지 렌더 */
+var ICON_LABELS = ['A', 'B', 'C', 'D'];
+function renderChoices(choices) {
+  var wrap = document.getElementById('choices-wrap');
+  wrap.innerHTML = '';
+  choices.forEach(function(ch, idx) {
+    var btn = document.createElement('button');
+    btn.className = 'choice-card';
+    btn.innerHTML =
+      '<img class="choice-icon" src="images/icon_choice_' + ICON_LABELS[idx].toLowerCase() + '.png" alt="" />' +
+      '<div class="choice-text-wrap">' +
+        '<span class="choice-label">선택 ' + ICON_LABELS[idx] + '</span>' +
+        '<span class="choice-body">' + ch.body + '</span>' +
+      '</div>' +
+      '<span class="choice-arrow">→</span>';
+    btn.addEventListener('click', function() { onChoiceSelect(ch, idx); });
+    wrap.appendChild(btn);
+  });
+}
+
+/* 선택지 클릭 처리 */
+/* ════════════════════════════════════════════════════
+   다음 대상으로 이동하는 공통 헬퍼
+════════════════════════════════════════════════════ */
+function goToNext(target) {
+  if (typeof target === 'function') {
+    target();
+  } else if (typeof target === 'string' && !SCENES[target] && typeof window[target] === 'function') {
+    window[target]();
+  } else if (target) {
+    doSceneTransition(target);
+  }
+}
+
+function onChoiceSelect(choice, idx) {
+  /* 수치 추가 */
+  if (choice.stats) addStats(choice.stats[0], choice.stats[1], choice.stats[2], choice.stats[3], choice.stats[4]);
+  /* 플래그 처리 */
+  if (choice.flag) choice.flag();
+
+  /* 선택지 숨기기 */
+  var wrap = document.getElementById('choices-wrap');
+  wrap.classList.add('hidden');
+
+  /* 결과 텍스트 타이핑 */
+  if (choice.result && choice.result.length > 0) {
+    typeAppend('\n' + choice.result, function() {
+      /* 다음 씬으로 */
+      nextTarget = choice.next;
+      document.getElementById('next-hint').classList.add('visible');
+      waitingForNext = true;
+    });
+  } else {
+    /* 결과 없으면 바로 다음 */
+    goToNext(choice.next);
+  }
+}
+
+
+/* ════════════════════════════════════════════════════
+   타이핑 엔진
+════════════════════════════════════════════════════ */
+function startTyping(lines, onDone) {
+  if (typingTimer) clearTimeout(typingTimer);
+
+  var container = document.getElementById('script-text');
+  container.innerHTML = '';
+
+  /* 커서 생성 */
+  var cursor = document.createElement('span');
+  cursor.id = 'typing-cursor';
+  cursor.style.cssText = 'display:inline-block;width:2px;height:0.9em;background:#7a6340;vertical-align:middle;margin-left:1px;animation:blink 0.7s step-end infinite;';
+  container.appendChild(cursor);
+
+  var fullText = lines.join('\n');
+  var i = 0;
+  var speed = getTypeSpeed();
+
+  /* 클릭 스킵 (한 번만, 한 틱 늦게 등록) */
+  function skipHandler() {
+    if (typingTimer) clearTimeout(typingTimer);
+    finishNow();
+  }
+  setTimeout(function() {
+    document.body.addEventListener('click', skipHandler, { once: true });
+  }, 0);
+
+  function tick() {
+    if (i < fullText.length) {
+      var ch = fullText[i];
+      if (ch === '\n') {
+        container.insertBefore(document.createElement('br'), cursor);
+      } else {
+        var prev = cursor.previousSibling;
+        if (prev && prev.nodeType === 3) {
+          prev.textContent += ch;
+        } else {
+          container.insertBefore(document.createTextNode(ch), cursor);
+        }
+      }
+      i++;
+      var delay = ch === '.' ? 400 : speed;
+      typingTimer = setTimeout(tick, delay);
+    } else {
+      cursor.style.display = 'none';
+      if (onDone) onDone();
+    }
+  }
+
+  function finishNow() {
+    if (typingTimer) clearTimeout(typingTimer);
+    container.innerHTML = '';
+    lines.forEach(function(line, idx) {
+      container.appendChild(document.createTextNode(line));
+      if (idx < lines.length - 1) container.appendChild(document.createElement('br'));
+    });
+    cursor = document.createElement('span');
+    cursor.style.display = 'none';
+    container.appendChild(cursor);
+    if (onDone) onDone();
+  }
+
+  tick();
+}
+
+/* 기존 텍스트 뒤에 이어 타이핑 */
+function typeAppend(text, onDone) {
+  var container = document.getElementById('script-text');
+
+  /* 커서 추가 */
+  var cursor = document.createElement('span');
+  cursor.style.cssText = 'display:inline-block;width:2px;height:0.9em;background:#7a6340;vertical-align:middle;margin-left:1px;animation:blink 0.7s step-end infinite;';
+  container.appendChild(cursor);
+
+  var i = 0;
+  var speed = getTypeSpeed();
+  var appendTimer = null;
+  var done = false;
+
+  /* 클릭하면 즉시 전체 출력 (한 번만)
+     - setTimeout으로 한 틱 늦게 등록: 선택지를 클릭한 바로 그 클릭이
+       버블링되어 곧바로 skipHandler를 실행시켜버리는 것을 방지 */
+  function skipHandler() {
+    if (done) return;
+    if (appendTimer) clearTimeout(appendTimer);
+    finishNow();
+  }
+  setTimeout(function() {
+    document.body.addEventListener('click', skipHandler, { once: true });
+  }, 0);
+
+  function finishNow() {
+    done = true;
+    while (i < text.length) {
+      var ch = text[i];
+      if (ch === '\n') {
+        container.insertBefore(document.createElement('br'), cursor);
+      } else {
+        var prev = cursor.previousSibling;
+        if (prev && prev.nodeType === 3) {
+          prev.textContent += ch;
+        } else {
+          container.insertBefore(document.createTextNode(ch), cursor);
+        }
+      }
+      i++;
+    }
+    cursor.style.display = 'none';
+    if (onDone) onDone();
+  }
+
+  function tick() {
+    if (done) return;
+    if (i < text.length) {
+      var ch = text[i];
+      if (ch === '\n') {
+        container.insertBefore(document.createElement('br'), cursor);
+      } else {
+        var prev = cursor.previousSibling;
+        if (prev && prev.nodeType === 3) {
+          prev.textContent += ch;
+        } else {
+          container.insertBefore(document.createTextNode(ch), cursor);
+        }
+      }
+      i++;
+      appendTimer = setTimeout(tick, speed);
+    } else {
+      done = true;
+      cursor.style.display = 'none';
+      if (onDone) onDone();
+    }
+  }
+  tick();
+}
+
+
+/* ════════════════════════════════════════════════════
+   씬 전환: 텍스트 영역만 페이드 (검은 화면 없음)
+════════════════════════════════════════════════════ */
+function doSceneTransition(sceneId) {
+  var scriptArea  = document.getElementById('script-area');
+  var choicesWrap = document.getElementById('choices-wrap');
+
+  /* 1. 텍스트+선택지 fade out */
+  scriptArea.classList.add('scene-out');
+  choicesWrap.classList.add('scene-out');
+
+  setTimeout(function() {
+    /* 2. 씬 로드 */
+    loadScene(sceneId);
+
+    /* 3. 새 텍스트 fade in */
+    scriptArea.classList.remove('scene-out');
+    scriptArea.classList.add('scene-in');
+    /* reveal 클래스가 이미 있으면 잠깐 떼었다 붙여야 transition이 발동 */
+    scriptArea.classList.remove('reveal');
+    void scriptArea.offsetWidth; /* reflow 강제 */
+    scriptArea.classList.add('reveal');
+
+    setTimeout(function() {
+      scriptArea.classList.remove('scene-in');
+      choicesWrap.classList.remove('scene-out');
+    }, 600);
+  }, 300);
+}
+
+/* 엔딩 전환: 검은 화면 → 엔딩 표시 */
+function doEndingTransition(callback) {
+  var ov = document.getElementById('ending-transition');
+  ov.classList.add('fade-in');
+  setTimeout(function() {
+    callback();
+    setTimeout(function() {
+      ov.classList.remove('fade-in');
+    }, 400);
+  }, 650);
+}
+
+/* 화면 클릭 → 다음 씬 */
+document.body.addEventListener('click', function() {
+  if (!waitingForNext || !nextTarget) return;
+  waitingForNext = false;
+  document.getElementById('next-hint').classList.remove('visible');
+  goToNext(nextTarget);
+});
+
+
+/* ════════════════════════════════════════════════════
+   엔딩 화면 표시
+════════════════════════════════════════════════════ */
+var currentEndingNum = null;
+var isFirstAchiever  = false;
+
+function triggerEnding(num) {
+  endingReached = true;
+  if (heartbeatTimer) clearInterval(heartbeatTimer);
+  window.onbeforeunload = null;
+  currentEndingNum = num;
+
+  /* 검은 화면 전환 후 엔딩 표시 */
+  doEndingTransition(function() {
+    var data = ENDINGS[num];
+    if (!data) return;
+
+    /* 게임 씬 숨기기 */
+    document.getElementById('scene').style.display = 'none';
+
+    /* 엔딩 정보 채우기 */
+    document.getElementById('ending-number-label').textContent = data.label;
+    document.getElementById('ending-arch-img').src = 'images/' + data.archImg;
+    document.getElementById('ending-illust-img').src = 'images/' + data.illustImg;
+
+    /* 본문 단락 */
+    var contentEl = document.getElementById('ending-text-content');
+    contentEl.innerHTML = '';
+    data.paragraphs.forEach(function(para) {
+      var p = document.createElement('p');
+      p.className = 'ending-text-paragraph';
+      p.innerHTML = para.replace(/\n/g, '<br>');
+      contentEl.appendChild(p);
+    });
+
+    /* 엔딩 화면 표시 */
+    var endingScreen = document.getElementById('ending-screen');
+    endingScreen.classList.add('active');
+    endingScreen.scrollTop = 0;
+
+    /* 제목은 일단 기본 이름으로 표시 (DB 확인 후 최초/비최초에 따라 갱신됨) */
+    document.getElementById('ending-title-text').textContent = data.title;
+
+    /* DB 확인 + 등록 시도 */
+    resolveEndingAchievement(num, data);
+  });
+}
+
+/* ════════════════════════════════════════════════════
+   최초 달성자 판단 + endings 테이블 등록 시도
+   - ending_number에 unique 제약이 걸려있으므로,
+     insert 성공 = 최초 달성, 실패(중복) = 이미 누군가 달성함
+════════════════════════════════════════════════════ */
+async function resolveEndingAchievement(num, data) {
+  var nickname = sessionStorage.getItem('playerName') || '플레이어';
+
+  try {
+    var { error } = await db.from('endings').insert({
+      ending_number: num,
+      lineage_id: LINEAGE_ID,
+      custom_name: data.title,
+      player_nickname: nickname
+    });
+
+    if (!error) {
+      /* ── 최초 달성자 ── */
+      isFirstAchiever = true;
+      document.getElementById('ending-name-wrap-first').style.display = 'flex';
+      document.getElementById('ending-complete-wrap-normal').style.display = 'none';
+
+      var input = document.getElementById('ending-name-input');
+      input.value = data.title;
+    } else {
+      /* ── 이미 누군가 달성함 (비최초) ── */
+      isFirstAchiever = false;
+      document.getElementById('ending-name-wrap-first').style.display = 'none';
+      document.getElementById('ending-complete-wrap-normal').style.display = 'flex';
+
+      var { data: existing } = await db
+        .from('endings')
+        .select('custom_name')
+        .eq('ending_number', num)
+        .single();
+
+      var endingName = (existing && existing.custom_name) ? existing.custom_name : data.title;
+      document.getElementById('ending-title-text').textContent = endingName;
+
+      document.getElementById('ending-normal-notice').innerHTML =
+        '이렇게 <em style="font-style:normal; color:#7a5a18; font-weight:700;">' + endingName + '</em>의 이야기는 결말을 맺어졌습니다.<br>' +
+        '완료 버튼을 눌러 이야기 선택창으로 돌아가 새로운 결말을 찾아보세요.';
+    }
+  } catch (err) {
+    console.error('엔딩 기록 처리 실패:', err);
+    isFirstAchiever = false;
+    document.getElementById('ending-name-wrap-first').style.display = 'none';
+    document.getElementById('ending-complete-wrap-normal').style.display = 'flex';
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   "완료" / "이야기 완료하기" 버튼
+════════════════════════════════════════════════════ */
+async function completeEnding() {
+  var btn = isFirstAchiever
+    ? document.getElementById('btn-ending-complete-first')
+    : document.getElementById('btn-ending-complete-normal');
+
+  btn.disabled = true;
+  btn.innerHTML = '✦ &nbsp;이동 중...&nbsp; ✦';
+
+  try {
+    if (isFirstAchiever) {
+      var input = document.getElementById('ending-name-input');
+      var customName = input.value.trim();
+      if (!customName) customName = ENDINGS[currentEndingNum].title;
+
+      await db.from('endings')
+        .update({ custom_name: customName })
+        .eq('ending_number', currentEndingNum);
+    }
+
+    /* 달성률 계산용 로그 기록 (몇 번째 발견이든 매번 한 줄씩 추가) */
+    await db.from('ending_logs').insert({ ending_number: currentEndingNum });
+
+    if (ROOM_ID) {
+      await db.from('rooms').delete().eq('id', ROOM_ID);
+    }
+  } catch (err) {
+    console.error('엔딩 완료 처리 실패:', err);
+  }
+
+  sessionStorage.setItem('justUnlockedEnding', String(currentEndingNum));
+  sessionStorage.setItem('justUnlockedIsFirst', isFirstAchiever ? '1' : '0');
+
+  location.href = 'archive.html';
+}
+
+
+</script>
+</body>
+</html>

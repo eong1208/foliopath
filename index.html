@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Folio Path</title>
+  <style>
+    /* ── 기본 설정 ── */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden; /* 스크롤 안 생기게 */
+      background: #1a1008;
+    }
+
+    /* ── 전체를 감싸는 컨테이너 ── */
+    /* 모든 이미지를 여기 안에 absolute로 쌓아올릴 거야 */
+    #scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── 공통: 레이어 기본 스타일 ── */
+    /* 모든 이미지 레이어에 공통 적용 */
+    .layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 화면 크기에 맞게 꽉 채움 */
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       레이어 z-index (숫자 클수록 위)
+       5: 양피지 배경      → z: 1
+       7: 하늘 배경        → z: 2
+       6: 일러스트 배경    → z: 3
+       4: 책               → z: 4
+       1: 타이틀           → z: 5
+       3: 표지판 세트      → z: 6
+       2: 이야기속으로버튼 → z: 7
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    /* ── 5. 양피지 배경 (제일 아래, 고정) ── */
+    #bg-parchment {
+      z-index: 1;
+    }
+
+    /* ── 7. 하늘 배경 (위에서 내려오면서 등장) ── */
+    #bg-sky {
+      z-index: 2;
+      animation: dropDown 1.2s ease-out 0.2s both;
+    }
+
+    @keyframes dropDown {
+      from {
+        opacity: 0;
+        transform: translateY(-60px); /* 위에서 시작 */
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── 6. 일러스트 배경 (서서히 나타남) ── */
+    #bg-illust {
+      z-index: 3;
+      animation: fadeIn 1.5s ease-out 0.5s both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ── 4. 책 (고정, 처음부터 보임) ── */
+#book {
+  z-index: 4;
+  object-fit: contain;
+  width: 85%;
+  top: 90%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* 위치 기준 */
+  animation: riseUp 1.3s ease-out 0.3s both;
+}
+
+@keyframes riseUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 10px)); /* ← 위치값 유지하면서 아래에서 시작 */
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%); /* ← 위치값 유지하면서 제자리로 */
+  }
+}
+
+    /* ── 1. 타이틀 (고정, 처음부터 보임) ── */
+    #title {
+      z-index: 5;
+      object-fit: contain;
+      width: 45%;
+      top: 37%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none; /* ← 핵심! 타이틀이 클릭을 가로채지 않게 함 */
+    }
+
+    /* ── 2. 이야기 속으로 버튼 ── */
+    #btn-start-wrap {
+      position: absolute;
+      z-index: 7;
+
+      /* 가운데 아래쪽 배치 */
+      left: 50%;
+      bottom: 16%;
+      transform: translateX(-50%);
+      width: 35%;
+    }
+
+    #btn-start {
+      width: 100%;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      padding: 0;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+
+    #btn-start:hover {
+      filter: drop-shadow(0px 6px 16px rgba(182, 136, 64, 0.45)); /* 마우스 오버 시 그림자 */
+    }
+
+    #btn-start:active {
+      transform: scale(0.95);
+    }
+
+    #btn-start img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       오버레이 (도움말 / 설정용)
+       지금은 빈 틀만 만들어둔 거야.
+       나중에 내용 채워넣으면 돼!
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .overlay {
+      display: none; /* 기본은 숨김 */
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay.active {
+      display: flex; /* 활성화 시 보임 */
+    }
+
+    .overlay-box {
+      background: #f5ead0;
+      border: 3px solid #8b6914;
+      border-radius: 12px;
+      padding: 40px;
+      min-width: 300px;
+      text-align: center;
+      font-family: 'Nanum Myeongjo', serif;
+      color: #3a2a00;
+      position: relative;
+    }
+
+    .overlay-box h2 {
+      margin-bottom: 16px;
+      font-size: 1.4rem;
+    }
+
+    .overlay-close {
+      position: absolute;
+      top: 12px; right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #8b6914;
+    }
+
+    /* ── 모바일 반응형 ── */
+    @media (max-width: 768px) {
+      #btn-start-wrap {
+        width: 28%;
+        bottom: 18%;
+      }
+    }
+  </style>
+
+  <!-- 한국어 폰트 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- 배경음 -->
+<audio id="bgm" src="sound/back.mp3" loop preload="auto"></audio>
+<!-- 클릭음 -->
+<audio id="sfx-click" src="sound/mouse.mp3" preload="auto"></audio>
+
+<div id="scene">
+
+  <!-- ✅ 5. 양피지 배경 (제일 아래) -->
+  <img id="bg-parchment" class="layer" src="images/bg_parchment.png" alt="양피지 배경" />
+
+  <!-- ✅ 7. 하늘 배경 (위에서 내려오며 등장) -->
+  <img id="bg-sky" class="layer" src="images/bg_sky.png" alt="하늘 배경" />
+
+  <!-- ✅ 6. 일러스트 배경 (서서히 나타남) -->
+  <img id="bg-illust" class="layer" src="images/bg_illust.png" alt="일러스트 배경" />
+
+  <!-- ✅ 4. 책 이미지 -->
+  <img id="book" class="layer" src="images/book.png" alt="책" />
+
+  <!-- ✅ 1. 타이틀 -->
+  <img id="title" class="layer" src="images/title.png" alt="Folio Path 타이틀" />
+
+  <!-- ✅ 2. 이야기 속으로 버튼 -->
+  <div id="btn-start-wrap">
+    <button id="btn-start" onclick="location.href='library.html'">
+      <img src="images/btn_start.png" alt="이야기 속으로" />
+    </button>
+  </div>
+
+</div><!-- /scene -->
+
+
+<!-- ━━━━ 도움말 오버레이 ━━━━ -->
+<div id="overlay-help" class="overlay">
+  <div class="overlay-box" style="max-width: 520px; width: 90%; max-height: 85vh; overflow-y: auto; text-align: left; padding: 32px 28px;">
+    <button class="overlay-close" onclick="closeOverlay('overlay-help')">✕</button>
+    <h2 style="margin-bottom: 20px;">도움말</h2>
+
+    <!-- 시작 방법 -->
+    <h3 style="font-size: 0.85rem; color: #8b6914; margin-bottom: 10px; letter-spacing: 0.05em;">✶ 시작 방법</h3>
+    <ol style="padding-left: 1.2em; margin-bottom: 20px; line-height: 1.9; font-size: 0.92rem;">
+      <li>서재에서 원하는 <strong>동화책</strong>을 선택하세요.</li>
+      <li>진행할 수 있는 <strong>파트(방)</strong>를 클릭해서 이야기를 시작합니다.</li>
+      <li>이야기 속 선택지를 골라가며 나만의 <strong>엔딩</strong>을 완성하세요.</li>
+    </ol>
+
+    <!-- 진행 방식 -->
+    <h3 style="font-size: 0.85rem; color: #8b6914; margin-bottom: 10px; letter-spacing: 0.05em;">✶ 진행 방식</h3>
+    <ul style="padding-left: 1.2em; margin-bottom: 12px; line-height: 1.9; font-size: 0.92rem;">
+      <li>이야기는 <strong>1번 → 2번 → 3번</strong> 순서로만 진행됩니다. 앞 단계 없이 다음 단계로 건너뛸 수 없습니다.</li>
+      <li>방의 <strong>기록</strong>과 <strong>플레이어</strong>는 묶여 있지 않습니다. 이전 단계를 완료한 분이 나가도, 클리어 기록이 남은 방에 새로운 분이 들어와 이어갈 수 있습니다.</li>
+      <li><strong>1번 방</strong>은 누구나 언제든 새로 시작할 수 있어, 고유한 줄기(A, B, C…)가 계속 생겨납니다.</li>
+    </ul>
+
+    <!-- 구분선 -->
+    <hr style="border: none; border-top: 1px solid #d4b87a; margin: 20px 0;" />
+
+    <!-- 유의사항 -->
+    <h3 style="font-size: 0.85rem; color: #8b6914; margin-bottom: 10px; letter-spacing: 0.05em;">⚠️ 유의사항</h3>
+    <ul style="padding-left: 1.2em; line-height: 1.9; font-size: 0.92rem;">
+      <li>진행 중 <strong>새로고침</strong>을 하면 저장되지 않습니다. 한 파트를 끝내거나 엔딩을 봐야 기록이 남습니다.</li>
+      <li>이야기 중 <strong>뒤로가기</strong>는 불가합니다. 선택지를 고를 때 신중히 생각해 주세요.</li>
+      <li>다른 이용자에게 불쾌함을 줄 수 있는 <strong>이름 사용은 금지</strong>됩니다.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ━━━━ 설정 오버레이 (공통) ━━━━ -->
+<div id="overlay-setting" class="overlay">
+  <div class="overlay-box" style="max-width: 420px; width: 90%; text-align: left; padding: 32px 28px;">
+    <button class="overlay-close" onclick="closeOverlay('overlay-setting')">✕</button>
+    <h2 style="margin-bottom: 24px;">설정</h2>
+
+    <!-- 배경음 크기 -->
+    <div style="margin-bottom: 22px;">
+      <label style="display:flex; justify-content:space-between; font-size:0.88rem; margin-bottom:8px;">
+        <span>배경음 크기</span>
+        <span id="setting-bgm-volume-label">35%</span>
+      </label>
+      <input type="range" id="setting-bgm-volume" min="0" max="100" step="5"
+             value="35" style="width:100%;"
+             oninput="onBgmVolumeChange(this.value)" />
+    </div>
+
+    <!-- 클릭음 on/off -->
+    <div style="margin-bottom: 22px; display:flex; align-items:center; justify-content:space-between;">
+      <label for="setting-click-toggle" style="font-size:0.88rem;">마우스 클릭음</label>
+      <input type="checkbox" id="setting-click-toggle" checked
+             style="width:20px; height:20px; cursor:pointer;"
+             onchange="onClickToggleChange(this.checked)" />
+    </div>
+
+    <!-- 텍스트 출력 속도 -->
+    <div>
+      <label style="display:block; font-size:0.88rem; margin-bottom:10px;">텍스트 출력 속도</label>
+      <div style="display:flex; gap:14px; font-size:0.85rem;">
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="slow"
+                 onchange="onTextSpeedChange(this.value)" /> 느리게
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="normal" checked
+                 onchange="onTextSpeedChange(this.value)" /> 보통
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="fast"
+                 onchange="onTextSpeedChange(this.value)" /> 빠르게
+        </label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+    // 우클릭 방지
+    document.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+    });
+
+    // 드래그 및 블록 선택 방지
+    document.addEventListener('dragstart', function(event) {
+        event.preventDefault();
+    });
+    document.addEventListener('selectstart', function(event) {
+        event.preventDefault();
+    });
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════
+   공통 사운드 & 설정 엔진
+   - 모든 페이지(index, library, archive, game_p1~3)에
+     동일하게 삽입한다.
+   - localStorage로 설정값을 공유하고,
+     배경음 재생 위치를 이어받아 끊김을 최소화한다.
+════════════════════════════════════════════════════ */
+
+/* ── 설정값 불러오기 (없으면 기본값) ── */
+function getSetting(key, def) {
+  var v = localStorage.getItem(key);
+  return (v === null) ? def : v;
+}
+
+var SETTINGS = {
+  bgmVolume: parseInt(getSetting('folio_bgmVolume', '35'), 10),   // 0~100
+  clickEnabled: getSetting('folio_clickEnabled', 'on') === 'on',  // on/off
+  textSpeed: getSetting('folio_textSpeed', 'normal'),             // slow/normal/fast
+};
+
+/* 텍스트 출력 속도 → 1글자당 ms (typeAppend 등에서 사용) */
+var TEXT_SPEED_MS = { slow: 65, normal: 40, fast: 18 };
+function getTypeSpeed() {
+  return TEXT_SPEED_MS[SETTINGS.textSpeed] || TEXT_SPEED_MS.normal;
+}
+
+/* ── 사운드 엘리먼트 ── */
+var bgm      = document.getElementById('bgm');
+var sfxClick = document.getElementById('sfx-click');
+var bgmStarted = false;
+
+/* 배경음 시작 + 이어듣기 위치 복원 */
+function startBgm() {
+  if (bgmStarted) return;
+  bgmStarted = true;
+  bgm.volume = SETTINGS.bgmVolume / 100;
+
+  var savedTime = parseFloat(sessionStorage.getItem('folio_bgmTime') || '0');
+  if (savedTime > 0 && isFinite(savedTime)) {
+    bgm.currentTime = savedTime;
+  }
+  bgm.play().catch(function(){});
+}
+
+/* 클릭음 재생 (설정에서 꺼져있으면 재생 안 함) */
+function playClick() {
+  if (!SETTINGS.clickEnabled) return;
+  sfxClick.currentTime = 0;
+  sfxClick.play().catch(function(){});
+}
+
+/* 첫 클릭 시 배경음 시작 + 매 클릭마다 클릭음 재생 */
+document.addEventListener('click', function() {
+  startBgm();
+  playClick();
+}, true);
+
+/* 1초마다 배경음 재생 위치를 저장 (다음 페이지에서 이어 듣기 위함) */
+setInterval(function() {
+  if (bgm && !bgm.paused) {
+    sessionStorage.setItem('folio_bgmTime', String(bgm.currentTime));
+  }
+}, 1000);
+
+/* 페이지를 벗어나기 직전에도 한 번 더 저장 */
+window.addEventListener('pagehide', function() {
+  if (bgm) {
+    sessionStorage.setItem('folio_bgmTime', String(bgm.currentTime));
+  }
+});
+
+
+/* ════════════════════════════════════════════════════
+   설정 오버레이 — 공통 UI
+════════════════════════════════════════════════════ */
+function openOverlay(id) {
+  var el = document.getElementById(id);
+  el.classList.add('active');
+  el.style.display = 'flex';
+
+  if (id === 'overlay-setting') {
+    syncSettingUI();
+  }
+}
+
+function closeOverlay(id) {
+  var el = document.getElementById(id);
+  el.classList.remove('active');
+  el.style.display = 'none';
+}
+
+/* 오버레이 바깥 클릭하면 닫히게 */
+document.querySelectorAll('.overlay').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      closeOverlay(overlay.id);
+    }
+  });
+});
+
+/* 설정창 UI를 현재 SETTINGS 값으로 동기화 */
+function syncSettingUI() {
+  var volSlider = document.getElementById('setting-bgm-volume');
+  var volLabel  = document.getElementById('setting-bgm-volume-label');
+  var clickToggle = document.getElementById('setting-click-toggle');
+  var speedRadios = document.querySelectorAll('input[name="setting-text-speed"]');
+
+  if (volSlider) {
+    volSlider.value = SETTINGS.bgmVolume;
+    if (volLabel) volLabel.textContent = SETTINGS.bgmVolume + '%';
+  }
+  if (clickToggle) {
+    clickToggle.checked = SETTINGS.clickEnabled;
+  }
+  speedRadios.forEach(function(radio) {
+    radio.checked = (radio.value === SETTINGS.textSpeed);
+  });
+}
+
+/* 배경음 크기 변경 */
+function onBgmVolumeChange(value) {
+  SETTINGS.bgmVolume = parseInt(value, 10);
+  localStorage.setItem('folio_bgmVolume', String(SETTINGS.bgmVolume));
+  bgm.volume = SETTINGS.bgmVolume / 100;
+  var volLabel = document.getElementById('setting-bgm-volume-label');
+  if (volLabel) volLabel.textContent = SETTINGS.bgmVolume + '%';
+}
+
+/* 클릭음 on/off 변경 */
+function onClickToggleChange(checked) {
+  SETTINGS.clickEnabled = checked;
+  localStorage.setItem('folio_clickEnabled', checked ? 'on' : 'off');
+}
+
+/* 텍스트 속도 변경 */
+function onTextSpeedChange(value) {
+  SETTINGS.textSpeed = value;
+  localStorage.setItem('folio_textSpeed', value);
+}
+</script>
+
+</body>
+</html>

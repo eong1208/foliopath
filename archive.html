@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Folio Path - 엔딩 서재</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+@font-face {
+    font-family: 'Aritaburi';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Arita-buri-SemiBold.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+  </style>
+  <style>
+
+    /* ══════════════════════════════
+       기본 설정
+    ══════════════════════════════ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #e8dfc8;
+      font-family: 'Nanum Myeongjo', serif;
+      position: relative;
+    }
+
+    /* ══════════════════════════════
+       배경 레이어 (library.html과 동일)
+    ══════════════════════════════ */
+    #bg-parchment {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    #bg-illust {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 4;   /* scene(3)보다 위 → 카드가 배경 아래로 */
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════
+       전체 씬 컨테이너
+    ══════════════════════════════ */
+    #scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+    }
+
+    /* ══════════════════════════════
+       타이틀 이미지 (엔딩 서재)
+    ══════════════════════════════ */
+    #archive-title {
+      position: absolute;
+      left: 50%;
+      top: 12%;
+      transform: translateX(-50%);
+      width: 24%;
+      pointer-events: none;
+      animation: fadeDown 0.8s ease-out both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ══════════════════════════════
+       메인 콘텐츠 영역
+    ══════════════════════════════ */
+    #main-section {
+      position: absolute;
+      left: 50%;
+      top: 23%;
+      transform: translateX(-50%);
+      width: 60%;
+      max-height: 78vh;
+      padding-bottom: 10%;          /* 화면을 넘어가면 스크롤 */
+      overflow-y: auto;
+      animation: fadeUp 0.9s ease-out 0.2s both;
+        scrollbar-width: none;        /* 파이어폭스용 */
+  -ms-overflow-style: none;     /* IE용 */
+    }
+
+    #main-section::-webkit-scrollbar {
+  display: none;                /* 크롬/사파리용 */
+}
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(24px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ══════════════════════════════
+       스토리 제목 + 달성 배지
+    ══════════════════════════════ */
+    #story-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2%;
+    }
+
+    #story-title {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: clamp(0.85rem, 1.3vw, 1.1rem);
+      color: #3a2a00;
+      font-weight: 700;
+    }
+
+    #achievement-badge {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: clamp(0.55rem, 0.85vw, 0.72rem);
+      color: #8a6914;
+      background: rgba(200, 168, 100, 0.18);
+      border: 1px solid #c8a86a;
+      border-radius: 20px;
+      padding: 3px 12px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ══════════════════════════════
+       엔딩카드 그리드 (4열)
+    ══════════════════════════════ */
+    #cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5%;
+    }
+
+    /* ── 카드 공통: 이미지 위에 텍스트 오버레이 구조 ── */
+    .ending-card {
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .ending-card:hover {
+      transform: translateY(-4px);
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.22));
+    }
+
+    /* 카드 이미지 */
+    .card-img-wrap {
+      width: 100%;
+      position: relative;
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      display: block;
+    }
+
+    /* ── 공개 카드: 이미지 위에 텍스트 오버레이 ── */
+    .card-info {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10% 8%;
+      pointer-events: none;
+    }
+
+    .card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;           /* num과 title 사이 간격, 조절 가능 */
+  align-items: center; /* 중앙정렬 유지 */
+}
+
+    .card-ending-num {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.8rem;        /* rem: 화면 크기와 무관하게 고정 */
+      letter-spacing: 0.2em;
+      color: #9a8060;
+        text-align: center;
+    }
+
+    .card-ending-title {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 1.1rem;
+      color: #2a1e08;
+      font-weight: 700;
+      line-height: 1.3;
+        text-align: center;
+    }
+
+    .card-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding: 0 0 0 4%;
+    }
+
+    .card-achieve-rate {
+      font-size: 1.8rem;
+      color: #8a6914;
+      font-weight: 800;
+    }
+
+    .card-achieve-label {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 0.7rem;
+      color: #9a8060;
+      font-weight: 400;
+    }
+
+    /* ── 잠긴 카드 ── */
+    .ending-card.locked {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .ending-card.locked .card-img-wrap {
+      opacity: 0.85;
+    }
+
+    /* 잠긴 카드 텍스트 오버레이 */
+    .card-locked-info {
+      position: absolute;
+      bottom: 12%;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .card-locked-num {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: #b0a088;
+    }
+
+    /* ══════════════════════════════
+       발견 애니메이션 (최초 달성 시)
+       - 카드가 빛나며 뒤집히는 효과
+    ══════════════════════════════ */
+    .ending-card.discovering {
+      animation: cardGlowPulse 1.4s ease-in-out;
+      z-index: 5;
+    }
+
+    .ending-card.discovering .card-img-wrap {
+      animation: cardFlip 1.2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    }
+
+    @keyframes cardGlowPulse {
+      0%   { filter: drop-shadow(0 0 0px rgba(255, 230, 150, 0)); }
+      35%  { filter: drop-shadow(0 0 24px rgba(255, 220, 130, 0.95)); }
+      70%  { filter: drop-shadow(0 0 24px rgba(255, 220, 130, 0.95)); }
+      100% { filter: drop-shadow(0 0 0px rgba(255, 230, 150, 0)); }
+    }
+
+    @keyframes cardFlip {
+      0%   { transform: rotateY(0deg); }
+      50%  { transform: rotateY(90deg); }
+      51%  { transform: rotateY(90deg); }
+      100% { transform: rotateY(0deg); }
+    }
+
+    /* 살짝 강조 스크롤 타겟 표시 */
+    .ending-card.just-found {
+      animation: cardHighlight 1.6s ease-out;
+    }
+    @keyframes cardHighlight {
+      0%   { transform: translateY(-4px) scale(1.04); }
+      60%  { transform: translateY(-4px) scale(1.04); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    /* ══════════════════════════════
+       표지판 (library.html과 동일)
+    ══════════════════════════════ */
+    #signpost-group {
+      position: absolute;
+      z-index: 10;
+      right: 7%;
+      bottom: 2%;
+      width: 18%;
+      height: auto;
+      transform-origin: bottom center;
+
+    }
+
+    #sign-post-img {
+      width: 100%;
+      height: auto;
+      display: block;
+            z-index: 100;
+    }
+
+    #sign-buttons {
+      position: absolute;
+      top: 8%;
+      left: 20%;
+      width: 75%;
+      display: flex;
+      flex-direction: column;
+      gap: 2%;
+    }
+
+    .sign-btn {
+      width: 85%;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      padding: 0;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .sign-btn:hover {
+      transform: scale(1.05) translateX(-4px);
+      filter: brightness(1.1);
+    }
+
+    .sign-btn:active { transform: scale(0.97); }
+    .sign-btn img { width: 100%; height: auto; display: block; }
+
+    /* ══════════════════════════════
+       모바일 반응형
+    ══════════════════════════════ */
+    @media (max-width: 768px) {
+      #archive-title { width: 70%; top: 3%; }
+
+      #main-section {
+        width: 90%;
+        top: 18%;
+        overflow-y: auto;
+        max-height: 78vh;
+        
+      }
+
+      #cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3%;
+      }
+
+      #signpost-group {
+        width: 28%;
+        right: 1%;
+        bottom: 8%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4%;
+      }
+    }
+
+    /* ══════════════════════════════
+       도움말 / 설정 오버레이
+    ══════════════════════════════ */
+    .overlay-panel {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay-box {
+      background: #f5ead0;
+      border: 3px solid #8b6914;
+      border-radius: 12px;
+      padding: 40px;
+      min-width: 300px;
+      text-align: center;
+      font-family: 'Nanum Myeongjo', serif;
+      color: #3a2a00;
+      position: relative;
+    }
+
+    .overlay-close {
+      position: absolute;
+      top: 12px; right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #8b6914;
+    }
+
+    .overlay-box h2 { margin-bottom: 16px; }
+
+    /* ══════════════════════════════
+       엔딩 상세 오버레이
+    ══════════════════════════════ */
+    #ending-detail-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #ending-detail-overlay.active { display: flex; }
+
+    #ending-detail-box {
+      position: relative;
+      background: #f2ead6;
+      border: 1px solid #c8a86a;
+      border-radius: 4px;
+      width: min(520px, 88vw);
+      max-height: 90vh;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 44px 48px 40px;
+      animation: popIn 0.32s cubic-bezier(0.34,1.4,0.64,1) both;
+    }
+
+    #ending-detail-box::-webkit-scrollbar { display: none; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    #detail-close {
+      position: absolute;
+      top: 14px; right: 20px;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: #8a6e40;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    #detail-close:hover { color: #2a1800; }
+
+    /* 상단: 번호 + 제목 + 초록이미지 */
+    #detail-header { text-align: center; margin-bottom: 16px; }
+
+    #detail-ending-num {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      color: #9a8060;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    #detail-ending-num::before,
+    #detail-ending-num::after { content: '✦'; font-size: 0.6rem; color: #c8a86a; }
+
+    #detail-title {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 1.6rem;
+      color: #2a1e08;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    /* 초록 이미지 */
+    #detail-deco-img { width: 100%; display: block; margin: 0 auto 16px; }
+
+    /* 구분선 
+    .detail-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(150,120,70,0.3);
+      margin: 14px 0;
+    } */
+
+    /* 통계 박스 */
+    #detail-stats {
+      display: flex;
+      border: 1px solid rgba(150,120,70,0.3);
+      border-radius: 3px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .stat-cell {
+      flex: 1;
+      padding: 14px 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stat-cell:first-child { border-right: 1px solid rgba(150,120,70,0.3); }
+
+    .stat-value {
+      font-size: 1.8rem;
+      color: #8a6914;
+      font-weight: 800;
+    }
+    .stat-label {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 0.65rem;
+      color: #9a8060;
+    }
+    .star-rating { font-size: 1.5rem; letter-spacing: 2px; color: #c8a040; }
+
+    /* 섹션 공통 */
+    .detail-section { margin-bottom: 18px; }
+
+    .detail-section-label {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      color: #9a8060;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+    .detail-section-label::before,
+    .detail-section-label::after { content: '✦'; font-size: 0.5rem; color: #c8a86a; }
+
+    .detail-section-body {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.88rem;
+      color: #3a2800;
+      line-height: 1.9;
+    }
+
+    /* FIRST ACHIEVER */
+    #detail-first-achiever {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    /* 빨간 이미지 */
+    #detail-player-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 4px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    #detail-player-info { display: flex; flex-direction: column; gap: 3px; }
+
+    #detail-player-name {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.95rem;
+      color: #2a1e08;
+      font-weight: 700;
+    }
+    #detail-player-date {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 0.65rem;
+      color: #9a8060;
+      font-style: italic;
+    }
+
+  </style>
+</head>
+<body>
+
+
+<!-- 배경음 -->
+<audio id="bgm" src="sound/back.mp3" loop preload="auto"></audio>
+<!-- 클릭음 -->
+<audio id="sfx-click" src="sound/mouse.mp3" preload="auto"></audio>
+<!-- 배경 (library.html과 동일) -->
+<img id="bg-parchment" src="images/bg_parchment.png" alt="양피지 배경" />
+<img id="bg-illust" src="images/bg_illust2.png" alt="배경" />
+
+<div id="scene">
+
+  <!-- 타이틀 이미지 -->
+  <img id="archive-title" src="images/archive_title.png" alt="엔딩 서재" />
+
+  <!-- ══ 메인 콘텐츠 ══ -->
+  <div id="main-section">
+
+    <!-- 스토리 제목 + 달성 현황 -->
+    <div id="story-header">
+      <span id="story-title">인어공주</span>
+      <span id="achievement-badge">19 / 20 달성</span>
+    </div>
+
+    <!-- 엔딩카드 그리드 (JS가 동적으로 채움) -->
+    <div id="cards-grid"></div><!-- /cards-grid -->
+  </div><!-- /main-section -->
+
+  <!-- ══ 표지판 ══ -->
+  <div id="signpost-group">
+    <img id="sign-post-img" src="images/sign_post.png" alt="표지판 거치대" />
+    <div id="sign-buttons">
+      <button class="sign-btn" onclick="location.href='index.html'">
+        <img src="images/sign_home.png" alt="홈으로" />
+      </button>
+      <button class="sign-btn" onclick="openOverlay('overlay-help')">
+        <img src="images/sign_help.png" alt="도움말" />
+      </button>
+      <button class="sign-btn" onclick="location.href='library.html'">
+        <img src="images/sign_library.png" alt="서재로" />
+      </button>
+      <button class="sign-btn" onclick="openOverlay('overlay-setting')">
+        <img src="images/sign_setting.png" alt="설정" />
+      </button>
+    </div>
+  </div>
+
+</div><!-- /scene -->
+
+
+<!-- 도움말 오버레이 -->
+<div id="overlay-help" class="overlay-panel">
+  <div class="overlay-box">
+    <button class="overlay-close" onclick="closeOverlay('overlay-help')">✕</button>
+    <h2>도움말</h2>
+    <p>여기에 도움말 내용을 넣어줘!</p>
+  </div>
+</div>
+
+<!-- 설정 오버레이 (공통 설정 UI) -->
+<div id="overlay-setting" class="overlay-panel">
+  <div class="overlay-box" style="max-width: 420px; width: 90%; text-align: left;">
+    <button class="overlay-close" onclick="closeOverlay('overlay-setting')">✕</button>
+    <h2>설정</h2>
+
+    <!-- 배경음 크기 -->
+    <div style="margin-bottom: 22px;">
+      <label style="display:flex; justify-content:space-between; font-size:0.88rem; margin-bottom:8px;">
+        <span>배경음 크기</span>
+        <span id="setting-bgm-volume-label">35%</span>
+      </label>
+      <input type="range" id="setting-bgm-volume" min="0" max="100" step="5"
+             value="35" style="width:100%;"
+             oninput="onBgmVolumeChange(this.value)" />
+    </div>
+
+    <!-- 클릭음 on/off -->
+    <div style="margin-bottom: 22px; display:flex; align-items:center; justify-content:space-between;">
+      <label for="setting-click-toggle" style="font-size:0.88rem;">마우스 클릭음</label>
+      <input type="checkbox" id="setting-click-toggle" checked
+             style="width:20px; height:20px; cursor:pointer;"
+             onchange="onClickToggleChange(this.checked)" />
+    </div>
+
+    <!-- 텍스트 출력 속도 -->
+    <div>
+      <label style="display:block; font-size:0.88rem; margin-bottom:10px;">텍스트 출력 속도</label>
+      <div style="display:flex; gap:14px; font-size:0.85rem;">
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="slow"
+                 onchange="onTextSpeedChange(this.value)" /> 느리게
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="normal" checked
+                 onchange="onTextSpeedChange(this.value)" /> 보통
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="fast"
+                 onchange="onTextSpeedChange(this.value)" /> 빠르게
+        </label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ 엔딩 상세 오버레이 ══ -->
+<div id="ending-detail-overlay">
+  <div id="ending-detail-box">
+
+    <!-- X 닫기 -->
+    <button id="detail-close" onclick="closeEndingDetail()">✕</button>
+
+    <!-- 상단: 번호 + 제목 + 초록 이미지 -->
+    <div id="detail-header">
+      <div id="detail-ending-num">ENDING 01</div>
+      <div id="detail-title">거품이 된 목소리</div>
+      <img id="detail-deco-img" src="images/arch_ed1.png" alt="엔딩 장식 이미지" />
+    </div>
+
+    <div class="detail-divider"></div>
+
+    <!-- 통계: 달성률 + 희귀도 -->
+    <div id="detail-stats">
+      <div class="stat-cell">
+        <span class="stat-value">33%</span>
+        <span class="stat-label">달성률</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-value star-rating">★★☆☆☆</span>
+        <span class="stat-label">희귀도</span>
+      </div>
+    </div>
+
+    <!-- ENDING SUMMARY -->
+    <div class="detail-section">
+      <div class="detail-section-label">ENDING SUMMARY</div>
+      <p class="detail-section-body">
+        인어공주는 결국 거품이 되어 사라졌습니다.<br>
+        그러나 파도 소리 속에 그녀의 목소리가 영원히 남았습니다.
+      </p>
+    </div>
+
+    <!-- UNLOCK CONDITION -->
+    <div class="detail-section">
+      <div class="detail-section-label">UNLOCK CONDITION</div>
+      <p class="detail-section-body">
+        파트1에서 왕자를 포기하는 선택을 3번 이상 한 뒤,<br>
+        파트2에서 인어를 외면하면 달성됩니다.
+      </p>
+    </div>
+
+    <!-- FIRST ACHIEVER -->
+    <div class="detail-section">
+      <div class="detail-section-label">FIRST ACHIEVER</div>
+      <div id="detail-first-achiever">
+        <img id="detail-player-img" src="images/arch_pl.png" alt="최초 달성자 프로필" />
+        <div id="detail-player-info">
+          <span id="detail-player-name">해변의독자</span>
+          <span id="detail-player-date">최초 달성일&nbsp; 2025.11.02 14:32</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ending-detail-box -->
+</div><!-- /ending-detail-overlay -->
+
+
+<!-- ════════════════════════════════════════════════════
+     Supabase 연결
+════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://tflyktyphhotsmvmxgyl.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_ah-o7ASSLP-4q4jKEQXP9g_L7ZQbd3S';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════
+   공통 사운드 & 설정 엔진
+   - 모든 페이지(index, library, archive, game_p1~3)에
+     동일하게 삽입한다.
+   - localStorage로 설정값을 공유하고,
+     배경음 재생 위치를 이어받아 끊김을 최소화한다.
+════════════════════════════════════════════════════ */
+
+/* ── 설정값 불러오기 (없으면 기본값) ── */
+function getSetting(key, def) {
+  var v = localStorage.getItem(key);
+  return (v === null) ? def : v;
+}
+
+var SETTINGS = {
+  bgmVolume: parseInt(getSetting('folio_bgmVolume', '35'), 10),   // 0~100
+  clickEnabled: getSetting('folio_clickEnabled', 'on') === 'on',  // on/off
+  textSpeed: getSetting('folio_textSpeed', 'normal'),             // slow/normal/fast
+};
+
+/* 텍스트 출력 속도 → 1글자당 ms (typeAppend 등에서 사용) */
+var TEXT_SPEED_MS = { slow: 65, normal: 40, fast: 18 };
+function getTypeSpeed() {
+  return TEXT_SPEED_MS[SETTINGS.textSpeed] || TEXT_SPEED_MS.normal;
+}
+
+/* ── 사운드 엘리먼트 ── */
+var bgm      = document.getElementById('bgm');
+var sfxClick = document.getElementById('sfx-click');
+var bgmStarted = false;
+
+/* 배경음 시작 + 이어듣기 위치 복원 */
+function startBgm() {
+  if (bgmStarted) return;
+  bgmStarted = true;
+  bgm.volume = SETTINGS.bgmVolume / 100;
+
+  var savedTime = parseFloat(sessionStorage.getItem('folio_bgmTime') || '0');
+  if (savedTime > 0 && isFinite(savedTime)) {
+    bgm.currentTime = savedTime;
+  }
+  bgm.play().catch(function(){});
+}
+
+/* 클릭음 재생 (설정에서 꺼져있으면 재생 안 함) */
+function playClick() {
+  if (!SETTINGS.clickEnabled) return;
+  sfxClick.currentTime = 0;
+  sfxClick.play().catch(function(){});
+}
+
+/* 첫 클릭 시 배경음 시작 + 매 클릭마다 클릭음 재생 */
+document.addEventListener('click', function() {
+  startBgm();
+  playClick();
+}, true);
+
+/* 1초마다 배경음 재생 위치를 저장 (다음 페이지에서 이어 듣기 위함) */
+setInterval(function() {
+  if (bgm && !bgm.paused) {
+    sessionStorage.setItem('folio_bgmTime', String(bgm.currentTime));
+  }
+}, 1000);
+
+/* 페이지를 벗어나기 직전에도 한 번 더 저장 */
+window.addEventListener('pagehide', function() {
+  if (bgm) {
+    sessionStorage.setItem('folio_bgmTime', String(bgm.currentTime));
+  }
+});
+
+
+/* ════════════════════════════════════════════════════
+   설정 오버레이 — 공통 UI
+════════════════════════════════════════════════════ */
+function openOverlay(id) {
+  var el = document.getElementById(id);
+  el.classList.add('active');
+  el.style.display = 'flex';
+
+  if (id === 'overlay-setting') {
+    syncSettingUI();
+  }
+}
+
+function closeOverlay(id) {
+  var el = document.getElementById(id);
+  el.classList.remove('active');
+  el.style.display = 'none';
+}
+
+/* 오버레이 바깥 클릭하면 닫히게 (.overlay, .overlay-panel 둘 다 지원) */
+document.querySelectorAll('.overlay, .overlay-panel').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      closeOverlay(overlay.id);
+    }
+  });
+});
+
+/* 설정창 UI를 현재 SETTINGS 값으로 동기화 */
+function syncSettingUI() {
+  var volSlider = document.getElementById('setting-bgm-volume');
+  var volLabel  = document.getElementById('setting-bgm-volume-label');
+  var clickToggle = document.getElementById('setting-click-toggle');
+  var speedRadios = document.querySelectorAll('input[name="setting-text-speed"]');
+
+  if (volSlider) {
+    volSlider.value = SETTINGS.bgmVolume;
+    if (volLabel) volLabel.textContent = SETTINGS.bgmVolume + '%';
+  }
+  if (clickToggle) {
+    clickToggle.checked = SETTINGS.clickEnabled;
+  }
+  speedRadios.forEach(function(radio) {
+    radio.checked = (radio.value === SETTINGS.textSpeed);
+  });
+}
+
+/* 배경음 크기 변경 */
+function onBgmVolumeChange(value) {
+  SETTINGS.bgmVolume = parseInt(value, 10);
+  localStorage.setItem('folio_bgmVolume', String(SETTINGS.bgmVolume));
+  bgm.volume = SETTINGS.bgmVolume / 100;
+  var volLabel = document.getElementById('setting-bgm-volume-label');
+  if (volLabel) volLabel.textContent = SETTINGS.bgmVolume + '%';
+}
+
+/* 클릭음 on/off 변경 */
+function onClickToggleChange(checked) {
+  SETTINGS.clickEnabled = checked;
+  localStorage.setItem('folio_clickEnabled', checked ? 'on' : 'off');
+}
+
+/* 텍스트 속도 변경 */
+function onTextSpeedChange(value) {
+  SETTINGS.textSpeed = value;
+  localStorage.setItem('folio_textSpeed', value);
+}
+
+/* ──────────────────────────────────────
+   엔딩 데이터
+────────────────────────────────────── */
+var ENDING_DATA = {
+  1: {
+    num: 'ENDING 01', title: '보이지 않은 생일',
+    rate: '33%', stars: '★★☆☆☆',
+    summary: '인어 공주는 육지에 대한 호기심을 접고 바닷속에서 가족들과 함께 평화롭고 긴 삶을 누렸습니다.<br>언니들의 노래와 산호 정원의 빛 속에서, 그녀의 마음은 잔잔한 행복으로 가득 찼습니다.',
+    unlock: '파트1에서 생일날 바다 위로 올라가는 선택을 하지 않으면 달성됩니다.',
+    player: '파도위의소녀', date: '2025.11.02 09:14'
+  },
+  2: {
+    num: 'ENDING 02', title: '침몰한 배',
+    rate: '18%', stars: '★★☆☆☆',
+    summary: '거센 폭풍우가 바다를 뒤흔들던 밤, 인어 공주는 끝내 왕자에게 손을 내밀지 않았습니다.<br>두 사람의 운명은 결코 교차하지 않은 채, 바다는 그날 밤의 진실을 삼켜버렸습니다.',
+    unlock: '파트1 폭풍 씬에서 왕자를 구하지 않는 선택을 하면 달성됩니다.',
+    player: '깊은바다탐험가', date: '2025.11.03 22:47'
+  },
+  3: {
+    num: 'ENDING 03', title: '왕국의 계승자',
+    rate: '9%', stars: '★★★☆☆',
+    summary: '위험을 감수하지 않기로 결정한 인어 공주는 다시 바닷속 궁전으로 돌아갔습니다.<br>어느새 어린 막내 공주는 책임감 있는 후계자로 성장해, 바다의 내일을 준비해 나갔습니다.',
+    unlock: '마녀의 거처에서 돌아가는 선택을 하면 달성됩니다.',
+    player: '조용한파도', date: '2025.11.05 16:33'
+  },
+  4: {
+    num: 'ENDING 04', title: '심연으로',
+    rate: '5%', stars: '★★★☆☆',
+    summary: '마녀의 제안을 거절한 순간, 인어 공주는 돌이킬 수 없는 선택을 했음을 깨달았습니다.<br>결국 어느 날 아무 말 없이 궁전을 떠났고, 심연의 어둠만이 마지막 행방을 알고 있습니다.',
+    unlock: '마녀의 최종 거래를 거절하면 달성됩니다.',
+    player: '어두운심해어', date: '2025.11.08 03:21'
+  },
+  5: {
+    num: 'ENDING 05', title: '약속된 재회',
+    rate: '4%', stars: '★★★★☆',
+    summary: '인어 공주는 누구보다 빠르게 왕자와 재회했습니다.<br>수많은 선택과 우연이 겹친 끝에 마침내 두 사람은 결혼에 이르렀고, 잃었던 목소리도 돌아왔습니다.',
+    unlock: '조개 껍데기를 왕자에게 건넨 뒤 파트2에서 조개를 보여주는 선택을 하면 달성됩니다.',
+    player: '조개껍데기수집가', date: '2025.11.10 19:05'
+  },
+  6: {
+    num: 'ENDING 06', title: '독이 된 조심성',
+    rate: '7%', stars: '★★☆☆☆',
+    summary: '왕자는 끝내 소녀에게 다가가지 않았습니다. 그렇게 평범한 하루들이 쌓여갔고,<br>훗날 왕자가 탄 배는 폭풍우를 만나 파손되었습니다. 그를 구해줄 소녀는 더 이상 없었습니다.',
+    unlock: '파트2에서 소녀를 숲에 두고 돌아가는 선택을 하면 달성됩니다.',
+    player: '신중한탐색자', date: '2025.11.12 11:28'
+  },
+  7: {
+    num: 'ENDING 07', title: '직면의 중요성',
+    rate: '12%', stars: '★★★☆☆',
+    summary: '이웃 나라에서 공주를 만난 순간 왕자는 확신했습니다. 뒤늦게 소녀를 찾았을 때,<br>그녀는 흔적도 없이 사라진 뒤였습니다. 그리고 훗날 왕자의 배는 예기치 못한 사고를 만났습니다.',
+    unlock: '파트2에서 이웃나라에 소녀를 두고 혼자 돌아가는 선택을 하면 달성됩니다.',
+    player: '후회의항해자', date: '2025.11.14 20:17'
+  },
+  8: {
+    num: 'ENDING 08', title: '감이 좋았던 왕자',
+    rate: '3%', stars: '★★★★☆',
+    summary: '왕자는 끈질기게 의문을 품고 스스로 진실을 확인하러 움직였습니다.<br>어떤 사실은 알지 못하는 편이 더 안전했을지도 모릅니다. 왕자는 타국에서 목숨을 잃고 말았습니다.',
+    unlock: '파트2에서 공주 방 안을 확인하고 진실을 추궁하는 선택을 하면 달성됩니다.',
+    player: '호기심많은왕자팬', date: '2025.11.18 00:42'
+  },
+  9: {
+    num: 'ENDING 09', title: '한정된 결말',
+    rate: '8%', stars: '★★★☆☆',
+    summary: '이웃 나라 공주와의 결혼은 조용히 무산되었고, 그 빈자리는 자연스럽게 인어 공주에게 돌아왔습니다.<br>그것이 진정한 사랑의 결말이었는지는 끝내 알 수 없었습니다.',
+    unlock: '파트2에서 공주 방을 확인한 뒤 조용히 파혼을 계획하는 선택을 하면 달성됩니다.',
+    player: '현실주의독자', date: '2025.11.20 14:09'
+  },
+  10: {
+    num: 'ENDING 10', title: '세상 그 누구보다 당신을 사랑하는',
+    rate: '6%', stars: '★★★☆☆',
+    summary: '사랑에 눈이 먼 막내를 가만히 지켜볼 언니들이 아니었습니다.<br>머리카락을 희생하고 마녀를 찾아가, 원하든 원하지 않든 그녀를 구해냈습니다.',
+    unlock: '파트3에서 카운트가 3 이상 누적되면 달성됩니다.',
+    player: '가족사랑연구자', date: '2025.11.22 18:53'
+  },
+  11: {
+    num: 'ENDING 11', title: '이른 귀환',
+    rate: '10%', stars: '★★★☆☆',
+    summary: '왕자의 태도에 지쳐버린 인어 공주 앞에 언니들이 나타났습니다.<br>그들의 손을 잡으며 긴 방황을 끝내고 다시 고향 바다로 돌아갔습니다.',
+    unlock: '파트3에서 카운트가 4 이상 누적되면 달성됩니다.',
+    player: '집으로돌아가는길', date: '2025.11.25 09:37'
+  },
+  12: {
+    num: 'ENDING 12', title: '사랑이 정답은 아니니까',
+    rate: '4%', stars: '★★★★☆',
+    summary: '세상은 생각보다 넓었습니다. 결국 인어 공주는 언니들에게 부탁해 마녀와 다시 거래를 했습니다.<br>사랑을 위해 얻었던 다리는 이제 자신만의 삶을 위해 사용될 것입니다.',
+    unlock: '파트3에서 개척 수치 10 이상, 통찰 수치 7 이상, 애정 수치 5 이하일 때 달성됩니다.',
+    player: '세상탐험대원', date: '2025.11.28 22:14'
+  },
+  13: {
+    num: 'ENDING 13', title: '사랑이 죄는 아니니까',
+    rate: '5%', stars: '★★★★☆',
+    summary: '왕자의 마음은 갈대와 같았지만, 예상치 못한 인연이 그녀의 삶에 스며들었습니다.<br>이번에는 누군가를 위해 자신을 희생하는 사랑이 아니라, 함께 웃을 수 있는 사랑을 꿈꾸며.',
+    unlock: '파트3에서 개척 수치 10 이상, 애정 수치 7 이하, 시장·부둣가 남자 플래그를 달성하면 됩니다.',
+    player: '새출발독자', date: '2025.12.01 13:00'
+  },
+  14: {
+    num: 'ENDING 14', title: '진정한 왕자님',
+    rate: '2%', stars: '★★★★★',
+    summary: '기시감의 정체를 깨닫는 데에는 오랜 시간이 걸리지 않았습니다.<br>두 사람은 누군가가 정해준 삶이 아닌, 자신이 원하는 삶을 살기 위해 함께 여행을 떠났습니다.',
+    unlock: '파트3에서 개척 10·통찰 10 이상, 시장·부둣가 남자 플래그와 꽃 플래그를 모두 달성해야 합니다.',
+    player: '진실탐구자', date: '2025.12.05 04:28'
+  },
+  15: {
+    num: 'ENDING 15', title: '새 정원을 찾아서',
+    rate: '3%', stars: '★★★★★',
+    summary: '결혼식을 앞둔 왕자를 뒤로한 채, 두 사람은 조용히 성을 떠났습니다.<br>좋은 친구가 될 수도, 가족 같은 존재가 될 수도. 확실한 건 자신들만의 정원을 찾아 나선다는 것.',
+    unlock: '파트3에서 개척 8 이상, 공주 관련 선택지를 충분히 누적하면 달성됩니다.',
+    player: '자유의날개', date: '2025.12.08 17:55'
+  },
+  16: {
+    num: 'ENDING 16', title: '거품이 된 목소리',
+    rate: '11%', stars: '★★★☆☆',
+    summary: '인어 공주는 왕자의 사랑을 끝내 얻지 못했습니다.<br>결혼식 전날 밤, 그녀는 조용히 파도 위에 섰습니다. 동이 트자 그 자리엔 거품만이 남았고,<br>바람이 그것을 데려갔습니다.',
+    unlock: '파트3에서 왕자가 이웃 나라 공주와 결혼하는 결말까지 진행하면 달성됩니다.',
+    player: '새벽의파도', date: '2025.12.10 05:02'
+  },
+  17: {
+    num: 'ENDING 17', title: '두 개의 심장',
+    rate: '7%', stars: '★★★★☆',
+    summary: '왕자는 오래도록 그녀의 목소리를 기억했습니다. 결혼식 날 밤, 파도 소리 속에서<br>그 선율을 다시 들은 듯한 기분이 들었습니다. 진실은 끝까지 밝혀지지 않았지만,<br>두 사람의 심장은 같은 박자로 뛰고 있었습니다.',
+    unlock: '파트3에서 원형 수치 최고, 애정 수치가 높은 상태로 결혼식까지 진행하면 달성됩니다.',
+    player: '두심장의시인', date: '2025.12.14 21:39'
+  },
+  18: {
+    num: 'ENDING 18', title: '마녀의 두 번째 계약',
+    rate: '3%', stars: '★★★★★',
+    summary: '거품이 되려던 순간, 마녀가 다시 나타났습니다.<br>"두 번째 계약이야. 이번엔 기억을 줄게." 인어 공주는 또 한 번 선택 앞에 섰습니다.<br>그 대가가 무엇인지도 모른 채.',
+    unlock: '파트3에서 통찰 수치 최고, 결혼식 직전 선택지에서 특정 조건을 만족하면 달성됩니다.',
+    player: '계약서낭독자', date: '2025.12.18 03:17'
+  },
+  19: {
+    num: 'ENDING 19', title: '영원한 파도 위에서',
+    rate: '2%', stars: '★★★★★',
+    summary: '거품이 된 인어 공주는 공기의 정령이 되었습니다.<br>300년간 착한 일을 쌓으면 불멸의 영혼을 얻는다고 했습니다. 그녀는 파도 위를 떠돌며,<br>슬픔에 잠긴 이들의 눈물을 조용히 닦아주기 시작했습니다.',
+    unlock: '모든 파트에서 원형과 통찰 수치의 합이 가장 높은 상태로 마지막까지 진행하면 달성됩니다.',
+    player: '영원의항해자', date: '2025.12.24 00:00'
+  },
+};
+
+/* ──────────────────────────────────────
+   카드 그리드 동적 렌더링
+   - endings 테이블: 엔딩별 1행 (최초 달성자 정보)
+   - ending_logs 테이블: 매 발견마다 1행 (달성률 계산용)
+────────────────────────────────────── */
+var TOTAL_ENDINGS = 20;
+var endingsMap = {};   // { ending_number: {custom_name, player_nickname, created_at} }
+var rateMap = {};      // { ending_number: 33 } (정수 퍼센트)
+
+/* 별점: 달성률이 낮을수록(희귀할수록) 별이 많아짐 */
+function rateToStars(rate) {
+  if (rate <= 3)  return '★★★★★';
+  if (rate <= 6)  return '★★★★☆';
+  if (rate <= 12) return '★★★☆☆';
+  if (rate <= 25) return '★★☆☆☆';
+  return '★☆☆☆☆';
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  return d.getFullYear() + '.' + pad(d.getMonth()+1) + '.' + pad(d.getDate()) +
+         ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+async function loadAndRenderCards() {
+  var grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+
+  /* 1. endings 테이블 (최초 달성자 정보) 조회 */
+  try {
+    var { data: endingsRows } = await db.from('endings').select('*');
+    (endingsRows || []).forEach(function(row) {
+      endingsMap[row.ending_number] = row;
+    });
+  } catch (err) {
+    console.error('endings 조회 실패:', err);
+  }
+
+  /* 2. ending_logs 테이블 (달성률 계산용) 조회 */
+  try {
+    var { data: logRows } = await db.from('ending_logs').select('ending_number');
+    var total = (logRows || []).length;
+    var counts = {};
+    (logRows || []).forEach(function(r) {
+      counts[r.ending_number] = (counts[r.ending_number] || 0) + 1;
+    });
+    if (total > 0) {
+      Object.keys(counts).forEach(function(num) {
+        rateMap[num] = Math.round(counts[num] / total * 100);
+      });
+    }
+  } catch (err) {
+    console.error('ending_logs 조회 실패:', err);
+  }
+
+  /* 3. 카드 렌더링 (1~20번) */
+  var discoveredCount = 0;
+  for (var i = 1; i <= TOTAL_ENDINGS; i++) {
+    var found = endingsMap[i];
+    var card = document.createElement('div');
+    card.id = 'ending-card-' + i;
+    var numStr = String(i).padStart(2, '0');
+
+    if (found) {
+      discoveredCount++;
+      var rate = (rateMap[i] !== undefined) ? rateMap[i] : 0;
+      var data = ENDING_DATA[i] || {};
+      var title = found.custom_name || data.title || ('엔딩 ' + numStr);
+
+      card.className = 'ending-card unlocked';
+      card.setAttribute('onclick', 'openEndingDetail(' + i + ')');
+      card.innerHTML =
+        '<div class="card-img-wrap">' +
+          '<img src="images/ending_card_' + numStr + '.png" alt="엔딩 ' + numStr + '" />' +
+          '<div class="card-info">' +
+            '<div class="card-top">' +
+              '<span class="card-ending-num">ENDING ' + numStr + '</span>' +
+              '<span class="card-ending-title">' + title + '</span>' +
+            '</div>' +
+            '<div class="card-bottom">' +
+              '<span class="card-achieve-rate">' + rate + '%</span>' +
+              '<span class="card-achieve-label">달성률</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    } else {
+      card.className = 'ending-card locked';
+      card.innerHTML =
+        '<div class="card-img-wrap">' +
+          '<img src="images/ending_card_locked.png" alt="잠긴 엔딩" />' +
+          '<div class="card-locked-info"><span class="card-locked-num">ENDING ' + numStr + '</span></div>' +
+        '</div>';
+    }
+
+    grid.appendChild(card);
+  }
+
+  /* 달성 배지 갱신 */
+  document.getElementById('achievement-badge').textContent =
+    discoveredCount + ' / ' + TOTAL_ENDINGS + ' 달성';
+
+  /* 4. 방금 발견한 엔딩이 있으면 발견 연출 실행 */
+  handleJustUnlocked();
+}
+
+/* ──────────────────────────────────────
+   방금 발견한 엔딩 처리
+   - 해당 카드로 스크롤
+   - 최초 달성자면: 빛나며 뒤집히는 애니메이션
+   - 비최초면: 살짝 강조만
+   - 애니메이션 후 상세 오버레이 자동 오픈
+────────────────────────────────────── */
+function handleJustUnlocked() {
+  var num = sessionStorage.getItem('justUnlockedEnding');
+  var isFirst = sessionStorage.getItem('justUnlockedIsFirst') === '1';
+
+  if (!num) return;
+
+  /* 한 번 처리하면 다시 안 뜨도록 즉시 제거 */
+  sessionStorage.removeItem('justUnlockedEnding');
+  sessionStorage.removeItem('justUnlockedIsFirst');
+
+  var card = document.getElementById('ending-card-' + num);
+  if (!card) return;
+
+  /* 카드 위치로 스크롤 */
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  setTimeout(function() {
+    if (isFirst) {
+      card.classList.add('discovering');
+      card.addEventListener('animationend', function onEnd() {
+        card.removeEventListener('animationend', onEnd);
+        card.classList.remove('discovering');
+        openEndingDetail(parseInt(num, 10));
+      }, { once: true });
+    } else {
+      card.classList.add('just-found');
+      card.addEventListener('animationend', function onEnd() {
+        card.removeEventListener('animationend', onEnd);
+        card.classList.remove('just-found');
+        openEndingDetail(parseInt(num, 10));
+      }, { once: true });
+    }
+  }, 500); /* 스크롤 끝나길 잠시 기다림 */
+}
+
+/* ──────────────────────────────────────
+   엔딩 상세 오버레이
+────────────────────────────────────── */
+function openEndingDetail(num) {
+  var d = ENDING_DATA[num] || {};
+  var found = endingsMap[num];
+  var numStr = String(num).padStart(2, '0');
+  var rate = (rateMap[num] !== undefined) ? rateMap[num] : 0;
+  var title = (found && found.custom_name) ? found.custom_name : (d.title || ('엔딩 ' + numStr));
+
+  document.getElementById('detail-ending-num').textContent = 'ENDING ' + numStr;
+  document.getElementById('detail-title').textContent      = title;
+
+  /* 통계: 실제 달성률 + 희귀도(달성률 기반) */
+  document.querySelector('#detail-stats .stat-cell:first-child .stat-value').textContent = rate + '%';
+  document.querySelector('.star-rating').textContent = rateToStars(rate);
+
+  /* 섹션 본문 (요약/해금조건은 시트 데이터 그대로 사용) */
+  var sections = document.querySelectorAll('.detail-section-body');
+  sections[0].innerHTML = d.summary || '';
+  sections[1].innerHTML = d.unlock || '';
+
+  /* 최초 달성자: 실제 DB 값 */
+  if (found) {
+    document.getElementById('detail-player-name').textContent = found.player_nickname || '알 수 없음';
+    document.getElementById('detail-player-date').textContent = '최초 달성일\u00a0 ' + formatDate(found.created_at);
+  } else {
+    document.getElementById('detail-player-name').textContent = '-';
+    document.getElementById('detail-player-date').textContent = '';
+  }
+
+  document.getElementById('ending-detail-overlay').classList.add('active');
+}
+
+function closeEndingDetail() {
+  document.getElementById('ending-detail-overlay').classList.remove('active');
+}
+
+document.getElementById('ending-detail-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeEndingDetail();
+});
+
+/* ──────────────────────────────────────
+   초기 실행
+────────────────────────────────────── */
+loadAndRenderCards();
+</script>
+
+</body>
+</html>

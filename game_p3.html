@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Folio Path - 파트 3 인어공주</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://hangeul.pstatic.net/hangeul_static/css/maru-buri.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://webfontbox.github.io/Arita/font.css">
+  <link rel="stylesheet" type="text/css" href="https://webfontbox.github.io/Arita/font.min.css">
+
+  <style>
+
+    /* ══════════════════════════════
+       기본 설정
+    ══════════════════════════════ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #e8dfc8;
+      font-family: 'MaruBuri', serif;
+      position: relative;
+      cursor: default;
+    }
+
+    /* ══════════════════════════════
+       배경 레이어
+    ══════════════════════════════ */
+    #bg-parchment {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    #bg-illust {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+    #bg-illust.reveal { opacity: 1; }
+
+    /* ══════════════════════════════
+       씬 컨테이너
+    ══════════════════════════════ */
+    #scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ══════════════════════════════
+       좌상단 홈 버튼
+    ══════════════════════════════ */
+    #btn-home {
+      position: absolute;
+      top: 2%;
+      left: 2%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      padding: 4px;
+      transition: filter 0.15s;
+    }
+    #btn-home:hover {
+      filter: invert(19%) sepia(28%) saturate(800%) hue-rotate(345deg) brightness(90%) contrast(95%);
+    }
+    #btn-home img { width: 28px; height: auto; display: block; }
+
+    /* ══════════════════════════════
+       우상단 설정 버튼
+    ══════════════════════════════ */
+    #btn-setting {
+      position: absolute;
+      top: 2%;
+      right: 2%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      padding: 4px;
+      transition: filter 0.15s;
+    }
+    #btn-setting:hover {
+      filter: invert(19%) sepia(28%) saturate(800%) hue-rotate(345deg) brightness(90%) contrast(95%);
+    }
+    #btn-setting img { width: 28px; height: auto; display: block; }
+
+    /* ══════════════════════════════
+       씬 이미지
+    ══════════════════════════════ */
+    #scene-img-wrap {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    #scene-img-wrap.reveal { opacity: 1; }
+
+    #scene-img {
+      left: 50%;
+      transform: translateX(-50%);
+      height: 100%;
+      position: absolute;
+      display: block;
+    }
+
+    /* ══════════════════════════════
+       본문 텍스트 영역
+    ══════════════════════════════ */
+    #script-area {
+      position: absolute;
+      top: 52%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      max-height: 25vh;
+      overflow-y: auto;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    #script-area::-webkit-scrollbar {
+      width: 6px;
+      background: transparent;
+    }
+    #script-area::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 3px;
+    }
+    #script-area:hover::-webkit-scrollbar-thumb,
+    #script-area:active::-webkit-scrollbar-thumb {
+      background: rgba(180, 154, 80, 0.35);
+    }
+    #script-area:hover {
+      scrollbar-color: rgba(180, 154, 80, 0.35) transparent;
+    }
+    #script-area.reveal { opacity: 1; }
+
+    #script-text {
+      font-family: 'MaruBuri', serif;
+      font-size: 1rem;
+      color: #2a1e08;
+      line-height: 1.95;
+      word-break: keep-all;
+      padding-left: 5%;
+    }
+
+    /* 타이핑 커서 */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ══════════════════════════════
+       선택지 카드 영역
+    ══════════════════════════════ */
+    #choices-wrap {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 62%;
+      height: 12%;
+      display: flex;
+      gap: 2%;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+    }
+    #choices-wrap.reveal {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #choices-wrap.hidden {
+      opacity: 0 !important;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(10px);
+    }
+
+    .choice-card {
+      flex: 1;
+      background-image: url('images/btn_choice.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-color: transparent;
+      border: none;
+      padding: 16px 18px 16px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      transition: filter 0.18s ease, transform 0.18s ease;
+      min-height: 80px;
+    }
+    .choice-card:hover { filter: brightness(0.92); transform: translateY(-2px); }
+    .choice-card:active { transform: translateY(0); }
+
+    .choice-icon { width: 50px; flex-shrink: 0; }
+
+    .choice-text-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .choice-label {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      color: #9a8060;
+      margin-bottom: 8%;
+    }
+
+    .choice-body {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.95rem;
+      color: #2a1e08;
+      line-height: 1.4;
+    }
+
+    .choice-arrow {
+      font-size: 1rem;
+      color: #9a8060;
+      flex-shrink: 0;
+      margin-right: 2%;
+    }
+
+    /* ══════════════════════════════
+       하단 안내 문구
+    ══════════════════════════════ */
+    #next-hint {
+      position: absolute;
+      bottom: 3%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 0.7rem;
+      color: #9a8060;
+      letter-spacing: 0.08em;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    #next-hint.visible { opacity: 1; }
+
+    /* ══════════════════════════════
+       씬 전환: 텍스트/선택지 영역만 페이드
+    ══════════════════════════════ */
+    /* 일반 씬 전환 — 검은 화면 없이 텍스트+선택지만 스르륵 */
+    #script-area.scene-out  { opacity: 0; transition: opacity 0.3s ease; }
+    #script-area.scene-in   { opacity: 0; }
+    #script-area.scene-in.reveal { opacity: 1; transition: opacity 0.5s ease 0.1s; }
+
+    #choices-wrap.scene-out { opacity: 0 !important; transition: opacity 0.2s ease; }
+
+    /* 엔딩 전환용 검은 overlay (엔딩 진입 시에만 사용) */
+    #ending-transition {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      z-index: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+    #ending-transition.fade-in  { opacity: 1;  pointer-events: auto; }
+    #ending-transition.fade-out { opacity: 0;  pointer-events: none; }
+
+    /* ══════════════════════════════
+       인트로 오버레이
+    ══════════════════════════════ */
+    #intro-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    #intro-overlay.fade-out {
+      animation: introFadeOut 1.6s ease forwards;
+    }
+    @keyframes introFadeOut {
+      0%   { opacity: 1; }
+      100% { opacity: 0; pointer-events: none; }
+    }
+
+    .intro-line {
+      opacity: 0;
+      color: #c8b98a;
+      text-align: center;
+      animation: introFadeIn 1s ease forwards;
+    }
+    @keyframes introFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #intro-tale {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
+      color: #8a7450;
+      animation-delay: 0.3s;
+      margin-bottom: 10px;
+    }
+    #intro-part {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      color: #8a7450;
+      animation-delay: 0.3s;
+      margin-bottom: 28px;
+    }
+    #intro-title {
+      font-family: 'Aritaburi', serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #e8d9b0;
+      animation-delay: 0.6s;
+      margin-bottom: 16px;
+    }
+    #intro-quote {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.95rem;
+      color: #a09070;
+      animation-delay: 1s;
+      margin-bottom: 24px;
+    }
+    #intro-divider {
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #6a5830, transparent);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: introFadeIn 1s ease 1.3s forwards;
+    }
+    #intro-player {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      color: #7a6a4a;
+      animation-delay: 1.5s;
+    }
+
+    /* ══════════════════════════════
+       씬 이미지 등장 애니메이션
+    ══════════════════════════════ */
+    #scene-img-wrap.reveal {
+      animation: sceneReveal 1.8s ease forwards;
+    }
+    @keyframes sceneReveal {
+      0%   { opacity: 0; filter: blur(12px) brightness(0.4); transform: translateX(-50%) scale(1.04); }
+      60%  { filter: blur(2px) brightness(0.85); }
+      100% { opacity: 1; filter: blur(0) brightness(1); transform: translateX(-50%) scale(1); }
+    }
+
+    /* ══════════════════════════════
+       ★ 엔딩 화면
+    ══════════════════════════════ */
+    #ending-screen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 50;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-y: auto;
+      padding: 3% 0 4%;
+    }
+    #ending-screen.active { display: flex; }
+
+    /* 엔딩 넘버 라벨 */
+    .ending-number {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.45em;
+      color: #9a7d40;
+      margin-top: 2%;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ending-number::before,
+    .ending-number::after {
+      content: '✦';
+      font-size: 0.55rem;
+      color: #b89a50;
+    }
+
+    /* 엔딩 제목 */
+    .ending-title {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: #2a1e08;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    /* 조개 라인 장식 */
+    .ending-arch-line {
+      width: 38%;
+      margin-bottom: 22px;
+    }
+
+    /* 엔딩 일러스트 */
+    .ending-illust {
+      width: 38%;
+      max-width: 560px;
+      border-radius: 2px;
+      margin-bottom: 26px;
+    }
+
+    /* 엔딩 본문 텍스트 박스 */
+    .ending-text-box {
+      width: 52%;
+      max-width: 720px;
+      max-height: 28vh;
+      position: relative;
+      padding: 28px 36px;
+      margin-bottom: 28px;
+      overflow-y: auto;
+
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    .ending-text-box::-webkit-scrollbar {
+      width: 6px;
+      background: transparent;
+    }
+    .ending-text-box::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 3px;
+    }
+    .ending-text-box:hover::-webkit-scrollbar-thumb,
+    .ending-text-box:active::-webkit-scrollbar-thumb {
+      background: rgba(180, 154, 80, 0.35);
+    }
+    .ending-text-box:hover {
+      scrollbar-color: rgba(180, 154, 80, 0.35) transparent;
+    }
+
+    /* 모서리 장식선 */
+    .ending-text-box::before,
+    .ending-text-box::after {
+      content: '';
+      position: absolute;
+      border-color: #b89a50;
+      border-style: solid;
+      width: 18px;
+      height: 18px;
+    }
+    .ending-text-box::before {
+      top: 8px; left: 8px;
+      border-width: 1px 0 0 1px;
+    }
+    .ending-text-box::after {
+      bottom: 8px; right: 8px;
+      border-width: 0 1px 1px 0;
+    }
+
+    /* 내부 추가 장식 (top-right, bottom-left) */
+    .ending-text-box .corner-tr,
+    .ending-text-box .corner-bl {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-color: #b89a50;
+      border-style: solid;
+    }
+    .ending-text-box .corner-tr {
+      top: 8px; right: 8px;
+      border-width: 1px 1px 0 0;
+    }
+    .ending-text-box .corner-bl {
+      bottom: 8px; left: 8px;
+      border-width: 0 0 1px 1px;
+    }
+
+    .ending-text-paragraph {
+      font-family: 'MaruBuri', serif;
+      font-size: 0.92rem;
+      color: #2a1e08;
+      line-height: 2;
+      text-align: center;
+      word-break: keep-all;
+      margin-bottom: 16px;
+    }
+    .ending-text-paragraph:last-child { margin-bottom: 0; }
+
+    /* 엔딩명 입력 영역 */
+    .ending-name-wrap {
+      width: 52%;
+      max-width: 720px;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      border: 1px solid #c4a96a;
+      border-radius: 2px;
+      overflow: hidden;
+      background: rgba(248, 242, 228, 0.6);
+    }
+
+    .ending-name-label {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 0.65rem;
+      color: #9a8060;
+      letter-spacing: 0.1em;
+      padding: 10px 14px 0;
+      white-space: nowrap;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      flex-shrink: 0;
+    }
+
+    .ending-name-input-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 14px 10px 0;
+    }
+
+    .ending-name-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.92rem;
+      color: #2a1e08;
+      width: 100%;
+      padding: 4px 0;
+    }
+    .ending-name-input::placeholder { color: #b8a888; }
+
+    .ending-name-btn {
+      background: #2a1e08;
+      border: none;
+      color: #c8b070;
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      padding: 0 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .ending-name-btn:hover { background: #3d2e12; }
+
+    /* ══════════════════════════════
+       모바일 반응형
+    ══════════════════════════════ */
+    @media (max-width: 768px) {
+      #scene-img-wrap { width: 88%; top: 3%; }
+      #script-area    { width: 88%; top: 50%; }
+      #choices-wrap   { width: 94%; flex-direction: column; gap: 2%; bottom: 3%; height: auto; }
+      #script-text    { font-size: 0.82rem; }
+
+      .ending-title       { font-size: 1.8rem; }
+      .ending-arch-line   { width: 80%; }
+      .ending-illust      { width: 85%; }
+      .ending-text-box    { width: 88%; padding: 20px 22px; }
+      .ending-name-wrap   { width: 88%; }
+    }
+
+
+
+    /* ══════════════════════════════
+       설정 오버레이 (공통)
+    ══════════════════════════════ */
+    .overlay-panel {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay-box {
+      background: #f5ead0;
+      border: 3px solid #8b6914;
+      border-radius: 12px;
+      padding: 32px 28px;
+      min-width: 300px;
+      text-align: center;
+      font-family: 'Nanum Myeongjo', serif;
+      color: #3a2a00;
+      position: relative;
+    }
+
+    .overlay-close {
+      position: absolute;
+      top: 12px; right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #8b6914;
+    }
+
+    .overlay-box h2 { margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+
+<!-- 배경 -->
+<img id="bg-parchment" src="images/bg_parchment.png" alt="배경" />
+<img id="bg-illust"    src="images/bg_illust_game.png" alt="배경 일러스트" />
+
+<!-- 배경음 -->
+<audio id="bgm" src="sound/back.mp3" loop preload="auto"></audio>
+<!-- 클릭음 -->
+<audio id="sfx-click" src="sound/mouse.mp3" preload="auto"></audio>
+
+<!-- 엔딩 전환용 검은 overlay -->
+<div id="ending-transition"></div>
+
+<!-- ══ 인트로 오버레이 ══ -->
+<div id="intro-overlay">
+  <p  id="intro-tale"   class="intro-line">TALE 01</p>
+  <p  id="intro-part"   class="intro-line">PART 3 &nbsp;✦&nbsp; 인어공주</p>
+  <h1 id="intro-title"  class="intro-line">인어공주</h1>
+  <p  id="intro-quote"  class="intro-line">"모든 선택의 끝에서, 그녀는 마지막 갈림길에 섰다."</p>
+  <div id="intro-divider"></div>
+  <p  id="intro-player" class="intro-line"><span id="intro-name">플레이어</span>님의 이야기가 시작됩니다.</p>
+</div>
+
+<!-- ══ 게임 씬 ══ -->
+<div id="scene">
+
+  <button id="btn-home" onclick="confirmHome()">
+    <img src="images/icon_home.png" alt="홈으로" />
+  </button>
+
+  <button id="btn-setting" onclick="openOverlay('overlay-setting')">
+    <img src="images/icon_setting.png" alt="설정" />
+  </button>
+
+  <div id="scene-img-wrap">
+    <img id="scene-img" src="images/p3_scene_01.png" alt="씬 이미지" />
+  </div>
+
+  <div id="script-area">
+    <p id="script-text"></p>
+  </div>
+
+  <div id="choices-wrap"></div>
+
+  <div id="next-hint">▶&nbsp; 화면을 누르면 다음으로 이동합니다.</div>
+
+</div><!-- /scene -->
+
+<!-- ══ 엔딩 화면 ══ -->
+<div id="ending-screen">
+  <!-- 홈 버튼 (엔딩화면용) -->
+  <button id="ending-btn-home" onclick="confirmHome()"
+    style="position:fixed;top:2%;left:2%;background:none;border:none;cursor:pointer;z-index:60;">
+    <img src="images/icon_home.png" alt="홈으로" style="width:28px;" />
+  </button>
+
+  <!-- 설정 버튼 (엔딩화면용) -->
+  <button id="ending-btn-setting" onclick="openOverlay('overlay-setting')"
+    style="position:fixed;top:2%;right:2%;background:none;border:none;cursor:pointer;z-index:60;">
+    <img src="images/icon_setting.png" alt="설정" style="width:28px;" />
+  </button>
+
+  <div class="ending-number" id="ending-number-label">ENDING 01</div>
+  <h2 class="ending-title" id="ending-title-text">보이지 않은 생일</h2>
+  <img class="ending-arch-line" id="ending-arch-img" src="images/arch_ed1.png" alt="" />
+  <img class="ending-illust"    id="ending-illust-img" src="images/game_ed1.png" alt="엔딩 일러스트" />
+
+  <div class="ending-text-box">
+    <div class="corner-tr"></div>
+    <div class="corner-bl"></div>
+    <div id="ending-text-content"></div>
+  </div>
+
+  <!-- ── 최초 달성자용: 엔딩명 입력 + 완료 버튼 ── -->
+  <div class="ending-name-wrap" id="ending-name-wrap-first" style="display:none;">
+    <div class="ending-name-label">나만의 엔딩명을 작성할 수 있어요</div>
+    <div class="ending-name-input-col">
+      <input class="ending-name-input" id="ending-name-input"
+             type="text" placeholder="여기에 입력하세요" maxlength="30" />
+    </div>
+    <button class="ending-name-btn" id="btn-ending-complete-first" onclick="completeEnding()">
+      ✦ &nbsp;완료&nbsp; ✦
+    </button>
+  </div>
+
+  <!-- ── 일반(비최초) 플레이어용: 안내문구 + 완료 버튼 ── -->
+  <div class="ending-complete-wrap" id="ending-complete-wrap-normal" style="display:none; flex-direction:column; gap:14px; align-items:center;">
+    <p id="ending-normal-notice" style="font-family:'MaruBuri',serif; font-size:0.78rem; color:#9a8060; line-height:1.85; text-align:center; word-break:keep-all; margin:0;"></p>
+    <button class="ending-name-btn" id="btn-ending-complete-normal" onclick="completeEnding()">
+      ✦ &nbsp;완료&nbsp; ✦
+    </button>
+  </div>
+</div><!-- /ending-screen -->
+
+<!-- 설정 오버레이 (공통 설정 UI) -->
+<div id="overlay-setting" class="overlay-panel">
+  <div class="overlay-box" style="max-width: 420px; width: 90%; text-align: left;">
+    <button class="overlay-close" onclick="closeOverlay('overlay-setting')">✕</button>
+    <h2>설정</h2>
+
+    <!-- 배경음 크기 -->
+    <div style="margin-bottom: 22px;">
+      <label style="display:flex; justify-content:space-between; font-size:0.88rem; margin-bottom:8px;">
+        <span>배경음 크기</span>
+        <span id="setting-bgm-volume-label">35%</span>
+      </label>
+      <input type="range" id="setting-bgm-volume" min="0" max="100" step="5"
+             value="35" style="width:100%;"
+             oninput="onBgmVolumeChange(this.value)" />
+    </div>
+
+    <!-- 클릭음 on/off -->
+    <div style="margin-bottom: 22px; display:flex; align-items:center; justify-content:space-between;">
+      <label for="setting-click-toggle" style="font-size:0.88rem;">마우스 클릭음</label>
+      <input type="checkbox" id="setting-click-toggle" checked
+             style="width:20px; height:20px; cursor:pointer;"
+             onchange="onClickToggleChange(this.checked)" />
+    </div>
+
+    <!-- 텍스트 출력 속도 -->
+    <div>
+      <label style="display:block; font-size:0.88rem; margin-bottom:10px;">텍스트 출력 속도</label>
+      <div style="display:flex; gap:14px; font-size:0.85rem;">
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="slow"
+                 onchange="onTextSpeedChange(this.value)" /> 느리게
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="normal" checked
+                 onchange="onTextSpeedChange(this.value)" /> 보통
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="fast"
+                 onchange="onTextSpeedChange(this.value)" /> 빠르게
+        </label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+    // 우클릭 방지
+    document.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+    });
+
+    // 드래그 및 블록 선택 방지
+    document.addEventListener('dragstart', function(event) {
+        event.preventDefault();
+    });
+    document.addEventListener('selectstart', function(event) {
+        event.preventDefault();
+    });
+</script>
+
+<!-- ════════════════════════════════════════════════════
+     공통 사운드 & 설정 엔진
+════════════════════════════════════════════════════ -->
+<script>
+/* ════════════════════════════════════════════════════
+   공통 사운드 & 설정 엔진
+   - 모든 페이지(index, library, archive, game_p1~3)에
+     동일하게 삽입한다.
+   - localStorage로 설정값을 공유하고,
+     배경음 재생 위치를 이어받아 끊김을 최소화한다.
+════════════════════════════════════════════════════ */
+
+/* ── 설정값 불러오기 (없으면 기본값) ── */
+function getSetting(key, def) {
+  var v = localStorage.getItem(key);
+  return (v === null) ? def : v;
+}
+
+var SETTINGS = {
+  bgmVolume: parseInt(getSetting('folio_bgmVolume', '35'), 10),   // 0~100
+  clickEnabled: getSetting('folio_clickEnabled', 'on') === 'on',  // on/off
+  textSpeed: getSetting('folio_textSpeed', 'normal'),             // slow/normal/fast
+};
+
+/* 텍스트 출력 속도 → 1글자당 ms (typeAppend 등에서 사용) */
+var TEXT_SPEED_MS = { slow: 65, normal: 40, fast: 18 };
+function getTypeSpeed() {
+  return TEXT_SPEED_MS[SETTINGS.textSpeed] || TEXT_SPEED_MS.normal;
+}
+
+/* ── 사운드 엘리먼트 ── */
+var bgm      = document.getElementById('bgm');
+var sfxClick = document.getElementById('sfx-click');
+var bgmStarted = false;
+
+/* 배경음 시작 + 이어듣기 위치 복원 */
+function startBgm() {
+  if (bgmStarted) return;
+  bgmStarted = true;
+  bgm.volume = SETTINGS.bgmVolume / 100;
+
+  var savedTime = parseFloat(sessionStorage.getItem('folio_bgmTime') || '0');
+  if (savedTime > 0 && isFinite(savedTime)) {
+    bgm.currentTime = savedTime;
+  }
+  bgm.play().catch(function(){});
+}
+
+/* 클릭음 재생 (설정에서 꺼져있으면 재생 안 함) */
+function playClick() {
+  if (!SETTINGS.clickEnabled) return;
+  sfxClick.currentTime = 0;
+  sfxClick.play().catch(function(){});
+}
+
+/* 첫 클릭 시 배경음 시작 + 매 클릭마다 클릭음 재생 */
+document.addEventListener('click', function() {
+  startBgm();
+  playClick();
+}, true);
+
+/* 1초마다 배경음 재생 위치를 저장 (다음 페이지에서 이어 듣기 위함) */
+setInterval(function() {
+  if (bgm && !bgm.paused) {
+    sessionStorage.setItem('folio_bgmTime', String(bgm.currentTime));
+  }
+}, 1000);
+
+/* 페이지를 벗어나기 직전에도 한 번 더 저장 */
+window.addEventListener('pagehide', function() {
+  if (bgm) {
+    sessionStorage.setItem('folio_bgmTime', String(bgm.currentTime));
+  }
+});
+
+
+/* ════════════════════════════════════════════════════
+   설정 오버레이 — 공통 UI
+════════════════════════════════════════════════════ */
+function openOverlay(id) {
+  var el = document.getElementById(id);
+  el.classList.add('active');
+  el.style.display = 'flex';
+
+  if (id === 'overlay-setting') {
+    syncSettingUI();
+  }
+}
+
+function closeOverlay(id) {
+  var el = document.getElementById(id);
+  el.classList.remove('active');
+  el.style.display = 'none';
+}
+
+/* 오버레이 바깥 클릭하면 닫히게 (.overlay, .overlay-panel 둘 다 지원) */
+document.querySelectorAll('.overlay, .overlay-panel').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      closeOverlay(overlay.id);
+    }
+  });
+});
+
+/* 설정창 UI를 현재 SETTINGS 값으로 동기화 */
+function syncSettingUI() {
+  var volSlider = document.getElementById('setting-bgm-volume');
+  var volLabel  = document.getElementById('setting-bgm-volume-label');
+  var clickToggle = document.getElementById('setting-click-toggle');
+  var speedRadios = document.querySelectorAll('input[name="setting-text-speed"]');
+
+  if (volSlider) {
+    volSlider.value = SETTINGS.bgmVolume;
+    if (volLabel) volLabel.textContent = SETTINGS.bgmVolume + '%';
+  }
+  if (clickToggle) {
+    clickToggle.checked = SETTINGS.clickEnabled;
+  }
+  speedRadios.forEach(function(radio) {
+    radio.checked = (radio.value === SETTINGS.textSpeed);
+  });
+}
+
+/* 배경음 크기 변경 */
+function onBgmVolumeChange(value) {
+  SETTINGS.bgmVolume = parseInt(value, 10);
+  localStorage.setItem('folio_bgmVolume', String(SETTINGS.bgmVolume));
+  bgm.volume = SETTINGS.bgmVolume / 100;
+  var volLabel = document.getElementById('setting-bgm-volume-label');
+  if (volLabel) volLabel.textContent = SETTINGS.bgmVolume + '%';
+}
+
+/* 클릭음 on/off 변경 */
+function onClickToggleChange(checked) {
+  SETTINGS.clickEnabled = checked;
+  localStorage.setItem('folio_clickEnabled', checked ? 'on' : 'off');
+}
+
+/* 텍스트 속도 변경 */
+function onTextSpeedChange(value) {
+  SETTINGS.textSpeed = value;
+  localStorage.setItem('folio_textSpeed', value);
+}
+</script>
+
+<!-- ════════════════════════════════════════════════════
+     Supabase 연결
+════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://tflyktyphhotsmvmxgyl.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_ah-o7ASSLP-4q4jKEQXP9g_L7ZQbd3S';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════
+   수치 & 플래그 — 이전 파트(P2)에서 이어받음
+════════════════════════════════════════════════════ */
+var savedStats = JSON.parse(sessionStorage.getItem('stats') || 'null');
+var savedFlags = JSON.parse(sessionStorage.getItem('flags') || 'null');
+
+var stats = savedStats || { A: 0, B: 0, C: 0, D: 0, count: 0 };
+var flags = savedFlags || {
+  hairColor: '',
+  shellGiven: false,
+  painRemoved: false,
+  visitedMarket: false,
+  visitedDock: false,
+  visitedCastle: false,
+};
+
+/* ════════════════════════════════════════════════════
+   방(room) 정보 — library.html에서 넘어온 값
+   (P3는 클리어 시 다음 방을 만들지 않고 엔딩으로 종료됨)
+════════════════════════════════════════════════════ */
+var ROOM_ID    = sessionStorage.getItem('roomId');
+var LINEAGE_ID = sessionStorage.getItem('lineageId');
+var endingReached = false;
+
+/* ════════════════════════════════════════════════════
+   생존 신호: 일정 간격으로 last_active 갱신
+════════════════════════════════════════════════════ */
+var heartbeatTimer = null;
+function startHeartbeat() {
+  if (!ROOM_ID) return;
+  heartbeatTimer = setInterval(function() {
+    db.from('rooms')
+      .update({ last_active: new Date().toISOString() })
+      .eq('id', ROOM_ID)
+      .then(function(){});
+  }, 30000);
+}
+
+/* ════════════════════════════════════════════════════
+   이탈 시 방 삭제
+════════════════════════════════════════════════════ */
+function deleteRoomOnExit() {
+  if (!ROOM_ID || endingReached) return;
+  var url = SUPABASE_URL + '/rest/v1/rooms?id=eq.' + ROOM_ID;
+  var blob = new Blob([JSON.stringify({})], { type: 'application/json' });
+  try {
+    navigator.sendBeacon(url + '&apikey=' + SUPABASE_KEY, blob);
+  } catch(e) {}
+  fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+    },
+    keepalive: true
+  }).catch(function(){});
+}
+
+window.addEventListener('pagehide', deleteRoomOnExit);
+window.addEventListener('beforeunload', function(e) {
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+
+function addStats(a, b, c, d, cnt) {
+  stats.A += (a || 0);
+  stats.B += (b || 0);
+  stats.C += (c || 0);
+  stats.D += (d || 0);
+  stats.count += (cnt || 0);
+}
+
+
+/* ════════════════════════════════════════════════════
+   씬 데이터 정의
+   각 씬: { img, lines[], choices[], next }
+   choices: { label, body, stats:[a,b,c,d,cnt], next, flag(선택) }
+   next: 씬ID 또는 함수
+════════════════════════════════════════════════════ */
+
+var SCENES = {
+
+  /* ══ P3 씬 1-1 ~ 1-3 : 정략 여행 출발 ══ */
+  /* 이미지: p3_scene_01.png */
+  's1': {
+    img: 'p3_scene_01.png',
+    lines: [
+      '"나와 함께 바다 너머의 이웃 나라로 가주겠니?',
+      '그곳에서도 너는 나의 가장 가까운 곁에 있어 줬으면 해."',
+      '',
+      '왕자의 다정한 제안은 내 심장을 뛰게 했지만, 동시에 차갑게 얼어붙게 만들었다.',
+      '그가 말하는 여행이 사실은 정략결혼을 위한 맞선 여행임을 소문을 통해 이미 알고 있었기 때문이다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '속에서 울분이 올라온다',
+        result: '기쁨보다 다른 감정이 불쑥 올라왔다.',
+        stats: [0,0,0,3,0], next: 's2' },
+      { label: '선택 B', body: '슬프기도 하고, 답답하기도 한다',
+        result: '',
+        stats: [1,0,0,2,0], next: 's2' },
+      { label: '선택 C', body: '애정이 식은 건 아니지만, 그렇다고 처음 만났을 때처럼 열렬하지도 않았다',
+        result: '',
+        stats: [0,2,0,-1,0], next: 's2' },
+    ]
+  },
+
+  /* ══ P3 씬 2-1 ~ 2-3 : 이웃나라 도착 ══ */
+  /* 이미지: p3_scene_02.png */
+  's2': {
+    img: 'p3_scene_02.png',
+    lines: [
+      '이웃 나라의 항구에 도착하자마자 우리를 맞이한 건 요란한 트럼펫 소리와 하늘을 수놓은 오색빛 깃발들이었다.',
+      '진주 장식으로 가득했던 내 방과 은색 머리카락을 빗어주던 언니들의 노래가 그리워져,',
+      '화려한 환영식이 도리어 나를 지독하게 외롭게 만들었다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '계속해서 안 나와줬으면 좋겠다',
+        result: '',
+        stats: [0,0,0,3,0], next: function(){ checkCount('s3'); } },
+      { label: '선택 B', body: '걱정된다. 무슨 일이 있는 걸까?',
+        result: '',
+        stats: [0,0,2,0,0], next: function(){ checkCount('s3'); } },
+      { label: '선택 C', body: '그냥 빨리 보고 다시 돌아갔으면 한다',
+        result: '',
+        stats: [1,0,0,0,0], next: function(){ checkCount('s3'); } },
+    ]
+  },
+
+  /* ══ P3 씬 3-1 ~ 3-3 : 공주 등장 전 ══ */
+  /* 이미지: p3_scene_03.png */
+  's3': {
+    img: 'p3_scene_03.png',
+    lines: [
+      '무도회와 알현식이 며칠째 이어졌지만, 정작 주인공인 공주는 수도원에서 예절을',
+      '배우느라 아직 모습을 드러내지 않았다.',
+      '잠시 축제의 소란을 피해 홀로 산책하던 중, 왕자가 들려주었던 바다 이야기가 떠올랐다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '집이 그리워진다',
+        result: '',
+        stats: [3,0,0,0,0], next: 's4' },
+      { label: '선택 B', body: '생각보다 재밌는 이야기였다',
+        result: '',
+        stats: [0,1,0,1,0], next: 's4' },
+      { label: '선택 C', body: '잘 모르겠다....',
+        result: '',
+        stats: [0,0,1,0,0], next: 's4' },
+    ]
+  },
+
+  /* ══ P3 씬 4-1 ~ 4-2 : 공주 첫 대면 ══ */
+  /* 이미지: p3_scene_04.png */
+  's4': {
+    img: 'p3_scene_04.png',
+    lines: [
+      '그렇게 영원히 흐르지 않을 것 같던 시간이 지나고, 마침내 공주가 그 모습을 드러냈다.',
+      '에메랄드보다 청아하고 깊은 푸른색 눈동자는 보는 사람의 넋을 빼놓기에 충분했다.',
+    ],
+    choices: [],
+    next: 's4b'
+  },
+
+  's4b': {
+    img: 'p3_scene_04.png',
+    lines: [
+      '그런데 그녀를 바라보는 왕자의 모습이 심상치 않다.',
+      '무언가에 홀린 듯한 약한 떨림이 그의 전신에서 느껴졌다.',
+      '',
+      '"당신이었나요? 나를... 구해준 사람이."',
+      '',
+      '왕자의 입에서 터져 나온 그 외침은 나의 심장을 얼어붙게 만들었다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '왕자가 확신했을 시 →',
+        result: '"당신이었군요! 내가 바닷가에 휩쓸려왔을 때 나를 구해준 사람이...!" 돌이킬 수 없는 선택을 했다는 것을 느꼈다.',
+        stats: [0,0,0,3,1], next: function(){ checkCount('s5'); } },
+      { label: '선택 B', body: '왕자가 의심했을 시 →',
+        result: '"전에... 어디에서 본 적 있지 않나요?" 눈 앞의 공주와 자신의 닮은 점이라곤 눈동자 색밖에 없다.',
+        stats: [0,0,3,0,0], next: function(){ checkCount('s5'); } },
+      { label: '선택 C', body: '왕자가 보류했을 시 →',
+        result: '"은인을 이렇게 뵙게 되다니. 운명이라는 건 실존하나봅니다." 생각보다 차분한 반응이다.',
+        stats: [0,1,1,0,0], next: function(){ checkCount('s5'); } },
+      { label: '선택 D', body: '왕자가 소녀를 봤을 시 →',
+        result: '왕자는 머뭇거리며 내쪽의 반응을 살핀다. 배려를 해주는 걸까.',
+        stats: [0,0,0,2,0], next: function(){ checkCount('s5'); } },
+    ]
+  },
+
+  /* ══ P3 씬 5-1 ~ 5-3 : 공주 소개, 첫날 연회 ══ */
+  /* 이미지: p3_scene_05.png */
+  's5': {
+    img: 'p3_scene_05.png',
+    lines: [
+      '이웃나라 공주는 잠시 놀란 듯 눈을 동그랗게 뜨더니, 환하게 웃으며 고개를 끄덕인다.',
+      '',
+      '"\'길에서 찾은 사랑스러운 여인\'이라... 정말 아름다운 소녀네요.',
+      '기억을 잃었으니 선뜻 이름을 지어 부르기도 그렇겠지요."',
+    ],
+    choices: [
+      { label: '선택 A', body: '밝게 답한다',
+        result: '이야기를 다 들은 후, 공주는 이해한다는 듯 고개를 끄덕인다.',
+        stats: [0,1,0,0,0], next: 's5b' },
+      { label: '선택 B', body: '주위의 눈치를 보며 움직인다',
+        result: '',
+        stats: [0,0,1,0,0], next: 's5b' },
+    ]
+  },
+
+  's5b': {
+    img: 'p3_scene_05.png',
+    lines: [
+      '그렇게 간단한 소개가 끝난 후, 화려한 연회가 열린다.',
+      '왕자는 공주와 대화하며 은인인지 확인하려 하는 것 같았다.',
+      '그 모습을 멀리서 지켜보다가, 연회장 홀 한 가운데에 서서',
+      '발 아래에서 기어오르는 고통을 참아내고 누구보다 강렬히, 화려하게 팔과 다리를 움직이며 춤을 춘다.',
+    ],
+    choices: [],
+    next: 's5c'
+  },
+
+  's5c': {
+    img: 'p3_scene_05.png',
+    lines: [
+      '춤이 끝나고 사방에서 박수 소리가 들린다. 그러나 그다지 유쾌하진 않았다.',
+      '왕자가 나를 부르더니 공주와 둘만의 시간을 가지라며 바깥으로 에스코트했다.',
+      '그러나 공주는 맑은 얼굴로 손을 내밀었다.',
+      '',
+      '"제가 왕자님께 부탁드렸어요. 괜찮다면 저랑 같이 산책하러 갈래요?"',
+    ],
+    choices: [
+      { label: '선택 A', body: '꽃을 받는다',
+        result: '마녀의 저주로 걸을 때마다 느껴지던 날카로운 칼날 같은 고통이 잠시 사그라든 것 같다. 손에 쥔 꽃은 생각보다 차갑고, 또 따스했다.',
+        stats: [0,2,1,-1,0], next: 's6', flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.flowerFlag=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
+      { label: '선택 B', body: '정중하게 거절한다',
+        result: '공주는 아쉬운 듯 작게 미소 지으며 내밀었던 손을 천천히 거두었다.',
+        stats: [1,0,0,1,0], next: 's6' },
+      { label: '선택 C', body: '기분 나쁜 티를 낸다',
+        result: '공주는 당황한 듯 눈을 동그랗게 뜨더니, 이내 미안한 표정으로 고개를 숙였다.',
+        stats: [0,0,0,2,1], next: 's6' },
+    ]
+  },
+
+  /* ══ P3 씬 6-1 ~ 6-2 : 시장 또는 부둣가 선택 ══ */
+  /* 이미지: p3_scene_06.png */
+  's6': {
+    img: 'p3_scene_06.png',
+    lines: [
+      '다음날부터 왕자는 여러 일정에 참여하느라 잘 보이지 않았다.',
+      '기분도 전환할 겸 이때를 기회삼아 몰래 성 밖으로 잠깐 나갔다 오자.',
+      '어디로 갈까? 시간상 한 군데만 들릴 수 있을 것 같다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '온갖 물건과 사람들이 제일 많이 왕래한다던 시장에 가보고 싶어',
+        result: '가벼운 발걸음으로 시장으로 걸음을 옮긴다.',
+        stats: [0,2,0,0,0], next: 's6_market',
+        flag: function(){ flags.visitedMarket = true; } },
+      { label: '선택 B', body: '물이 많은 곳에 가보고 싶어. 가까이에 부둣가가 있었던 것 같은데...',
+        result: '가벼운 발걸음으로 부둣가로 걸음을 옮긴다.',
+        stats: [0,1,1,0,0], next: 's6_dock',
+        flag: function(){ flags.visitedDock = true; } },
+      { label: '선택 C', body: '그냥 성 안에만 있을래. 그게 좋아',
+        result: '',
+        stats: [1,0,1,0,0], next: 's9',
+        flag: function(){ flags.visitedCastle = true; } },
+    ]
+  },
+
+  /* ══ P3 씬 6-시장 ══ */
+  's6_market': {
+    img: 'p3_scene_06.png',
+    lines: [
+      '시장에 도착했다. 온갖 소리와 활기로 들끓는 시장은 그곳에 서 있는 것만으로도 묘하게 힘이 나게 했다.',
+      '화려하게 진열된 좌판 사이에서 여러 색의 실을 정교하게 꼬아 만든 팔찌가 시선을 붙잡았다.',
+      '그 팔찌의 색들은 바닷속 성에서 함께 지내던 언니들의 머리카락 색처럼 다채롭고 선명했다.',
+      '뒤에서 익숙한 다정한 목소리가 들려왔다.',
+      '',
+      '"눈썰미가 좋으시네요. 그거, 바다타고 건너온 실입니다."',
+      '',
+      '검은 눈동자인 왕자와 다르게 반짝이는 푸른 눈동자를 가진 청년이었다.',
+      '',
+      '"이것도 기념인데... 어떻습니까, 제가 아가씨께 하나 선물해드려도?"',
+    ],
+    choices: [
+      { label: '선택 A', body: '...돈 있는데? 들고 온 은화가 들어있는 주머니를 보여준다',
+        result: '당당한 태도에 청년은 잠시 멍한 표정을 짓더니, 이내 유쾌하게 웃음을 터뜨린다.',
+        stats: [0,1,0,0,0], next: 's6_market2',
+        flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.marketMan=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
+      { label: '선택 B', body: '지상에서는 이런 일이 흔한 걸까...? 경계하며 거절의 의사를 표한다',
+        result: '청년은 무안한 듯 뒷머리를 긁적이다가도 이내 수긍하며 물러난다.',
+        stats: [1,0,1,0,0], next: 's8' },
+      { label: '선택 C', body: '냉큼 끄덕인다. 사준다는데 거절할 필욘 없지',
+        result: '청년이 가장 선명한 푸른색 실 팔찌를 골라 당신의 손목에 직접 묶어준다.',
+        stats: [0,3,0,0,0], next: 's6_market2',
+        flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.marketMan=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
+    ]
+  },
+
+  's6_market2': {
+    img: 'p3_scene_06.png',
+    lines: [
+      '대답을 재촉하는 대신 시장 구석구석의 재미있는 이야기들을 들려주었다.',
+      '저곳의 과일은 맛이 없는데, 아주머니는 친절하다는 거. 저쪽의 영감은 가짜 보석으로 여행객을 낚는다는 것 등등.',
+      '왕궁의 엄격한 예법이나 왕자의 무심함과는 다른 그의 생동감 넘치는 눈빛에,',
+      '나도 모르게 미묘한 흥미를 느끼며 조용히 귀를 기울였다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '바다 밖 세상 이야기에 관심을 가진다',
+        result: '청년은 바다 건너 대륙에는 눈이 녹지 않는 산과 거대한 사막이 있다는 이야기를 들려준다.',
+        stats: [0,3,0,0,0], next: 's8' },
+      { label: '선택 B', body: '손짓과 몸짓으로 그의 질문에 답하려 노력한다',
+        result: '"말하지 않아도 다 느껴집니다. 당신의 눈이 세상 누구보다 많은 것을 말해주고 있거든요."',
+        stats: [0,1,1,0,0], next: 's8' },
+      { label: '선택 C', body: '성으로 돌아가야 할 시간을 생각하며 초조해한다',
+        result: '"누군가 당신을 아주 애타게 기다리고 있나 봅니다."',
+        stats: [0,0,0,3,0], next: 's8' },
+    ]
+  },
+
+  /* ══ P3 씬 6-부둣가 ══ */
+  's6_dock': {
+    img: 'p3_scene_07.png',
+    lines: [
+      '늦은 오후라서 그런지, 사람이 많진 않았다.',
+      '파도 소리를 따라 부둣가를 천천히 걷는다.',
+      '잠시 걸음을 멈추어 바다를 바라보던 순간, 시야 한쪽에 누군가가 들어온다.',
+      '검은 머리의 한 청년이 자리에 서서 수평선을 바라보고 있다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '남자에게 다가간다',
+        result: '발소리를 들은 남자가 천천히 고개를 돌린다. 잠시 눈이 마주친다.',
+        stats: [0,2,0,0,0], next: 's6_dock2',
+        flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.marketMan=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
+      { label: '선택 B', body: '조금 더 지켜본다',
+        result: '남자는 한동안 같은 자세로 바다만 바라본다. 마치 무언가를 고민하는 사람처럼 보인다.',
+        stats: [0,0,2,0,0], next: 's6_dock2',
+        flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.marketMan=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
+      { label: '선택 C', body: '다른 곳으로 이동한다',
+        result: '굳이 말을 걸 필요는 없을 것이다. 발걸음을 돌린다.',
+        stats: [1,0,0,0,0], next: 's8' },
+    ]
+  },
+
+  's6_dock2': {
+    img: 'p3_scene_07.png',
+    lines: [
+      '얼마 지나지 않아 상대가 먼저 다가와 말을 건넨다.',
+      '',
+      '"좋은 풍경이죠." 그는 여전히 바다를 바라보고 있다.',
+      '',
+      '"이상하게 볼 때마다 눈을 못 떼겠더라고요.',
+      '당신은 어떤 이유로 이곳에 온 건가요?"',
+    ],
+    choices: [
+      { label: '선택 A', body: '남자 옆에 선다',
+        result: '남자는 잠시 놀란 듯하다가 옅게 웃는다. 잠시 말없이 나란히 바다를 바라본다.',
+        stats: [0,1,0,0,0], next: 's6_dock3' },
+      { label: '선택 B', body: '바다를 가리킨다',
+        result: '남자는 손끝이 향한 곳을 따라 시선을 옮긴다. "그럴 수도 있겠네요."',
+        stats: [0,0,2,0,0], next: 's6_dock3' },
+      { label: '선택 C', body: '시선을 피한다',
+        result: '그러나 눈치 빠른 상대는 더 이상 묻지 않는다.',
+        stats: [1,0,0,0,0], next: 's6_dock3' },
+    ]
+  },
+
+  's6_dock3': {
+    img: 'p3_scene_07.png',
+    lines: [
+      '잠시 침묵이 흐른다. 이상하게도 어색하지는 않다.',
+      '남자는 근처에 세워 둔 작은 수레에서 작은 꽃팔찌 하나를 집어 든다.',
+      '',
+      '"잘 하는 게 이런 것밖에 없지만... 이번에도 기념품이라고 생각해주세요."',
+    ],
+    choices: [
+      { label: '선택 A', body: '꽃팔찌를 받는다',
+        result: '청년은 만족스러운 듯 웃는다. "끈팔찌랑은 또 다른 느낌이네요. 이것도 잘 어울릴 줄 알았습니다." 손목에서 꽃향기가 은은하게 풍겨온다.',
+        stats: [0,3,0,0,0], next: 's8',
+        flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.flowerFlag=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
+      { label: '선택 B', body: '잠시 망설인다',
+        result: '청년은 당신의 표정을 살피더니 어깨를 으쓱이며 한 발자국 물러난다. "부담 가질 필요는 없어요."',
+        stats: [0,0,1,0,0], next: 's8' },
+      { label: '선택 C', body: '경계하며 거절의 의사를 표한다',
+        result: '청년은 아쉽다는 듯 웃으며 꽃팔찌를 다시 수레 위에 올려놓는다.',
+        stats: [1,0,0,0,0], next: 's8' },
+    ]
+  },
+
+  /* ══ P3 씬 8-1 : 성으로 귀환 ══ */
+  /* 이미지: p3_scene_08.png */
+  's8': {
+    img: 'p3_scene_08.png',
+    lines: [
+      '이윽고 저 멀리 교회에서 종이 세 번 울리는 소리가 들려온다.',
+      '즐거웠던 짧은 만남을 뒤로하고 다시 적막한 궁성으로 발걸음을 옮겨야 할 때다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '가볍게 손을 흔들고 작별인사를 한다',
+        result: '청년은 당신이 인파 속으로 사라질 때까지 그 자리에 서서 미소를 지으며 손을 흔들어 주었다.',
+        stats: [0,1,0,0,0], next: 's9' },
+      { label: '선택 B', body: '답례로 머리에 꽂았던 작은 장식을 건넨다',
+        result: '"내일도, 그다음 날도 여기서 기다리겠습니다!" 그 외침이 성문 안으로 들어서는 당신의 귓가에 오래도록 맴돌았다.',
+        stats: [0,3,0,0,0], next: 's9' },
+    ]
+  },
+
+  /* ══ P3 씬 9-1 ~ 9-3 : 성 안 선택 ══ */
+  /* 이미지: p3_scene_09.png */
+  's9': {
+    img: 'p3_scene_09.png',
+    lines: [
+      '성은 언제나 고요했고, 적적했다.',
+      '복도에는 화려한 장식과 그림들이 벽을 가득 메우고 있다.',
+      '문득, 눈앞에 갈림길이 눈에 들어온다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '왼쪽의 초상화가 걸린 복도로 향한다',
+        result: '',
+        stats: [0,0,2,0,0], next: 's10' },
+      { label: '선택 B', body: '오른쪽의 정원으로 나가는 길로 향한다',
+        result: '',
+        stats: [0,1,1,0,0], next: 's11' },
+      { label: '선택 C', body: '지친다. 방으로 돌아가자',
+        result: '',
+        stats: [1,0,0,0,0], next: 's12' },
+    ]
+  },
+
+  /* ══ P3 씬 10-1 ~ 10-3 : 초상화 복도 ══ */
+  /* 이미지: p3_scene_10.png */
+  's10': {
+    img: 'p3_scene_10.png',
+    lines: [
+      '오래된 왕족들의 초상화가 눈에 들어온다.',
+      '대부분 눈부신 금발과 푸른 눈을 가지고 있다.',
+      '그중에는 이번 약혼식의 주인공인 공주의 초상화도 걸려 있다.',
+      '바라보던 중, 문득 무언가 떠올라 걸음을 멈춘다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '그러고보니...',
+        result: '',
+        stats: [0,0,2,0,0], next: 's10b' },
+      { label: '선택 B', body: '이상한 기시감이 든다',
+        result: '',
+        stats: [0,0,3,0,0], next: 's10b' },
+      { label: '선택 C', body: '문득 바다 속의 가족들이 떠오른다. 잘 지내려나...',
+        result: '',
+        stats: [3,0,0,0,0], next: 's10b' },
+    ]
+  },
+
+  's10b': {
+    img: 'p3_scene_10.png',
+    lines: [
+      '공주의 초상화를 자세히 살펴본다.',
+      '공주의 부친이자 현왕은 금발이지만, 모친은 흑발을 가지고 있었다.',
+      '처음에는 별생각이 없었지만, 이상하게도 자꾸만 누군가의 얼굴이 떠오른다.',
+      '성 밖에서 마주친 남자와 매우 닮아있는 것 같은 기분이 든다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '다시 방으로 돌아간다',
+        result: '',
+        stats: [0,0,0,0,0], next: 's12' },
+    ]
+  },
+
+  /* ══ P3 씬 11-1 : 정원 ══ */
+  /* 이미지: p3_scene_11.png */
+  's11': {
+    img: 'p3_scene_11.png',
+    lines: [
+      '정원은 지난밤 보았던 모습과는 사뭇 달랐다.',
+      '달빛 아래에서는 신비롭게 느껴졌던 꽃들도 지금은 평범한 색을 띠고 있다.',
+      '문득, 성 밖에서 만난 그 남자가 떠올라 팔찌를 매만진다.',
+      '...나는 여기서 뭘 하고 있는 걸까.',
+    ],
+    choices: [
+      { label: '선택 A', body: '이곳을 떠나고 싶다',
+        result: '',
+        stats: [0,3,0,0,0], next: 's12' },
+      { label: '선택 B', body: '그 남자가 궁금해진다',
+        result: '',
+        stats: [0,1,1,0,0], next: 's12' },
+      { label: '선택 C', body: '...방으로 돌아가자',
+        result: '',
+        stats: [1,0,0,0,0], next: 's12' },
+    ]
+  },
+
+  /* ══ P3 씬 12-1 : 방에서 잠들다 ══ */
+  /* 이미지: p3_scene_12.png */
+  's12': {
+    img: 'p3_scene_12.png',
+    lines: [
+      '얼마 지나지 않아 방에 도착한다. 창문 너머로 보이는 바다는 오늘도 잔잔하다.',
+      '침대에 몸을 눕혔지만 쉽게 잠이 오지 않는다.',
+      '머릿속에는 오늘 보고 들은 것들이 뒤섞인 채 맴돌 뿐이다.',
+      '결국 언제 잠들었는지도 모른 채 눈을 감는다.',
+    ],
+    choices: [],
+    next: 's13'
+  },
+
+  /* ══ P3 씬 13-1 : 두 번째 외출 ══ */
+  /* 이미지: p3_scene_13.png */
+  's13': {
+    img: 'p3_scene_13.png',
+    lines: [
+      '다음 날. 약혼식이 한 걸음 더 가까워졌다.',
+      '그 때문인지 성 안은 어제보다도 분주하고, 사람들의 표정에도 묘한 긴장감이 감돈다.',
+      '방 안에만 머물러 있기에는 마음이 답답하다.',
+      '다시 한번 성 밖으로 나가보자.',
+    ],
+    choices: [
+      { label: '선택 A', body: '시장에 가보고 싶어 (전에 들르지 않은 곳)',
+        result: '가벼운 발걸음으로 시장으로 걸음을 옮긴다.',
+        stats: [0,2,0,0,0], next: 's6_market',
+        excludeIf: function(){ return flags.visitedMarket; } },
+      { label: '선택 B', body: '부둣가에 가고 싶어 (전에 들르지 않은 곳)',
+        result: '가벼운 발걸음으로 부둣가로 걸음을 옮긴다.',
+        stats: [0,1,1,0,0], next: 's6_dock',
+        excludeIf: function(){ return flags.visitedDock; } },
+      { label: '선택 C', body: '그냥 성 안에 있을래',
+        result: '',
+        stats: [1,0,1,0,0], next: 's14' },
+    ]
+  },
+
+  /* ══ P3 씬 14-1 ~ 14-2 : 약혼식 전날 밤 ══ */
+  /* 이미지: p3_scene_14.png */
+  's14': {
+    img: 'p3_scene_14.png',
+    lines: [
+      '...해가 저물 무렵이 되어서야 발걸음을 멈춘다.',
+      '하지만 아무리 둘러보아도 바뀌지 않는 사실이 있다.',
+      '왕자는 내일 약혼식을 올린다는 것.',
+      '그 사실을 곱씹으며 천천히 방으로 돌아간다.',
+    ],
+    choices: [],
+    next: 's14b'
+  },
+
+  's14b': {
+    img: 'p3_scene_14.png',
+    lines: [
+      '창밖으로 달빛이 바다를 비춘다.',
+      '푹신한 침대에서 잠을 청해보지만 쉽게 눈을 감을 수 없었다.',
+      '이제는 선택해야 한다는 생각이 든다. 시간이 얼마 남지 않았다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '왕자를 떠올린다',
+        result: '이런 와중에도 왕자의 얼굴이 떠올랐다. 내일이 지나면, 모든 것이 달라질 것이다.',
+        stats: [0,0,0,3,0], next: 's15' },
+      { label: '선택 B', body: '바다의 가족을 떠올린다',
+        result: '언니들은 지금 무엇을 하고 있을까. 아버지는 여전히 엄한 표정으로 왕국을 다스리고 있을까.',
+        stats: [3,0,0,0,0], next: 's15' },
+      { label: '선택 C', body: '지금까지 있었던 일을 떠올린다 (개척 8 이상)',
+        result: '예상했던 일도, 예상하지 못했던 일도 많았다. 부디 후회없는 선택을 할 수 있길.',
+        stats: [0,0,3,0,0], next: 's15' },
+      { label: '선택 D', body: '앞으로의 일을 떠올린다',
+        result: '약혼식이 끝난 뒤에는 어떻게 될까. 그럼에도 지금까지 봐 온 육지 세상의 아름다움을 떠올리며 앞으로의 삶을 상상하며 눈을 감는다.',
+        stats: [0,3,0,0,0], next: 's15' },
+    ]
+  },
+
+  /* ══ P3 씬 15-1 ~ 15-4 : 약혼식 날 아침 ══ */
+  /* 이미지: p3_scene_15.png */
+  's15': {
+    img: 'p3_scene_15.png',
+    lines: [
+      '이러나저러나 시간은 속절없이 흘러가고, 눈을 감았다 뜨자 약혼식 날이 도래했다.',
+    ],
+    choices: [],
+    next: function(){ checkFinalRoute(); }
+  },
+
+  /* ══ P3 씬 16-1 ~ 16-2 : 언니들 등장 ══ */
+  /* 이미지: p3_scene_16.png */
+  's16': {
+    img: 'p3_scene_16.png',
+    lines: [
+      '자정이 지나 모두가 잠든 시간, 갑자기 창문에서 소리가 들린다.',
+      '언니들이었다.',
+      '머리카락이 잘려있다. 그들은 떨리는 목소리로 말한다.',
+      '',
+      '"마녀에게서 칼을 받아왔어. 해가 뜨기 전, 왕자의 심장에 칼날을 꽂으면',
+      '네 몸이 다시 인어로 돌아올 수 있어."',
+    ],
+    choices: [
+      { label: '선택 A', body: '칼을 받아들고 왕자의 방으로 향한다',
+        result: '언니들의 간절한 목소리가 귓가를 맴돌았다. 살아남을 수 있는 방법은 단 하나뿐이었다.',
+        stats: [2,0,0,0,0], next: 's17' },
+      { label: '선택 B', body: '칼을 손에 쥐지만 망설인다',
+        result: '왕자를 사랑했다. 그래서 끝내 그를 죽일 수 없었다.',
+        stats: [0,0,0,2,0], next: 's17' },
+    ]
+  },
+
+  /* ══ P3 씬 17-1 : 최후의 선택 (여명) ══ */
+  /* 이미지: p3_scene_17.png */
+  's17': {
+    img: 'p3_scene_17.png',
+    lines: [
+      '왕자의 방. 그는 잠들어 있다.',
+      '해는 곧 뜰 것이다. 선택의 시간이 얼마 남지 않았다.',
+      '칼을 손에 쥔 채, 마지막으로 결정을 내려야 한다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '왕자를 찌른다 (원형 ≥ 8)',
+        result: '언니들의 간절한 목소리가 귓가를 맴돌았다. 살아남을 수 있는 방법은 단 하나뿐이었다.',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(16); } },
+      { label: '선택 B', body: '공주를 찌른다 (원형 ≥ 8)',
+        result: '왕자를 사랑했기에 도저히 그를 찌를 수 없었다.',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(17); } },
+      { label: '선택 C', body: '스스로를 찌른다',
+        result: '이미 예견된 결말이라면, 마지막은 스스로가 선택할 수 있지 않을까.',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(18); } },
+      { label: '선택 D', body: '칼을 바다에 던진다 (원형 ≥ 12)',
+        result: '살아남기 위해 누군가를 희생시키는 방법도 있었다. 하지만 그것은 자신이 원하던 결말이 아니었다.',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(19); } },
+      { label: '선택 E', body: '왕자를 깨운다 (통찰 ≥ 10 + 애정 ≥ 12 + 해피엔딩 선택지 클리어)',
+        result: '마지막 용기를 내어 그의 어깨를 흔들었다.',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(20); } },
+    ]
+  },
+
+};
+
+
+/* ════════════════════════════════════════════════════
+   분기 함수들
+════════════════════════════════════════════════════ */
+
+/* 카운트 누적 체크 — 3이상: 엔딩10, 4이상: 엔딩11 강제 */
+function checkCount(nextScene) {
+  if (stats.count >= 4) {
+    triggerEnding(11);
+  } else if (stats.count >= 3) {
+    triggerEnding(10);
+  } else {
+    loadScene(nextScene);
+  }
+}
+
+/* 최종 분기 — 수치·플래그에 따라 엔딩 루트 결정 */
+function checkFinalRoute() {
+  var f = JSON.parse(sessionStorage.getItem('flags') || '{}');
+
+  /* 개척 10↑ + 통찰 7↑ + 애정 5↓ → 엔딩12 */
+  if (stats.B >= 10 && stats.C >= 7 && stats.D <= 5) { triggerEnding(12); return; }
+
+  /* 개척 10↑ + 애정 7↓ + 시장/부둣가 플래그 → 엔딩13 */
+  if (stats.B >= 10 && stats.D <= 7 && f.marketMan) { triggerEnding(13); return; }
+
+  /* 개척 10↑ + 통찰 10↑ + 꽃 + 시장 → 엔딩14 */
+  if (stats.B >= 10 && stats.C >= 10 && f.flowerFlag && f.marketMan) { triggerEnding(14); return; }
+
+  /* 개척 8↑ + 공주(꽃) 플래그 → 엔딩15 */
+  if (stats.B >= 8 && f.flowerFlag) { triggerEnding(15); return; }
+
+  /* 그 외 → 씬16(언니들 등장) */
+  loadScene('s16');
+}
+
+
+
+/* ════════════════════════════════════════════════════
+   엔딩 데이터
+════════════════════════════════════════════════════ */
+var ENDINGS = {
+  10: {
+    label: 'ENDING 10', title: '세상 그 누구보다 당신을 사랑하는',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed10.png',
+    paragraphs: [
+      '사랑에 빠진 사람은 종종 아무것도 보지 못한다. 인어 공주 역시 마찬가지였다.',
+      '언니들은 그런 막내를 보며 가만히 있을 수 없었다.\n머리카락을 희생하고, 마녀를 찾아가고, 수많은 대가를 치르면서까지 그녀를 구할 방법을 찾았다.',
+      '세상에서 가장 사랑하는 동생을 위해.\n언니들은 마지막까지 그녀의 손을 놓지 않았다.',
+    ]
+  },
+  11: {
+    label: 'ENDING 11', title: '이른 귀환',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed11.png',
+    paragraphs: [
+      '왕자의 태도에 지쳐버린 것은 하루아침의 일이 아니었다.',
+      '언니들은 아무 말 없이 손을 내밀었다. 언제든 돌아올 수 있다고, 아직 늦지 않았다고.',
+      '인어 공주는 한참 동안 바다를 바라보았다. 결국 그녀는 언니들의 손을 잡았다.\n차가운 바닷물이 몸을 감싸고, 잊고 있던 고향의 향기가 폐부 깊숙이 스며든다.',
+    ]
+  },
+  12: {
+    label: 'ENDING 12', title: '사랑이 정답은 아니니까',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed12.png',
+    paragraphs: [
+      '왕자를 사랑했던 마음이 거짓은 아니었다. 하지만 시간이 흐를수록 인어 공주는 깨닫게 되었다. 세상은 생각보다 넓었다.',
+      '결국 인어 공주는 언니들에게 부탁해 마녀와 다시 거래를 했다.\n처음과는 다른 조건으로, 처음과는 다른 선택을 하기 위해서.',
+      '사랑을 위해 얻었던 다리는 이제 자신만의 삶을 위해 사용될 것이다.\n오히려 지금부터가 진짜 시작이었다.',
+    ]
+  },
+  13: {
+    label: 'ENDING 13', title: '사랑이 죄는 아니니까',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed13.png',
+    paragraphs: [
+      '왕자의 마음은 바람에 흔들리는 갈대와 같았다.\n기대했다가 실망하고, 희망을 품었다가 상처받는 일을 반복하면서 인어 공주의 마음도 조금씩 지쳐갔다.',
+      '그러던 어느 날, 예상치 못한 인연이 그녀의 삶에 스며들었다.\n처음에는 그저 우연이었다. 잠시 나눈 대화와 사소한 친절, 그리고 가볍게 건네받은 작은 선물 하나.',
+      '인어 공주는 조심스럽게 앞으로 나아가 보기로 했다.\n이번에는 누군가를 위해 자신을 희생하는 사랑이 아니라, 함께 웃을 수 있는 사랑을 꿈꾸며.',
+    ]
+  },
+  14: {
+    label: 'ENDING 14', title: '진정한 왕자님',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed14.png',
+    paragraphs: [
+      '기시감의 정체를 깨닫는 데에는 생각보다 오랜 시간이 걸리지 않았다.\n수많은 단서와 우연들이 이어지며 마침내 진실이 모습을 드러냈다.',
+      '둘은 많은 이야기를 나누었다. 각자가 품고 있던 고민과, 앞으로 살아가고 싶은 미래에 대해서.\n그리고 끝내 같은 결론에 도달했다. 누군가가 정해준 삶이 아니라 자신이 원하는 삶을 살고 싶다고.',
+      '두 사람은 모든 것을 뒤로한 채 여행을 떠났다. 세상은 넓고, 아직 가보지 못한 곳은 너무나 많았으니까.\n그들의 새로운 이야기는 그렇게 시작되었다.',
+    ]
+  },
+  15: {
+    label: 'ENDING 15', title: '새 정원을 찾아서',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed15.png',
+    paragraphs: [
+      '결혼식을 앞둔 왕자를 뒤로한 채, 두 사람은 조용히 성을 떠났다.\n누군가는 무책임하다고 말할지도 모른다. 하지만 둘에게는 그것이 가장 솔직한 선택이었다.',
+      '어디로 향할지, 앞으로 어떤 관계가 될지는 아무도 알 수 없었다.',
+      '확실한 것은 단 하나뿐이었다. 이제 그들은 자신들만의 새로운 정원을 찾아 나선다는 사실이었다.',
+    ]
+  },
+  16: {
+    label: 'ENDING 16', title: '사랑했어요',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed16.png',
+    paragraphs: [
+      '살아남을 수 있는 방법은 단 하나뿐이었다. 그를 죽이는 것.',
+      '수없이 망설였다. 수없이 스스로를 설득하려 했다. 하지만 결국 마지막 순간, 인어 공주는 칼을 들어 올렸다.',
+      '다섯 갈래로 나뉘어 있던 발은 서서히 하나로 이어졌고, 목에는 익숙한 아가미가 되살아났다.\n인어 공주는 비틀거리며 창가로 달려갔다. 그리고 망설임 없이 바다로 몸을 던졌다.\n살아남았다. 하지만 영원히 되돌릴 수 없는 것을 남겨둔 채로.',
+    ]
+  },
+  17: {
+    label: 'ENDING 17', title: '눈 먼 선택',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed17.png',
+    paragraphs: [
+      '왕자를 사랑했다. 그래서 끝내 그를 죽일 수 없었다.',
+      '고민 끝에 인어 공주의 시선이 향한 곳에는 잠든 공주가 있었다.\n칼이 공주의 몸을 꿰뚫는 순간, 공주는 놀란 눈으로 그녀를 바라보았다.\n비명을 지르지도, 원망하지도 않았다. 오히려 천천히 손을 뻗어 그녀의 손을 감싸 쥐었다.',
+      '결국 그녀는 살아남았다. 하지만 그 대가로 누군가의 미래를 빼앗아야 했다.\n과연 이것이 최선의 선택이었는지는 끝내 알 수 없었다.',
+    ]
+  },
+  18: {
+    label: 'ENDING 18', title: '그럼에도 사랑했기에',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed18.png',
+    paragraphs: [
+      '언니들은 간절하게 그녀를 설득했다. 아직 늦지 않았다고. 지금이라면 모든 것을 되돌릴 수 있다고.',
+      '하지만 인어 공주는 끝내 왕자를 죽일 수 없었다. 공주 역시 마찬가지였다. 그녀는 누구의 목숨도 빼앗고 싶지 않았다.',
+      '이미 예정된 결말이라면, 적어도 마지막 선택만큼은 자신의 의지로 하고 싶었다.\n사랑은 이루어지지 못했지만, 적어도 후회는 없었다. 그녀는 그렇게 조용히 눈을 감았다.',
+    ]
+  },
+  19: {
+    label: 'ENDING 19', title: '눈 먼 자의 희곡',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed19.png',
+    paragraphs: [
+      '그를 사랑했다. 너무 오랫동안, 너무 깊게. 그래서 그를 죽일 수 없었다. 공주 역시 그저 자신의 삶을 살아왔을 뿐이었다.',
+      '인어 공주는 칼을 힘껏 바다를 향해 던졌다. 은빛 궤적을 그린 칼날은 파도 사이로 사라져 버렸다.',
+      '그 순간, 그녀의 몸은 발끝부터 천천히 하얀 포말로 부서지기 시작했다.\n잠시 후 그곳에는 아무것도 남지 않았다. 한 사람을 뜨겁게 사랑했던 흔적조차.\n오직 새벽바람만이 조용히 바다를 스쳐 지나갈 뿐이었다.',
+    ]
+  },
+  20: {
+    label: 'ENDING 20', title: '해피엔딩',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed20.png',
+    paragraphs: [
+      '왕자를 깨우려던 손끝이 떨렸다. 지금이라면 모든 것을 끝낼 수도 있었다.\n하지만 인어 공주는 마지막 용기를 내어 그의 어깨를 흔들었다.',
+      '잠에서 깨어난 왕자는 처음에는 상황을 이해하지 못했다.\n하지만 눈앞에 선 그녀를 바라보는 순간, 이상할 정도로 마음이 복잡해졌다.',
+      '기쁘거나 슬플 때 가장 먼저 떠오르는 사람. 무언가를 이야기하고 싶을 때 가장 먼저 찾게 되는 사람.\n그 사람은 언제나 그녀였다.',
+      '그날 새벽, 예정되어 있던 결혼은 취소되었다.\n인어 공주는 처음으로 미래를 두려워하지 않았다.\n이것은 동화의 끝이 아니라, 두 사람이 함께 써 내려갈 새로운 이야기의 시작이었다.',
+    ]
+  },
+  1: {
+    label: 'ENDING 01',
+    title: '보이지 않은 생일',
+    archImg: 'arch_ed1.png',
+    illustImg: 'game_ed1.png',
+    paragraphs: [
+      '오늘은 인어 공주의 생일이었습니다.',
+      '언니들이 예쁘게 꾸며준 산호 정원에서 가족들과 함께 웃고 노래하며,\n그녀의 마음은 잔잔한 행복으로 가득 찼습니다.',
+      '언젠가 육지 위에서의 삶에 대한 호기심이 그녀의 마음을 끌었지만,\n이 선택으로 인해 그녀는 그 호기심을 접고 바닷속에서 가족들과 함께\n평화롭고 긴 삶을 누렸습니다.',
+      '육지에서의 이야기는 이제 먼 전설이 되었지만,\n바다 속에서의 사랑과 추억은 그녀의 마음에 영원히 빛났습니다.',
+    ]
+  },
+  2: {
+    label: 'ENDING 02',
+    title: '침몰한 배',
+    archImg: 'arch_ed1.png',
+    illustImg: 'game_ed2.png',
+    paragraphs: [
+      '거센 폭풍우가 바다를 뒤흔들던 밤, 인어 공주는 끝내 수면 위로 올라가지 않았습니다.',
+      '왕자는 다른 누군가의 도움으로 목숨을 건졌을 수도,\n혹은 그러지 못했을 수도 있습니다.',
+      '하지만 적어도 두 사람의 운명은 결코 교차하지 않았습니다.',
+      '그날 밤의 진실은 파도 아래로 가라앉았고,\n바다는 끝내 아무에게도 대답해주지 않았습니다.',
+    ]
+  },
+  3: {
+    label: 'ENDING 03',
+    title: '왕국의 계승자',
+    archImg: 'arch_ed1.png',
+    illustImg: 'game_ed3.png',
+    paragraphs: [
+      '위험을 감수하지 않기로 결정한 인어 공주는 다시 바닷속 궁전으로 돌아갔습니다.',
+      '육지에 대한 호기심은 여전히 남아 있었지만,\n그것이 자신의 모든 것을 걸 만큼 중요한 것은 아니었습니다.',
+      '그녀는 조금씩 왕국의 일들을 배우기 시작했습니다.\n아버지를 도와 국정을 살피고, 할머니에게서 오래된 지혜를 배우며,\n언니들과 함께 바다를 순찰했습니다.',
+      '그렇게 인어 공주는 평범하지만 안정된 미래를 손에 넣었고,\n모두의 기대 속에서 바다의 내일을 준비해 나갔습니다.',
+    ]
+  },
+  4: {
+    label: 'ENDING 04',
+    title: '심연으로',
+    archImg: 'arch_ed1.png',
+    illustImg: 'game_ed4.png',
+    paragraphs: [
+      '마녀의 제안을 거절한 순간, 인어 공주는 자신이 돌이킬 수 없는 선택을 했음을 깨달았습니다.',
+      '육지로 향할 길은 완전히 사라졌습니다.\n그렇다고 이전처럼 아무 일도 없었던 것처럼 살아갈 수도 없었습니다.\n한 번 품어버린 동경은 쉽게 사라지지 않았기 때문입니다.',
+      '결국 어느 날, 인어 공주는 아무 말 없이 궁전을 떠났습니다.',
+      '언니들은 오랫동안 그녀를 찾아다녔지만 흔적조차 발견하지 못했습니다.\n심연의 어둠만이 마지막 행방을 알고 있을 뿐입니다.',
+    ]
+  },
+};
+
+
+/* ════════════════════════════════════════════════════
+   페이지 이탈 경고 (홈 버튼)
+════════════════════════════════════════════════════ 
+function confirmHome() {
+  if (confirm('진행 중인 게임이 저장되지 않습니다. 홈으로 돌아가시겠습니까?')) {
+    window.onbeforeunload = null;
+    deleteRoomOnExit();
+    location.href = 'library.html';
+  }
+}*/
+
+
+/* ════════════════════════════════════════════════════
+   닉네임
+════════════════════════════════════════════════════ */
+var playerName = sessionStorage.getItem('playerName') || '플레이어';
+document.getElementById('intro-name').textContent = playerName;
+
+
+/* ════════════════════════════════════════════════════
+   인트로 → 게임화면 전환
+════════════════════════════════════════════════════ */
+var INTRO_DURATION = 4200;
+
+setTimeout(function() {
+  var overlay = document.getElementById('intro-overlay');
+  overlay.classList.add('fade-out');
+  setTimeout(function() {
+    overlay.style.display = 'none';
+    revealGameScene();
+    loadScene('s1');
+    startHeartbeat();
+  }, 1600);
+}, INTRO_DURATION);
+
+function revealGameScene() {
+  document.getElementById('bg-illust').classList.add('reveal');
+  setTimeout(function() {
+    document.getElementById('scene-img-wrap').classList.add('reveal');
+  }, 300);
+  setTimeout(function() {
+    document.getElementById('script-area').classList.add('reveal');
+  }, 800);
+}
+
+
+/* ════════════════════════════════════════════════════
+   씬 로더
+════════════════════════════════════════════════════ */
+var currentScene = null;
+var typingTimer = null;
+var typingDone = false;
+var waitingForNext = false;
+var nextTarget = null;
+
+function loadScene(sceneId) {
+  currentScene = sceneId;
+  typingDone = false;
+  waitingForNext = false;
+  nextTarget = null;
+
+  var scene = SCENES[sceneId];
+  if (!scene) { console.warn('씬 없음:', sceneId); return; }
+
+  /* onEnter 콜백 (플래그 설정 등) */
+  if (scene.onEnter) scene.onEnter();
+
+  /* 이미지 교체 */
+  var imgEl = document.getElementById('scene-img');
+  if (imgEl.getAttribute('data-src') !== scene.img) {
+    imgEl.setAttribute('data-src', scene.img);
+    imgEl.src = 'images/' + scene.img;
+  }
+
+  /* 선택지 초기화 */
+  var choicesWrap = document.getElementById('choices-wrap');
+  choicesWrap.innerHTML = '';
+  choicesWrap.classList.remove('reveal', 'hidden');
+
+  /* 안내문구 숨기기 */
+  document.getElementById('next-hint').classList.remove('visible');
+
+  /* 본문 타이핑 시작 */
+  startTyping(scene.lines, function() {
+    typingDone = true;
+
+    /* excludeIf 조건이 true인 선택지는 제외 */
+    var visibleChoices = (scene.choices || []).filter(function(ch) {
+      return !(ch.excludeIf && ch.excludeIf());
+    });
+
+    if (visibleChoices.length > 0) {
+      /* 선택지 렌더링 */
+      renderChoices(visibleChoices);
+      setTimeout(function() {
+        choicesWrap.classList.add('reveal');
+      }, 300);
+    } else if (scene.choices && scene.choices.length > 0) {
+      /* 선택지가 있었는데 전부 필터링된 경우: 안전장치로 next-hint 표시
+         (이 케이스는 씬 설계상 발생하지 않아야 하지만, 만약을 위해 처리) */
+      console.warn('모든 선택지가 필터링됨:', sceneId);
+      var nxt = scene.next;
+      nextTarget = nxt;
+      document.getElementById('next-hint').classList.add('visible');
+      waitingForNext = true;
+    } else {
+      /* 선택지 없으면 "클릭해서 다음으로" */
+      var nxt = scene.next;
+      nextTarget = nxt;
+      document.getElementById('next-hint').classList.add('visible');
+      waitingForNext = true;
+    }
+  });
+}
+
+/* 선택지 렌더 */
+var ICON_LABELS = ['A', 'B', 'C', 'D'];
+function renderChoices(choices) {
+  var wrap = document.getElementById('choices-wrap');
+  wrap.innerHTML = '';
+  choices.forEach(function(ch, idx) {
+    var btn = document.createElement('button');
+    btn.className = 'choice-card';
+    btn.innerHTML =
+      '<img class="choice-icon" src="images/icon_choice_' + ICON_LABELS[idx].toLowerCase() + '.png" alt="" />' +
+      '<div class="choice-text-wrap">' +
+        '<span class="choice-label">선택 ' + ICON_LABELS[idx] + '</span>' +
+        '<span class="choice-body">' + ch.body + '</span>' +
+      '</div>' +
+      '<span class="choice-arrow">→</span>';
+    btn.addEventListener('click', function() { onChoiceSelect(ch, idx); });
+    wrap.appendChild(btn);
+  });
+}
+
+/* 선택지 클릭 처리 */
+function onChoiceSelect(choice, idx) {
+  /* 수치 추가 */
+  if (choice.stats) addStats(choice.stats[0], choice.stats[1], choice.stats[2], choice.stats[3], choice.stats[4]);
+  /* 플래그 처리 */
+  if (choice.flag) choice.flag();
+
+  /* 선택지 숨기기 */
+  var wrap = document.getElementById('choices-wrap');
+  wrap.classList.add('hidden');
+
+  /* 결과 텍스트 타이핑 */
+  if (choice.result && choice.result.length > 0) {
+    typeAppend('\n' + choice.result, function() {
+      /* 다음 씬으로 */
+      nextTarget = choice.next;
+      document.getElementById('next-hint').classList.add('visible');
+      waitingForNext = true;
+    });
+  } else {
+    /* 결과 없으면 바로 다음 */
+    goToNext(choice.next);
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   다음 대상으로 이동하는 공통 헬퍼
+════════════════════════════════════════════════════ */
+function goToNext(target) {
+  if (typeof target === 'function') {
+    target();
+  } else if (typeof target === 'string' && !SCENES[target] && typeof window[target] === 'function') {
+    window[target]();
+  } else if (target) {
+    doSceneTransition(target);
+  }
+}
+
+
+/* ════════════════════════════════════════════════════
+   타이핑 엔진
+════════════════════════════════════════════════════ */
+function startTyping(lines, onDone) {
+  if (typingTimer) clearTimeout(typingTimer);
+
+  var container = document.getElementById('script-text');
+  container.innerHTML = '';
+
+  /* 커서 생성 */
+  var cursor = document.createElement('span');
+  cursor.id = 'typing-cursor';
+  cursor.style.cssText = 'display:inline-block;width:2px;height:0.9em;background:#7a6340;vertical-align:middle;margin-left:1px;animation:blink 0.7s step-end infinite;';
+  container.appendChild(cursor);
+
+  var fullText = lines.join('\n');
+  var i = 0;
+  var speed = getTypeSpeed();
+
+  /* 클릭 스킵 (한 번만, 한 틱 늦게 등록) */
+  function skipHandler() {
+    if (typingTimer) clearTimeout(typingTimer);
+    finishNow();
+  }
+  setTimeout(function() {
+    document.body.addEventListener('click', skipHandler, { once: true });
+  }, 0);
+
+  function tick() {
+    if (i < fullText.length) {
+      var ch = fullText[i];
+      if (ch === '\n') {
+        container.insertBefore(document.createElement('br'), cursor);
+      } else {
+        var prev = cursor.previousSibling;
+        if (prev && prev.nodeType === 3) {
+          prev.textContent += ch;
+        } else {
+          container.insertBefore(document.createTextNode(ch), cursor);
+        }
+      }
+      i++;
+      var delay = ch === '.' ? 400 : speed;
+      typingTimer = setTimeout(tick, delay);
+    } else {
+      cursor.style.display = 'none';
+      if (onDone) onDone();
+    }
+  }
+
+  function finishNow() {
+    if (typingTimer) clearTimeout(typingTimer);
+    container.innerHTML = '';
+    lines.forEach(function(line, idx) {
+      container.appendChild(document.createTextNode(line));
+      if (idx < lines.length - 1) container.appendChild(document.createElement('br'));
+    });
+    cursor = document.createElement('span');
+    cursor.style.display = 'none';
+    container.appendChild(cursor);
+    if (onDone) onDone();
+  }
+
+  tick();
+}
+
+/* 기존 텍스트 뒤에 이어 타이핑 */
+function typeAppend(text, onDone) {
+  var container = document.getElementById('script-text');
+
+  /* 커서 추가 */
+  var cursor = document.createElement('span');
+  cursor.style.cssText = 'display:inline-block;width:2px;height:0.9em;background:#7a6340;vertical-align:middle;margin-left:1px;animation:blink 0.7s step-end infinite;';
+  container.appendChild(cursor);
+
+  var i = 0;
+  var speed = getTypeSpeed();
+  var appendTimer = null;
+  var done = false;
+
+  /* 클릭하면 즉시 전체 출력 (한 번만)
+     - setTimeout으로 한 틱 늦게 등록: 선택지를 클릭한 바로 그 클릭이
+       버블링되어 곧바로 skipHandler를 실행시켜버리는 것을 방지 */
+  function skipHandler() {
+    if (done) return;
+    if (appendTimer) clearTimeout(appendTimer);
+    finishNow();
+  }
+  setTimeout(function() {
+    document.body.addEventListener('click', skipHandler, { once: true });
+  }, 0);
+
+  function finishNow() {
+    done = true;
+    while (i < text.length) {
+      var ch = text[i];
+      if (ch === '\n') {
+        container.insertBefore(document.createElement('br'), cursor);
+      } else {
+        var prev = cursor.previousSibling;
+        if (prev && prev.nodeType === 3) {
+          prev.textContent += ch;
+        } else {
+          container.insertBefore(document.createTextNode(ch), cursor);
+        }
+      }
+      i++;
+    }
+    cursor.style.display = 'none';
+    if (onDone) onDone();
+  }
+
+  function tick() {
+    if (done) return;
+    if (i < text.length) {
+      var ch = text[i];
+      if (ch === '\n') {
+        container.insertBefore(document.createElement('br'), cursor);
+      } else {
+        var prev = cursor.previousSibling;
+        if (prev && prev.nodeType === 3) {
+          prev.textContent += ch;
+        } else {
+          container.insertBefore(document.createTextNode(ch), cursor);
+        }
+      }
+      i++;
+      appendTimer = setTimeout(tick, speed);
+    } else {
+      done = true;
+      cursor.style.display = 'none';
+      if (onDone) onDone();
+    }
+  }
+  tick();
+}
+
+
+/* ════════════════════════════════════════════════════
+   씬 전환: 텍스트 영역만 페이드 (검은 화면 없음)
+════════════════════════════════════════════════════ */
+function doSceneTransition(sceneId) {
+  var scriptArea  = document.getElementById('script-area');
+  var choicesWrap = document.getElementById('choices-wrap');
+
+  /* 1. 텍스트+선택지 fade out */
+  scriptArea.classList.add('scene-out');
+  choicesWrap.classList.add('scene-out');
+
+  setTimeout(function() {
+    /* 2. 씬 로드 */
+    loadScene(sceneId);
+
+    /* 3. 새 텍스트 fade in */
+    scriptArea.classList.remove('scene-out');
+    scriptArea.classList.add('scene-in');
+    /* reveal 클래스가 이미 있으면 잠깐 떼었다 붙여야 transition이 발동 */
+    scriptArea.classList.remove('reveal');
+    void scriptArea.offsetWidth; /* reflow 강제 */
+    scriptArea.classList.add('reveal');
+
+    setTimeout(function() {
+      scriptArea.classList.remove('scene-in');
+      choicesWrap.classList.remove('scene-out');
+    }, 600);
+  }, 300);
+}
+
+/* 엔딩 전환: 검은 화면 → 엔딩 표시 */
+function doEndingTransition(callback) {
+  var ov = document.getElementById('ending-transition');
+  ov.classList.add('fade-in');
+  setTimeout(function() {
+    callback();
+    setTimeout(function() {
+      ov.classList.remove('fade-in');
+    }, 400);
+  }, 650);
+}
+
+/* 화면 클릭 → 다음 씬 */
+document.body.addEventListener('click', function() {
+  if (!waitingForNext || !nextTarget) return;
+  waitingForNext = false;
+  document.getElementById('next-hint').classList.remove('visible');
+  goToNext(nextTarget);
+});
+
+
+/* ════════════════════════════════════════════════════
+   엔딩 화면 표시
+════════════════════════════════════════════════════ */
+var currentEndingNum = null;
+var isFirstAchiever  = false;
+
+function triggerEnding(num) {
+  endingReached = true;
+  if (heartbeatTimer) clearInterval(heartbeatTimer);
+  window.onbeforeunload = null;
+  currentEndingNum = num;
+
+  /* 검은 화면 전환 후 엔딩 표시 */
+  doEndingTransition(function() {
+    var data = ENDINGS[num];
+    if (!data) return;
+
+    /* 게임 씬 숨기기 */
+    document.getElementById('scene').style.display = 'none';
+
+    /* 엔딩 정보 채우기 */
+    document.getElementById('ending-number-label').textContent = data.label;
+    document.getElementById('ending-arch-img').src = 'images/' + data.archImg;
+    document.getElementById('ending-illust-img').src = 'images/' + data.illustImg;
+
+    /* 본문 단락 */
+    var contentEl = document.getElementById('ending-text-content');
+    contentEl.innerHTML = '';
+    data.paragraphs.forEach(function(para) {
+      var p = document.createElement('p');
+      p.className = 'ending-text-paragraph';
+      p.innerHTML = para.replace(/\n/g, '<br>');
+      contentEl.appendChild(p);
+    });
+
+    /* 엔딩 화면 표시 */
+    var endingScreen = document.getElementById('ending-screen');
+    endingScreen.classList.add('active');
+    endingScreen.scrollTop = 0;
+
+    /* 제목은 일단 기본 이름으로 표시 (DB 확인 후 최초/비최초에 따라 갱신됨) */
+    document.getElementById('ending-title-text').textContent = data.title;
+
+    /* DB 확인 + 등록 시도 */
+    resolveEndingAchievement(num, data);
+  });
+}
+
+/* ════════════════════════════════════════════════════
+   최초 달성자 판단 + endings 테이블 등록 시도
+════════════════════════════════════════════════════ */
+async function resolveEndingAchievement(num, data) {
+  var nickname = sessionStorage.getItem('playerName') || '플레이어';
+
+  try {
+    var { error } = await db.from('endings').insert({
+      ending_number: num,
+      lineage_id: LINEAGE_ID,
+      custom_name: data.title,
+      player_nickname: nickname
+    });
+
+    if (!error) {
+      /* ── 최초 달성자 ── */
+      isFirstAchiever = true;
+      document.getElementById('ending-name-wrap-first').style.display = 'flex';
+      document.getElementById('ending-complete-wrap-normal').style.display = 'none';
+
+      var input = document.getElementById('ending-name-input');
+      input.value = data.title;
+    } else {
+      /* ── 이미 누군가 달성함 (비최초) ── */
+      isFirstAchiever = false;
+      document.getElementById('ending-name-wrap-first').style.display = 'none';
+      document.getElementById('ending-complete-wrap-normal').style.display = 'flex';
+
+      var { data: existing } = await db
+        .from('endings')
+        .select('custom_name')
+        .eq('ending_number', num)
+        .single();
+
+      var endingName = (existing && existing.custom_name) ? existing.custom_name : data.title;
+      document.getElementById('ending-title-text').textContent = endingName;
+
+      document.getElementById('ending-normal-notice').innerHTML =
+        '이렇게 <em style="font-style:normal; color:#7a5a18; font-weight:700;">' + endingName + '</em>의 이야기는 결말을 맺어졌습니다.<br>' +
+        '완료 버튼을 눌러 이야기 선택창으로 돌아가 새로운 결말을 찾아보세요.';
+    }
+  } catch (err) {
+    console.error('엔딩 기록 처리 실패:', err);
+    isFirstAchiever = false;
+    document.getElementById('ending-name-wrap-first').style.display = 'none';
+    document.getElementById('ending-complete-wrap-normal').style.display = 'flex';
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   "완료" / "이야기 완료하기" 버튼
+   - P3는 마지막 파트이므로, 방을 삭제하고 계보 완전 종료
+════════════════════════════════════════════════════ */
+async function completeEnding() {
+  var btn = isFirstAchiever
+    ? document.getElementById('btn-ending-complete-first')
+    : document.getElementById('btn-ending-complete-normal');
+
+  btn.disabled = true;
+  btn.innerHTML = '✦ &nbsp;이동 중...&nbsp; ✦';
+
+  try {
+    if (isFirstAchiever) {
+      var input = document.getElementById('ending-name-input');
+      var customName = input.value.trim();
+      if (!customName) customName = ENDINGS[currentEndingNum].title;
+
+      await db.from('endings')
+        .update({ custom_name: customName })
+        .eq('ending_number', currentEndingNum);
+    }
+
+    /* 달성률 계산용 로그 기록 (몇 번째 발견이든 매번 한 줄씩 추가) */
+    await db.from('ending_logs').insert({ ending_number: currentEndingNum });
+
+    if (ROOM_ID) {
+      await db.from('rooms').delete().eq('id', ROOM_ID);
+    }
+  } catch (err) {
+    console.error('엔딩 완료 처리 실패:', err);
+  }
+
+  sessionStorage.setItem('justUnlockedEnding', String(currentEndingNum));
+  sessionStorage.setItem('justUnlockedIsFirst', isFirstAchiever ? '1' : '0');
+
+  location.href = 'archive.html';
+}
+
+
+</script>
+</body>
+</html>

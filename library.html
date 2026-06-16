@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Folio Path - 서재</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+@font-face {
+    font-family: 'Aritaburi';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Arita-buri-SemiBold.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+</style>
+  <style>
+
+    
+
+    /* ══════════════════════════════
+       기본 설정
+    ══════════════════════════════ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #e8dfc8;
+      font-family: 'Nanum Myeongjo', serif;
+      position: relative; /* 표지판 absolute 기준점 */
+    }
+
+    /* ══════════════════════════════
+       배경 레이어
+    ══════════════════════════════ */
+    #bg-parchment {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    #bg-illust {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 2;
+    }
+
+    /* ══════════════════════════════
+       전체 씬 컨테이너 (index.html과 동일 구조)
+    ══════════════════════════════ */
+    #scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+    }
+
+    /* ══════════════════════════════
+       안내문구 이미지 (동화를 선택하세요)
+    ══════════════════════════════ */
+    #library-title {
+      position: absolute;
+      left: 50%;
+      top: 12%;
+      transform: translateX(-50%);
+      width: 24%;
+      pointer-events: none;
+      animation: fadeDown 0.8s ease-out both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ══════════════════════════════
+       메인 책 영역 (테두리 + 책 + 파트 목록)
+    ══════════════════════════════ */
+    #main-section {
+      position: absolute;
+      left: 50%;
+      top: 25%;
+      transform: translateX(-50%);
+      width: 68%;
+      animation: fadeUp 0.9s ease-out 0.2s both;
+    }
+
+    /* 테두리 이미지 */
+#library-main-frame {
+  width: 83%;         
+  position: relative;   
+  display: block;
+    margin: 0 auto;
+}
+
+    /* 테두리 안의 내용물 (책 + 파트 목록) */
+    #main-inner {
+  position: absolute;
+  top: 8%;
+  left: 13%;
+  width: 75%;
+  height: 84%;
+  display: flex;
+  align-items: center;
+  gap: 6%;
+}
+
+    /* ── 왼쪽: 책 이미지 영역 ── */
+    #main-book-wrap {
+      flex: 0 0 30%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #main-book-img {
+      width: 60%;
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    #main-book-img:hover {
+      transform: scale(1.03);
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3));
+    }
+
+    .tale-label {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.75vw;
+      letter-spacing: 0.15em;
+      color: #7a6340;
+    }
+
+    /* ── 오른쪽: 파트 목록 ── */
+    #part-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .part-section-label {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.8vw;
+      letter-spacing: 0.2em;
+      color: #817461;
+      margin-bottom: 10px;
+      font-weight: 800;
+    }
+
+    /* 파트 한 줄 */
+    .part-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(150,120,70,0.25);
+    }
+
+    .part-row:last-child { border-bottom: none; }
+
+    .part-name {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.9vw;
+      letter-spacing: 0.18em;
+      color: #4a3820;
+      flex: 0 0 5vw;
+    }
+
+    /* 플레이 버튼 이미지 */
+    .btn-part {
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: filter 0.18s ease;
+    }
+
+    .btn-part.playable:hover {
+      filter: brightness(0.82);
+    }
+
+    .btn-part.done,
+    .btn-part.locked {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .btn-part img {
+      height: 2vw;
+    }
+
+    .part-status-text {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.85vw;
+      color: #5a4530;
+    }
+
+    /* 대기 중인 방 개수 표시 */
+    .part-room-count {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 0.72vw;
+      color: #9a8060;
+      margin-left: 4px;
+    }
+
+    /* ══════════════════════════════
+       하단 잠긴 책 영역
+    ══════════════════════════════ */
+    #bottom-section {
+      position: absolute;
+      left: 50%;
+      top: 62%;
+      transform: translateX(-50%);
+      width: 68%;
+      animation: fadeUp 0.9s ease-out 0.4s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(24px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* 하단 테두리: 1px 라인 사각형 */
+  #library-bottom-frame {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 100%;
+  border: 1px solid rgb(171, 143, 106);
+  pointer-events: none;
+}
+
+    /* 테두리 안 내용물 */
+    #bottom-inner {
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      z-index: 1;
+      padding: 2.5% 5% 2%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .coming-label {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.7vw;
+      letter-spacing: 0.22em;
+      color: #9a8060;
+      margin-bottom: 1%;
+    }
+
+    /* 잠긴 책 5개 가로 배열 */
+    #locked-books {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      gap: 2%;
+    }
+
+    .locked-book-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    /* 잠긴 책 이미지 버튼 */
+    .locked-book-btn {
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      width: 100%;
+      transition: filter 0.18s ease;
+    }
+
+    .locked-book-btn:hover {
+      filter: brightness(0.78);
+    }
+
+    .locked-book-btn img {
+      width: 100%;
+      display: block;
+    }
+
+    /* 클릭 시 떨리는 애니메이션 */
+    @keyframes shake {
+      0%   { transform: translateX(0); }
+      15%  { transform: translateX(-4px) rotate(-1deg); }
+      30%  { transform: translateX(4px) rotate(1deg); }
+      45%  { transform: translateX(-3px); }
+      60%  { transform: translateX(3px); }
+      75%  { transform: translateX(-2px); }
+      90%  { transform: translateX(2px); }
+      100% { transform: translateX(0); }
+    }
+
+    .locked-book-btn.shaking {
+      animation: shake 0.5s ease;
+    }
+
+    /* ══════════════════════════════
+       표지판 (홈화면과 동일)
+    ══════════════════════════════ */
+    #signpost-group {
+      position: absolute;
+      z-index: 8;
+
+      right: 7%;
+      bottom: 2%;
+      width: 18%;
+      height: auto;
+      transform-origin: bottom center;
+    }
+
+
+    #sign-post-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    #sign-buttons {
+      position: absolute;
+      top: 8%;
+      left: 20%;
+      width: 75%;
+      display: flex;
+      flex-direction: column;
+      gap: 2%;
+    }
+
+    .sign-btn {
+      width: 85%;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      padding: 0;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .sign-btn:hover {
+      transform: scale(1.05) translateX(-4px);
+      filter: brightness(1.1);
+    }
+
+    .sign-btn:active { transform: scale(0.97); }
+    .sign-btn img { width: 100%; height: auto; display: block; }
+
+    /* ══════════════════════════════
+       팝업 오버레이 (책 클릭 시)
+    ══════════════════════════════ */
+    #popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(20, 14, 6, 0.72);
+      z-index: 50;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #popup-overlay.active { display: flex; }
+
+    /* 팝업 박스 */
+ #popup-box {
+  background-image: url('images/popup_main.png');
+  background-size: 100% 100%;      /* 박스에 딱 맞게 (비율 고정 안 함) */
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  position: relative;
+  width: min(1000px, 88vw);      /* 1450 → 1265 로 변경 */
+  min-height: 75vh;
+  overflow-y: auto;             /* px 대신 %로 (비율에 맞게 여백) */
+  animation: popIn 0.35s cubic-bezier(0.34,1.4,0.64,1) both;
+  border: none;                     /* 기존 border 제거 */
+  border-radius: 0;
+}
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.88); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* X 닫기 버튼 */
+    #popup-close {
+      position: absolute;
+      top: 6%; right: 5%;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: #8a6e40;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+
+    #popup-close:hover { color: #3a2800; }
+
+    /* ── 팝업 상단: 제목 + 정보 ── */
+    #popup-top {
+      display: flex;
+      gap: 28px;
+      margin-bottom: 20px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(150,120,70,0.3);
+        padding: 4% 8% 2% 12%;  
+    }
+
+    /* 왼쪽: 제목/소개 */
+    #popup-left { flex: 0 0 44%;   }
+
+    .popup-tale-num {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      color: #b8903a;
+      margin-bottom: 10px;
+    }
+
+    .popup-title {
+      font-family: 'Nanum Myeongjo', serif;
+      font-weight: 800;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      color: #2a1e08;
+      margin-bottom: 10px;
+      line-height: 1.7;
+    }
+
+    /* 초록 진행바 자리 (G 이미지 넣을 곳) */
+    #popup-progress-img {
+      width: 100%;
+      max-width: 200px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .popup-quote {
+      font-size: clamp(0.72rem, 1.2vw, 0.88rem);
+      color: #5a4830;
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    /* 세로 구분선 자리 (P 이미지 넣을 곳) */
+    #popup-divider-img {
+      flex: 0 0 auto;
+      width: clamp(2px, 0.5vw, 4px);
+      align-self: stretch;
+      display: block;
+      object-fit: fill;
+    }
+
+    /* 오른쪽: 정보 목록 */
+    #popup-right { flex: 1; }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(150,120,70,0.2);
+    }
+
+    .info-row:last-child { border-bottom: none; }
+
+    /* 파란 아이콘 자리 (B 이미지 넣을 곳) */
+    .info-icon {
+      width: clamp(10px, 1.5vw, 16px);
+      flex-shrink: 0;
+    }
+
+    .info-key {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: clamp(0.62rem, 1vw, 0.8rem);
+      color: #7a6040;
+      flex: 0 0 70px;
+    }
+
+    .info-val {
+      font-size: clamp(0.65rem, 1vw, 0.82rem);
+      color: #2a1e08;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .info-val img { height: clamp(14px, 2vw, 22px); }
+
+    /* ── 팝업 중단: 줄거리 ── */
+    #popup-story {
+      display: flex;
+      gap: 4%;
+      margin-bottom: 20px;
+       padding: 1% 5% 0% 15%;
+      margin-top: 5%;
+    }
+
+    /* 레드 아트 자리 (R 이미지 넣을 곳) */
+    #popup-story-art {
+      flex: 0 0 clamp(80px, 14vw, 150px);
+      width: 10%;
+      aspect-ratio: 1;
+      display: block;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    #popup-story-text { flex: 1; }
+
+    .story-heading {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .story-heading-label {
+      font-size: clamp(0.75rem, 1.2vw, 0.95rem);
+      color: #3a2800;
+      font-weight: 700;
+    }
+
+    /* 스카이 아이콘 자리 (S 이미지) */
+    .story-icon {
+      width: clamp(10px, 1.5vw, 16px);
+    }
+
+    .story-body {
+      font-size: clamp(0.65rem, 1vw, 0.82rem);
+      color: #4a3820;
+      line-height: 1.85;
+    }
+
+    /* ── 팝업 하단: 닉네임 + 시작버튼 ── */
+    #popup-bottom { margin-top: 4px; 
+     padding: 0% 7% 0% 7%;}
+
+    .nickname-label {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: clamp(0.65rem, 1vw, 0.82rem);
+      color: #5a4830;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 1%;
+    }
+
+    #nickname-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #c8a86a;
+      border-radius: 3px;
+      background: rgba(255,248,230,0.3);
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: clamp(0.7rem, 1.1vw, 0.88rem);
+      color: #3a2800;
+      outline: none;
+      margin-bottom: 30px;
+      transition: border-color 0.2s;
+    }
+
+    #nickname-input:focus { border-color: #8a6030; }
+    #nickname-input::placeholder { color: #b8a080; }
+
+    #btn-enter {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      background: #2a1e08;
+      border: 1px solid #8a6030;
+      border-radius: 3px;
+      color: #e8d8a0;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: clamp(0.8rem, 1.3vw, 1rem);
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: background 0.2s ease, filter 0.2s ease;
+    }
+
+    #btn-enter:hover {
+      background: #3a2e18;
+      filter: brightness(1.15);
+    }
+
+    #btn-enter:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ── 모바일 반응형 ── */
+    @media (max-width: 768px) {
+      #library-title { width: 85%; }
+      #main-section, #bottom-section { width: 94%; }
+
+      #signpost-group {
+        width: 28%;
+        right: 1%;
+        bottom: 8%;
+      }
+
+      #popup-top { flex-direction: column; gap: 14px; }
+      #popup-divider-img { display: none; }
+      #popup-left { flex: unset; }
+      #popup-box { padding: 28px 20px 24px; }
+
+      #popup-story { flex-direction: column; }
+      #popup-story-art { flex: unset; width: 100%; aspect-ratio: 16/7; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- 배경음 -->
+<audio id="bgm" src="sound/back.mp3" loop preload="auto"></audio>
+<!-- 클릭음 -->
+<audio id="sfx-click" src="sound/mouse.mp3" preload="auto"></audio>
+
+<!-- 배경 (scene 밖에 위치) -->
+<img id="bg-parchment" src="images/bg_parchment.png" alt="양피지 배경" />
+<img id="bg-illust" src="images/bg_illust2.png" alt="배경" />
+
+<div id="scene">
+
+  <!-- 안내문구 -->
+  <img id="library-title" src="images/library_title.png" alt="동화를 선택하세요" />
+
+  <!-- ══ 메인 책 영역 ══ -->
+  <div id="main-section">
+    <img id="library-main-frame" src="images/library_main.png" alt="메인 테두리" />
+
+    <div id="main-inner">
+
+      <!-- 왼쪽: 책 -->
+      <div id="main-book-wrap">
+        <img id="main-book-img" src="images/book1.png" alt="인어공주 책"
+             onclick="openPopup()" />
+        
+      </div>
+
+      <!-- 오른쪽: 파트 목록 -->
+      <div id="part-list">
+        <div class="part-section-label">PLAYABLE PARTS</div>
+
+        <!-- PART 1 -->
+        <div class="part-row" id="part-row-1">
+          <span class="part-name">PART 1</span>
+          <button class="btn-part playable" onclick="openPopup()">
+            <img src="images/btn_play.png" alt="플레이 가능" />
+          </button>
+          <span class="part-status-text">플레이 가능</span>
+        </div>
+
+        <!-- PART 2 -->
+        <div class="part-row" id="part-row-2">
+          <span class="part-name">PART 2</span>
+          <button class="btn-part locked" id="btn-part-2">
+            <img src="images/btn_lock.png" alt="잠김" />
+          </button>
+          <span class="part-status-text" id="status-text-2">잠김</span>
+        </div>
+
+        <!-- PART 3 -->
+        <div class="part-row" id="part-row-3">
+          <span class="part-name">PART 3</span>
+          <button class="btn-part locked" id="btn-part-3">
+            <img src="images/btn_lock.png" alt="잠김" />
+          </button>
+          <span class="part-status-text" id="status-text-3">잠김</span>
+        </div>
+
+      </div><!-- /part-list -->
+    </div><!-- /main-inner -->
+  </div><!-- /main-section -->
+
+  <!-- ══ 하단 잠긴 책 영역 ══ -->
+  <div id="bottom-section">
+    <!-- 테두리: 이미지 대신 CSS 1px 라인 사각형 -->
+    <div id="library-bottom-frame"></div>
+
+    <div id="bottom-inner">
+      <div class="coming-label">COMING SOON</div>
+
+      <div id="locked-books">
+
+        <div class="locked-book-wrap">
+          <button class="locked-book-btn" onclick="shakeLocked(this)">
+            <img src="images/book2.png" alt="잠긴 책 2" />
+          </button>
+          <span class="tale-label">TALE 02</span>
+        </div>
+
+        <div class="locked-book-wrap">
+          <button class="locked-book-btn" onclick="shakeLocked(this)">
+            <img src="images/book3.png" alt="잠긴 책 3" />
+          </button>
+          <span class="tale-label">TALE 03</span>
+        </div>
+
+        <div class="locked-book-wrap">
+          <button class="locked-book-btn" onclick="shakeLocked(this)">
+            <img src="images/book4.png" alt="잠긴 책 4" />
+          </button>
+          <span class="tale-label">TALE 04</span>
+        </div>
+
+        <div class="locked-book-wrap">
+          <button class="locked-book-btn" onclick="shakeLocked(this)">
+            <img src="images/book5.png" alt="잠긴 책 5" />
+          </button>
+          <span class="tale-label">TALE 05</span>
+        </div>
+
+        <div class="locked-book-wrap">
+          <button class="locked-book-btn" onclick="shakeLocked(this)">
+            <img src="images/book6.png" alt="잠긴 책 6" />
+          </button>
+          <span class="tale-label">TALE 06</span>
+        </div>
+
+      </div><!-- /locked-books -->
+    </div><!-- /bottom-inner -->
+  </div><!-- /bottom-section -->
+
+  <!-- ══ 표지판 (index.html과 동일) ══ -->
+  <div id="signpost-group">
+    <img id="sign-post-img" src="images/sign_post.png" alt="표지판 거치대" />
+    <div id="sign-buttons">
+      <button class="sign-btn" onclick="location.href='index.html'">
+        <img src="images/sign_home.png" alt="홈으로" />
+      </button>
+      <button class="sign-btn" onclick="openOverlay('overlay-help')">
+        <img src="images/sign_help.png" alt="도움말" />
+      </button>
+      <button class="sign-btn" onclick="location.href='archive.html'">
+        <img src="images/sign_archive.png" alt="보관함" />
+      </button>
+      <button class="sign-btn" onclick="openOverlay('overlay-setting')">
+        <img src="images/sign_setting.png" alt="설정" />
+      </button>
+    </div>
+  </div>
+
+</div><!-- /scene -->
+
+
+<!-- ══════════════════════════════
+     팝업: 책 상세 + 닉네임 설정
+══════════════════════════════ -->
+<div id="popup-overlay">
+  <div id="popup-box">
+
+    <!-- X 닫기 -->
+    <button id="popup-close" onclick="closePopup()">✕</button>
+
+    <!-- 상단: 제목 / 구분선 / 정보 -->
+    <div id="popup-top">
+
+      <!-- 왼쪽: 제목 + 소개 -->
+      <div id="popup-left">
+        <div class="popup-tale-num">TALE 01</div>
+        <div class="popup-title" id="popup-title">인어공주</div>
+
+        <!-- G: 초록 진행바 이미지 자리 -->
+        <img id="popup-progress-img" src="images/deco_green.png" alt="진행바" />
+
+        <p class="popup-quote" id="popup-quote">
+          "목소리를 잃은 인어는<br>왕자의 마음을 얻을 수 있을까요?"
+        </p>
+      </div>
+
+      <!-- P: 세로 구분선 이미지 자리 -->
+      <img id="popup-divider-img" src="images/deco_purple.png" alt="구분선" />
+
+      <!-- 오른쪽: 정보 목록 -->
+      <div id="popup-right">
+
+        <div class="info-row">
+          <!-- B: 파란 아이콘 이미지 자리 -->
+          <img class="info-icon" src="images/deco_blue.png" alt="" />
+          <span class="info-key">현재 파트</span>
+          <span class="info-val" id="popup-current-part">
+            파트 선택 가능
+          </span>
+        </div>
+
+        <div class="info-row">
+          <img class="info-icon" src="images/deco_blue.png" alt="" />
+          <span class="info-key">주인공</span>
+          <span class="info-val" id="popup-hero">인어공주</span>
+        </div>
+
+        <div class="info-row">
+          <img class="info-icon" src="images/deco_blue.png" alt="" />
+          <span class="info-key">장르</span>
+          <span class="info-val">판타지 · 로맨스</span>
+        </div>
+
+        <div class="info-row">
+          <img class="info-icon" src="images/deco_blue.png" alt="" />
+          <span class="info-key">플레이 가능</span>
+          <span class="info-val" id="popup-playable-info">
+            <img src="images/btn_play.png" alt="플레이" />
+            파트를 선택해주세요
+          </span>
+        </div>
+
+      </div><!-- /popup-right -->
+    </div><!-- /popup-top -->
+
+    <!-- 중단: 줄거리 -->
+    <div id="popup-story">
+      <!-- R: 아트 이미지 자리 -->
+      <img id="popup-story-art" src="images/deco_red.png" alt="아트" />
+
+      <div id="popup-story-text">
+        <div class="story-heading">
+          <!-- S: 스카이 아이콘 자리 -->
+          <img class="story-icon" src="images/deco_sky.png" alt="" />
+          <span class="story-heading-label">줄거리</span>
+          <img class="story-icon" src="images/deco_sky.png" alt="" />
+        </div>
+        <p class="story-body">
+          바다 속에서 인간 세상을 꿈꾸는 인어공주의 이야기.<br>
+          그녀는 지상으로 올라가 인간 왕자를 만나 사랑에 빠지지만,<br>
+          마녀와의 거래로 목소리를 잃고 인간의 다리가 되어 왕자를 찾아간다.<br>
+          그러나 사랑을 얻기 위한 대가는 생각보다 더 크고 아프다.
+        </p>
+      </div>
+    </div><!-- /popup-story -->
+
+    <!-- 파트 선택 -->
+    <div id="popup-part-select" style="padding: 0 7% 1%; display:flex; gap:2%;">
+      <button class="popup-part-btn" data-part="1" onclick="selectPart(1)"
+        style="flex:1; padding:10px; border:1px solid #c8a86a; border-radius:3px;
+        background:rgba(255,248,230,0.3); font-family:'Aritaburi',sans-serif;
+        font-size:0.78rem; letter-spacing:0.12em; color:#5a4830; cursor:pointer;
+        transition: all 0.18s;">
+        PART 1
+      </button>
+      <button class="popup-part-btn" data-part="2" onclick="selectPart(2)"
+        style="flex:1; padding:10px; border:1px solid #c8a86a; border-radius:3px;
+        background:rgba(255,248,230,0.3); font-family:'Aritaburi',sans-serif;
+        font-size:0.78rem; letter-spacing:0.12em; color:#5a4830; cursor:pointer;
+        transition: all 0.18s;">
+        PART 2
+      </button>
+      <button class="popup-part-btn" data-part="3" onclick="selectPart(3)"
+        style="flex:1; padding:10px; border:1px solid #c8a86a; border-radius:3px;
+        background:rgba(255,248,230,0.3); font-family:'Aritaburi',sans-serif;
+        font-size:0.78rem; letter-spacing:0.12em; color:#5a4830; cursor:pointer;
+        transition: all 0.18s;">
+        PART 3
+      </button>
+    </div>
+
+    <!-- 하단: 닉네임 + 시작 -->
+    <div id="popup-bottom">
+      <div class="nickname-label">
+        플레이어 닉네임
+      </div>
+      <input type="text" id="nickname-input"
+             placeholder="닉네임을 입력해주세요" maxlength="12" />
+      <button id="btn-enter" onclick="startGame()" disabled>
+        ✦ &nbsp; 파트를 먼저 선택해주세요 &nbsp; ✦
+      </button>
+    </div>
+
+  </div><!-- /popup-box -->
+</div><!-- /popup-overlay -->
+
+
+<!-- 도움말 오버레이 -->
+<div id="overlay-help" class="overlay" style="
+  display:none; position:fixed; top:0; left:0;
+  width:100%; height:100%; background:rgba(0,0,0,0.6);
+  z-index:200; justify-content:center; align-items:center;">
+  <div style="background:#f5ead0; border:3px solid #8b6914; border-radius:12px;
+              padding:40px; min-width:300px; text-align:center;
+              font-family:'Nanum Myeongjo',serif; color:#3a2a00; position:relative;">
+    <button onclick="closeOverlay('overlay-help')" style="
+      position:absolute; top:12px; right:16px; background:none;
+      border:none; font-size:1.5rem; cursor:pointer; color:#8b6914;">✕</button>
+    <h2 style="margin-bottom:16px;">도움말</h2>
+    <p>여기에 도움말 내용을 넣을 예정</p>
+  </div>
+</div>
+
+<!-- 설정 오버레이 (공통 설정 UI) -->
+<div id="overlay-setting" class="overlay" style="
+  display:none; position:fixed; top:0; left:0;
+  width:100%; height:100%; background:rgba(0,0,0,0.6);
+  z-index:200; justify-content:center; align-items:center;">
+  <div style="background:#f5ead0; border:3px solid #8b6914; border-radius:12px;
+              padding:32px 28px; min-width:300px; max-width:420px; width:90%;
+              text-align:left;
+              font-family:'Nanum Myeongjo',serif; color:#3a2a00; position:relative;">
+    <button onclick="closeOverlay('overlay-setting')" style="
+      position:absolute; top:12px; right:16px; background:none;
+      border:none; font-size:1.5rem; cursor:pointer; color:#8b6914;">✕</button>
+    <h2 style="margin-bottom:24px;">설정</h2>
+
+    <!-- 배경음 크기 -->
+    <div style="margin-bottom: 22px;">
+      <label style="display:flex; justify-content:space-between; font-size:0.88rem; margin-bottom:8px;">
+        <span>배경음 크기</span>
+        <span id="setting-bgm-volume-label">35%</span>
+      </label>
+      <input type="range" id="setting-bgm-volume" min="0" max="100" step="5"
+             value="35" style="width:100%;"
+             oninput="onBgmVolumeChange(this.value)" />
+    </div>
+
+    <!-- 클릭음 on/off -->
+    <div style="margin-bottom: 22px; display:flex; align-items:center; justify-content:space-between;">
+      <label for="setting-click-toggle" style="font-size:0.88rem;">마우스 클릭음</label>
+      <input type="checkbox" id="setting-click-toggle" checked
+             style="width:20px; height:20px; cursor:pointer;"
+             onchange="onClickToggleChange(this.checked)" />
+    </div>
+
+    <!-- 텍스트 출력 속도 -->
+    <div>
+      <label style="display:block; font-size:0.88rem; margin-bottom:10px;">텍스트 출력 속도</label>
+      <div style="display:flex; gap:14px; font-size:0.85rem;">
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="slow"
+                 onchange="onTextSpeedChange(this.value)" /> 느리게
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="normal" checked
+                 onchange="onTextSpeedChange(this.value)" /> 보통
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="radio" name="setting-text-speed" value="fast"
+                 onchange="onTextSpeedChange(this.value)" /> 빠르게
+        </label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════
+     Supabase 연결
+════════════════════════════════════════════════════ -->
+<script>
+    // 우클릭 방지
+    document.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+    });
+
+    // 드래그 및 블록 선택 방지
+    document.addEventListener('dragstart', function(event) {
+        event.preventDefault();
+    });
+    document.addEventListener('selectstart', function(event) {
+        event.preventDefault();
+    });
+</script>
+
+<!-- ════════════════════════════════════════════════════
+     공통 사운드 & 설정 엔진
+════════════════════════════════════════════════════ -->
+<script>
+/* ════════════════════════════════════════════════════
+   공통 사운드 & 설정 엔진
+   - 모든 페이지(index, library, archive, game_p1~3)에
+     동일하게 삽입한다.
+   - localStorage로 설정값을 공유하고,
+     배경음 재생 위치를 이어받아 끊김을 최소화한다.
+════════════════════════════════════════════════════ */
+
+/* ── 설정값 불러오기 (없으면 기본값) ── */
+function getSetting(key, def) {
+  var v = localStorage.getItem(key);
+  return (v === null) ? def : v;
+}
+
+var SETTINGS = {
+  bgmVolume: parseInt(getSetting('folio_bgmVolume', '35'), 10),   // 0~100
+  clickEnabled: getSetting('folio_clickEnabled', 'on') === 'on',  // on/off
+  textSpeed: getSetting('folio_textSpeed', 'normal'),             // slow/normal/fast
+};
+
+/* 텍스트 출력 속도 → 1글자당 ms (typeAppend 등에서 사용) */
+var TEXT_SPEED_MS = { slow: 65, normal: 40, fast: 18 };
+function getTypeSpeed() {
+  return TEXT_SPEED_MS[SETTINGS.textSpeed] || TEXT_SPEED_MS.normal;
+}
+
+/* ── 사운드 엘리먼트 ── */
+var bgm      = document.getElementById('bgm');
+var sfxClick = document.getElementById('sfx-click');
+var bgmStarted = false;
+
+/* 배경음 시작 + 이어듣기 위치 복원 */
+function startBgm() {
+  if (bgmStarted) return;
+  bgmStarted = true;
+  bgm.volume = SETTINGS.bgmVolume / 100;
+
+  var savedTime = parseFloat(sessionStorage.getItem('folio_bgmTime') || '0');
+  if (savedTime > 0 && isFinite(savedTime)) {
+    bgm.currentTime = savedTime;
+  }
+  bgm.play().catch(function(){});
+}
+
+/* 클릭음 재생 (설정에서 꺼져있으면 재생 안 함) */
+function playClick() {
+  if (!SETTINGS.clickEnabled) return;
+  sfxClick.currentTime = 0;
+  sfxClick.play().catch(function(){});
+}
+
+/* 첫 클릭 시 배경음 시작 + 매 클릭마다 클릭음 재생 */
+document.addEventListener('click', function() {
+  startBgm();
+  playClick();
+}, true);
+
+/* 1초마다 배경음 재생 위치를 저장 (다음 페이지에서 이어 듣기 위함) */
+setInterval(function() {
+  if (bgm && !bgm.paused) {
+    sessionStorage.setItem('folio_bgmTime', String(bgm.currentTime));
+  }
+}, 1000);
+
+/* 페이지를 벗어나기 직전에도 한 번 더 저장 */
+window.addEventListener('pagehide', function() {
+  if (bgm) {
+    sessionStorage.setItem('folio_bgmTime', String(bgm.currentTime));
+  }
+});
+
+
+/* ════════════════════════════════════════════════════
+   설정 오버레이 — 공통 UI
+════════════════════════════════════════════════════ */
+function openOverlay(id) {
+  var el = document.getElementById(id);
+  el.classList.add('active');
+  el.style.display = 'flex';
+
+  if (id === 'overlay-setting') {
+    syncSettingUI();
+  }
+}
+
+function closeOverlay(id) {
+  var el = document.getElementById(id);
+  el.classList.remove('active');
+  el.style.display = 'none';
+}
+
+/* 오버레이 바깥 클릭하면 닫히게 */
+document.querySelectorAll('.overlay').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      closeOverlay(overlay.id);
+    }
+  });
+});
+
+/* 설정창 UI를 현재 SETTINGS 값으로 동기화 */
+function syncSettingUI() {
+  var volSlider = document.getElementById('setting-bgm-volume');
+  var volLabel  = document.getElementById('setting-bgm-volume-label');
+  var clickToggle = document.getElementById('setting-click-toggle');
+  var speedRadios = document.querySelectorAll('input[name="setting-text-speed"]');
+
+  if (volSlider) {
+    volSlider.value = SETTINGS.bgmVolume;
+    if (volLabel) volLabel.textContent = SETTINGS.bgmVolume + '%';
+  }
+  if (clickToggle) {
+    clickToggle.checked = SETTINGS.clickEnabled;
+  }
+  speedRadios.forEach(function(radio) {
+    radio.checked = (radio.value === SETTINGS.textSpeed);
+  });
+}
+
+/* 배경음 크기 변경 */
+function onBgmVolumeChange(value) {
+  SETTINGS.bgmVolume = parseInt(value, 10);
+  localStorage.setItem('folio_bgmVolume', String(SETTINGS.bgmVolume));
+  bgm.volume = SETTINGS.bgmVolume / 100;
+  var volLabel = document.getElementById('setting-bgm-volume-label');
+  if (volLabel) volLabel.textContent = SETTINGS.bgmVolume + '%';
+}
+
+/* 클릭음 on/off 변경 */
+function onClickToggleChange(checked) {
+  SETTINGS.clickEnabled = checked;
+  localStorage.setItem('folio_clickEnabled', checked ? 'on' : 'off');
+}
+
+/* 텍스트 속도 변경 */
+function onTextSpeedChange(value) {
+  SETTINGS.textSpeed = value;
+  localStorage.setItem('folio_textSpeed', value);
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://tflyktyphhotsmvmxgyl.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_ah-o7ASSLP-4q4jKEQXP9g_L7ZQbd3S';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+
+
+<script>
+
+  /* ════════════════════════════════════════════════════
+     상태 변수
+  ════════════════════════════════════════════════════ */
+  var selectedPart = null;       // 사용자가 선택한 파트 번호 (1/2/3)
+  var roomCounts = { 2: 0, 3: 0 }; // PART2/3 대기방 개수
+
+  /* 파트별 표시 정보 */
+  var PART_INFO = {
+    1: {
+      title: '인어공주',
+      hero: '인어공주',
+      quote: '"목소리를 잃은 인어는<br>왕자의 마음을 얻을 수 있을까요?"',
+    },
+    2: {
+      title: '왕자',
+      hero: '왕자',
+      quote: '"숲에서 수상한 소녀를 만난 왕자.<br>앞으로 어떤 이야기가 펼쳐질까요?"',
+    },
+    3: {
+      title: '인어공주',
+      hero: '인어공주',
+      quote: '"왕자를 구해주고 그와 함께 살아가지만...<br>지금 당신은 행복하나요?"',
+    },
+  };
+
+  /* ════════════════════════════════════════════════════
+     페이지 로드 시: 대기방 개수 조회 + 화면 갱신
+  ════════════════════════════════════════════════════ */
+  async function refreshRoomCounts() {
+    try {
+      // PART2 대기중인 방 개수
+      const { count: count2 } = await db
+        .from('rooms')
+        .select('*', { count: 'exact', head: true })
+        .eq('part', 2)
+        .eq('status', 'waiting');
+
+      // PART3 대기중인 방 개수
+      const { count: count3 } = await db
+        .from('rooms')
+        .select('*', { count: 'exact', head: true })
+        .eq('part', 3)
+        .eq('status', 'waiting');
+
+      roomCounts[2] = count2 || 0;
+      roomCounts[3] = count3 || 0;
+
+      updatePartDisplay(2, roomCounts[2]);
+      updatePartDisplay(3, roomCounts[3]);
+    } catch (err) {
+      console.error('방 개수 조회 실패:', err);
+      // 실패 시 기본적으로 잠김 처리 유지
+    }
+  }
+
+  /* PART2/3 화면 표시 갱신 */
+  function updatePartDisplay(part, count) {
+    var btn = document.getElementById('btn-part-' + part);
+    var statusText = document.getElementById('status-text-' + part);
+
+    if (count > 0) {
+      btn.classList.remove('locked');
+      btn.classList.add('playable');
+      btn.innerHTML = '<img src="images/btn_play.png" alt="플레이 가능" />';
+      statusText.innerHTML = '플레이 가능 <span class="part-room-count">— 대기 중인 방 ' + count + '개</span>';
+    } else {
+      btn.classList.remove('playable');
+      btn.classList.add('locked');
+      btn.innerHTML = '<img src="images/btn_lock.png" alt="잠김" />';
+      statusText.textContent = '잠김';
+    }
+  }
+
+  /* ════════════════════════════════════════════════════
+     팝업 열기 / 닫기
+  ════════════════════════════════════════════════════ */
+  function openPopup() {
+    document.getElementById('popup-overlay').classList.add('active');
+    refreshRoomCounts(); // 팝업 열 때마다 최신 상태로 갱신
+  }
+
+  function closePopup() {
+    document.getElementById('popup-overlay').classList.remove('active');
+    selectedPart = null;
+    resetPartButtons();
+    updateEnterButton();
+
+    // 정보 영역 기본값(파트1)으로 복귀
+    var info = PART_INFO[1];
+    document.getElementById('popup-title').textContent = info.title;
+    document.getElementById('popup-quote').innerHTML = info.quote;
+    document.getElementById('popup-hero').textContent = info.hero;
+    document.getElementById('popup-current-part').textContent = '파트 선택 가능';
+    document.getElementById('popup-playable-info').innerHTML = '<img src="images/btn_play.png" alt="플레이" /> 파트를 선택해주세요';
+  }
+
+  /* 팝업 바깥 클릭 시 닫기 */
+  document.getElementById('popup-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closePopup();
+  });
+
+  /* ════════════════════════════════════════════════════
+     파트 선택
+  ════════════════════════════════════════════════════ */
+  function resetPartButtons() {
+    document.querySelectorAll('.popup-part-btn').forEach(function(btn) {
+      btn.style.background = 'rgba(255,248,230,0.3)';
+      btn.style.color = '#5a4830';
+      btn.style.borderColor = '#c8a86a';
+    });
+  }
+
+  function selectPart(part) {
+    // PART2/3은 대기방이 없으면 선택 불가
+    if (part !== 1 && roomCounts[part] === 0) {
+      return; // 잠긴 파트는 클릭해도 반응 없음
+    }
+
+    selectedPart = part;
+    resetPartButtons();
+
+    var btn = document.querySelector('.popup-part-btn[data-part="' + part + '"]');
+    btn.style.background = '#2a1e08';
+    btn.style.color = '#e8d8a0';
+    btn.style.borderColor = '#8a6030';
+
+    // 정보 영역 업데이트
+    var info = PART_INFO[part];
+    document.getElementById('popup-title').textContent = info.title;
+    document.getElementById('popup-quote').innerHTML = info.quote;
+    document.getElementById('popup-hero').textContent = info.hero;
+
+    var currentPartEl = document.getElementById('popup-current-part');
+    var playableInfoEl = document.getElementById('popup-playable-info');
+
+    if (part === 1) {
+      currentPartEl.textContent = '파트 1 (처음부터)';
+      playableInfoEl.innerHTML = '<img src="images/btn_play.png" alt="플레이" /> 새로운 이야기 시작';
+    } else {
+      currentPartEl.textContent = '파트 ' + part;
+      playableInfoEl.innerHTML = '<img src="images/btn_play.png" alt="플레이" /> 새로운 이야기 시작';
+    }
+
+    updateEnterButton();
+  }
+
+  function updateEnterButton() {
+    var btn = document.getElementById('btn-enter');
+    if (selectedPart) {
+      btn.disabled = false;
+      btn.innerHTML = '✦ &nbsp; 이야기 속으로 들어가기 &nbsp; ✦';
+    } else {
+      btn.disabled = true;
+      btn.innerHTML = '✦ &nbsp; 파트를 먼저 선택해주세요 &nbsp; ✦';
+    }
+  }
+
+  /* ════════════════════════════════════════════════════
+     잠긴 책 떨기
+  ════════════════════════════════════════════════════ */
+  function shakeLocked(btn) {
+    if (btn.classList.contains('shaking')) return;
+    btn.classList.add('shaking');
+    btn.addEventListener('animationend', function() {
+      btn.classList.remove('shaking');
+    }, { once: true });
+  }
+
+  /* ════════════════════════════════════════════════════
+     게임 시작 — 핵심 로직
+  ════════════════════════════════════════════════════ */
+  async function startGame() {
+    var nicknameInput = document.getElementById('nickname-input');
+    var nickname = nicknameInput.value.trim();
+
+    if (!nickname) {
+      nicknameInput.focus();
+      nicknameInput.style.borderColor = '#c04040';
+      return;
+    }
+
+    if (!selectedPart) return;
+
+    var btn = document.getElementById('btn-enter');
+    btn.disabled = true;
+    btn.innerHTML = '✦ &nbsp; 이야기를 준비하는 중... &nbsp; ✦';
+
+    try {
+      if (selectedPart === 1) {
+        await startPart1(nickname);
+      } else {
+        await startPartN(nickname, selectedPart);
+      }
+    } catch (err) {
+      console.error('게임 시작 실패:', err);
+      alert('이야기를 시작하지 못했습니다. 잠시 후 다시 시도해주세요.');
+      btn.disabled = false;
+      btn.innerHTML = '✦ &nbsp; 이야기 속으로 들어가기 &nbsp; ✦';
+    }
+  }
+
+  /* ── PART1 시작: 새 계보 + 새 방 생성 ── */
+  async function startPart1(nickname) {
+    // crypto.randomUUID()로 새 계보 ID 생성
+    var lineageId = crypto.randomUUID();
+
+    var { data, error } = await db
+      .from('rooms')
+      .insert({
+        lineage_id: lineageId,
+        part: 1,
+        status: 'playing',
+        player_nickname: nickname
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // 세션에 정보 저장 (game_p1.html에서 사용)
+    sessionStorage.setItem('playerName', nickname);
+    sessionStorage.setItem('roomId', data.id);
+    sessionStorage.setItem('lineageId', lineageId);
+    sessionStorage.setItem('part', '1');
+
+    location.href = 'game_p1.html';
+  }
+
+  /* ── PART2/3 시작: 대기 중인 방 중 하나를 골라 배정 ── */
+  async function startPartN(nickname, part) {
+    // 대기 중인 방 목록 조회
+    var { data: waitingRooms, error: fetchError } = await db
+      .from('rooms')
+      .select('*')
+      .eq('part', part)
+      .eq('status', 'waiting');
+
+    if (fetchError) throw fetchError;
+
+    if (!waitingRooms || waitingRooms.length === 0) {
+      alert('대기 중인 방이 없습니다. 다시 시도해주세요.');
+      await refreshRoomCounts();
+      var btn = document.getElementById('btn-enter');
+      btn.disabled = false;
+      btn.innerHTML = '✦ &nbsp; 이야기 속으로 들어가기 &nbsp; ✦';
+      return;
+    }
+
+    // 랜덤하게 하나 선택
+    var randomIndex = Math.floor(Math.random() * waitingRooms.length);
+    var chosenRoom = waitingRooms[randomIndex];
+
+    // 그 방을 'playing' 상태로 변경 (선점)
+    var { data: updatedRoom, error: updateError } = await db
+      .from('rooms')
+      .update({
+        status: 'playing',
+        player_nickname: nickname,
+        last_active: new Date().toISOString()
+      })
+      .eq('id', chosenRoom.id)
+      .eq('status', 'waiting')  // 동시성 체크: 이미 누가 가져갔으면 실패
+      .select()
+      .single();
+
+    if (updateError || !updatedRoom) {
+      // 다른 사람이 먼저 가져간 경우 - 다시 시도
+      alert('다른 플레이어가 먼저 입장했습니다. 다시 시도해주세요.');
+      await refreshRoomCounts();
+      var btn = document.getElementById('btn-enter');
+      btn.disabled = false;
+      btn.innerHTML = '✦ &nbsp; 이야기 속으로 들어가기 &nbsp; ✦';
+      return;
+    }
+
+    // 세션에 정보 저장 (이전 단계의 수치/플래그 포함)
+    sessionStorage.setItem('playerName', nickname);
+    sessionStorage.setItem('roomId', updatedRoom.id);
+    sessionStorage.setItem('lineageId', updatedRoom.lineage_id);
+    sessionStorage.setItem('part', String(part));
+    sessionStorage.setItem('stats', JSON.stringify({
+      A: updatedRoom.stats_a,
+      B: updatedRoom.stats_b,
+      C: updatedRoom.stats_c,
+      D: updatedRoom.stats_d,
+      count: updatedRoom.stats_count
+    }));
+    sessionStorage.setItem('flags', JSON.stringify(updatedRoom.flags || {}));
+
+    location.href = 'game_p' + part + '.html';
+  }
+
+  /* ════════════════════════════════════════════════════
+     초기화
+  ════════════════════════════════════════════════════ */
+  refreshRoomCounts();
+
+</script>
+
+</body>
+</html>
