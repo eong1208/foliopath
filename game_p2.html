@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="kr">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Folio Path - 파트 3 인어공주</title>
+  <title>Folio Path - 파트 2 왕자</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://hangeul.pstatic.net/hangeul_static/css/maru-buri.css" rel="stylesheet">
@@ -601,6 +601,143 @@
     }
 
 
+    /* ══════════════════════════════
+       파트 완료 오버레이
+    ══════════════════════════════ */
+    #part-end-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(10, 6, 0, 0.78);
+      z-index: 300;
+      justify-content: center;
+      align-items: center;
+      animation: partEndBgIn 0.8s ease both;
+    }
+    #part-end-overlay.active { display: flex; }
+
+    @keyframes partEndBgIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    #part-end-box {
+      position: relative;
+      width: min(560px, 84vw);
+      max-height: 80vh;
+      background: #f5eedd;
+      border: 1px solid #c4a86a;
+      border-radius: 3px;
+      padding: 52px 52px 44px;
+      text-align: center;
+      animation: partEndBoxIn 0.7s cubic-bezier(0.34,1.3,0.64,1) 0.15s both;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #part-end-text-area {
+      overflow-y: auto;
+      max-height: 50vh;
+      margin-bottom: 24px;
+
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    #part-end-text-area::-webkit-scrollbar {
+      width: 6px;
+      background: transparent;
+    }
+    #part-end-text-area::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 3px;
+    }
+    #part-end-text-area:hover::-webkit-scrollbar-thumb,
+    #part-end-text-area:active::-webkit-scrollbar-thumb {
+      background: rgba(180, 154, 80, 0.35);
+    }
+    #part-end-text-area:hover {
+      scrollbar-color: rgba(180, 154, 80, 0.35) transparent;
+    }
+
+    @keyframes partEndBoxIn {
+      from { opacity: 0; transform: scale(0.88) translateY(16px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* 네 모서리 장식 */
+    #part-end-box::before,
+    #part-end-box::after,
+    #part-end-box .corner-tr,
+    #part-end-box .corner-bl {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      border-color: #b89a50;
+      border-style: solid;
+    }
+    #part-end-box::before  { top:10px; left:10px;   border-width:1px 0 0 1px; }
+    #part-end-box::after   { bottom:10px; right:10px; border-width:0 1px 1px 0; }
+    #part-end-box .corner-tr { top:10px; right:10px;  border-width:1px 1px 0 0; }
+    #part-end-box .corner-bl { bottom:10px; left:10px; border-width:0 0 1px 1px; }
+
+    .part-end-label {
+      font-family: 'Aritaburi', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.35em;
+      color: #9a7d40;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 18px;
+    }
+    .part-end-label::before,
+    .part-end-label::after { content: '✦'; font-size: 0.5rem; color: #c4a050; }
+
+    #part-end-summary {
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.92rem;
+      color: #3a2800;
+      line-height: 2;
+      margin-bottom: 16px;
+      word-break: keep-all;
+    }
+    #part-end-summary em {
+      font-style: normal;
+      color: #7a5a18;
+      font-weight: 700;
+    }
+
+    #part-end-notice {
+      font-family: 'MaruBuri', serif;
+      font-size: 0.78rem;
+      color: #9a8060;
+      line-height: 1.85;
+      margin-bottom: 0;
+      word-break: keep-all;
+    }
+
+    .part-end-complete-btn {
+      display: block;
+      width: 100%;
+      padding: 13px 24px;
+      background: #2a1e08;
+      border: 1px solid #c4a96a;
+      border-radius: 2px;
+      color: #e8d8a0;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: background 0.2s ease, filter 0.2s ease;
+    }
+    .part-end-complete-btn:hover {
+      background: #3a2e18;
+      filter: brightness(1.15);
+    }
+    .part-end-complete-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
 
     /* ══════════════════════════════
        설정 오버레이 (공통)
@@ -658,9 +795,9 @@
 <!-- ══ 인트로 오버레이 ══ -->
 <div id="intro-overlay">
   <p  id="intro-tale"   class="intro-line">TALE 01</p>
-  <p  id="intro-part"   class="intro-line">PART 3 &nbsp;✦&nbsp; 인어공주</p>
-  <h1 id="intro-title"  class="intro-line">인어공주</h1>
-  <p  id="intro-quote"  class="intro-line">"모든 선택의 끝에서, 그녀는 마지막 갈림길에 섰다."</p>
+  <p  id="intro-part"   class="intro-line">PART 2 &nbsp;✦&nbsp; 왕자</p>
+  <h1 id="intro-title"  class="intro-line">왕자</h1>
+  <p  id="intro-quote"  class="intro-line">"왕자는 그날 해변에서 구해준 소녀의 얼굴을 잊을 수가 없었다."</p>
   <div id="intro-divider"></div>
   <p  id="intro-player" class="intro-line"><span id="intro-name">플레이어</span>님의 이야기가 시작됩니다.</p>
 </div>
@@ -677,7 +814,7 @@
   </button>
 
   <div id="scene-img-wrap">
-    <img id="scene-img" src="images/p3_scene_01.png" alt="씬 이미지" />
+    <img id="scene-img" src="images/p2_scene_01.png" alt="씬 이미지" />
   </div>
 
   <div id="script-area">
@@ -735,6 +872,22 @@
     </button>
   </div>
 </div><!-- /ending-screen -->
+
+<!-- ══ 파트 완료 오버레이 ══ -->
+<div id="part-end-overlay">
+  <div id="part-end-box">
+    <div class="corner-tr"></div>
+    <div class="corner-bl"></div>
+    <div class="part-end-label" id="part-end-label">PART 2 — END</div>
+    <div id="part-end-text-area">
+      <p id="part-end-summary"></p>
+      <p id="part-end-notice"></p>
+    </div>
+    <button class="part-end-complete-btn" id="btn-part-end-complete" onclick="goToLibraryFromPartEnd()">
+      ✦ &nbsp;완료&nbsp; ✦
+    </button>
+  </div>
+</div>
 
 <!-- 설정 오버레이 (공통 설정 UI) -->
 <div id="overlay-setting" class="overlay-panel">
@@ -955,7 +1108,7 @@ function onTextSpeedChange(value) {
 
 <script>
 /* ════════════════════════════════════════════════════
-   수치 & 플래그 — 이전 파트(P2)에서 이어받음
+   수치 & 플래그 — 이전 파트(P1)에서 이어받음
 ════════════════════════════════════════════════════ */
 var savedStats = JSON.parse(sessionStorage.getItem('stats') || 'null');
 var savedFlags = JSON.parse(sessionStorage.getItem('flags') || 'null');
@@ -965,18 +1118,15 @@ var flags = savedFlags || {
   hairColor: '',
   shellGiven: false,
   painRemoved: false,
-  visitedMarket: false,
-  visitedDock: false,
-  visitedCastle: false,
 };
 
 /* ════════════════════════════════════════════════════
    방(room) 정보 — library.html에서 넘어온 값
-   (P3는 클리어 시 다음 방을 만들지 않고 엔딩으로 종료됨)
 ════════════════════════════════════════════════════ */
 var ROOM_ID    = sessionStorage.getItem('roomId');
 var LINEAGE_ID = sessionStorage.getItem('lineageId');
 var endingReached = false;
+var partEndNextHref = 'library.html';
 
 /* ════════════════════════════════════════════════════
    생존 신호: 일정 간격으로 last_active 갱신
@@ -1036,693 +1186,856 @@ function addStats(a, b, c, d, cnt) {
    next: 씬ID 또는 함수
 ════════════════════════════════════════════════════ */
 
+var SCENES_KEY = "p2";
 var SCENES = {
 
-  /* ══ P3 씬 1-1 ~ 1-3 : 정략 여행 출발 ══ */
-  /* 이미지: p3_scene_01.png */
+  /* ══ P2 씬 1-1 ~ 1-3 : 소녀 첫 발견 ══ */
+  /* 이미지: p2_scene_01.png */
   's1': {
-    img: 'p3_scene_01.png',
+    img: 'p2_scene_01.png',
     lines: [
-      '"나와 함께 바다 너머의 이웃 나라로 가주겠니?',
-      '그곳에서도 너는 나의 가장 가까운 곁에 있어 줬으면 해."',
+      '눈을 뜨기 전, 마지막으로 기억나는 것은 거센 파도였다.',
+      '부서지는 배, 쏟아지는 물, 그리고 누군가의 손.',
+      '분명 누군가가 나를 붙잡고 있었는데, 그 얼굴은 흐릿하게 흐려져 더 이상 떠오르지 않는다.',
+      '물속에서 들려오던 어딘가 슬프게 울리던 노래. 그리고 조개 껍데기...',
+      '그 기억은 손을 뻗으면 닿을 듯하면서도 끝내 잡히지 않은 채 멀어져 간다.',
       '',
-      '왕자의 다정한 제안은 내 심장을 뛰게 했지만, 동시에 차갑게 얼어붙게 만들었다.',
-      '그가 말하는 여행이 사실은 정략결혼을 위한 맞선 여행임을 소문을 통해 이미 알고 있었기 때문이다.',
-    ],
-    choices: [
-      { label: '선택 A', body: '속에서 울분이 올라온다',
-        result: '기쁨보다 다른 감정이 불쑥 올라왔다.',
-        stats: [0,0,0,3,0], next: 's2' },
-      { label: '선택 B', body: '슬프기도 하고, 답답하기도 한다',
-        result: '',
-        stats: [1,0,0,2,0], next: 's2' },
-      { label: '선택 C', body: '애정이 식은 건 아니지만, 그렇다고 처음 만났을 때처럼 열렬하지도 않았다',
-        result: '',
-        stats: [0,2,0,-1,0], next: 's2' },
-    ]
-  },
-
-  /* ══ P3 씬 2-1 ~ 2-3 : 이웃나라 도착 ══ */
-  /* 이미지: p3_scene_02.png */
-  's2': {
-    img: 'p3_scene_02.png',
-    lines: [
-      '이웃 나라의 항구에 도착하자마자 우리를 맞이한 건 요란한 트럼펫 소리와 하늘을 수놓은 오색빛 깃발들이었다.',
-      '진주 장식으로 가득했던 내 방과 은색 머리카락을 빗어주던 언니들의 노래가 그리워져,',
-      '화려한 환영식이 도리어 나를 지독하게 외롭게 만들었다.',
-    ],
-    choices: [
-      { label: '선택 A', body: '계속해서 안 나와줬으면 좋겠다',
-        result: '',
-        stats: [0,0,0,3,0], next: function(){ checkCount('s3'); } },
-      { label: '선택 B', body: '걱정된다. 무슨 일이 있는 걸까?',
-        result: '',
-        stats: [0,0,2,0,0], next: function(){ checkCount('s3'); } },
-      { label: '선택 C', body: '그냥 빨리 보고 다시 돌아갔으면 한다',
-        result: '',
-        stats: [1,0,0,0,0], next: function(){ checkCount('s3'); } },
-    ]
-  },
-
-  /* ══ P3 씬 3-1 ~ 3-3 : 공주 등장 전 ══ */
-  /* 이미지: p3_scene_03.png */
-  's3': {
-    img: 'p3_scene_03.png',
-    lines: [
-      '무도회와 알현식이 며칠째 이어졌지만, 정작 주인공인 공주는 수도원에서 예절을',
-      '배우느라 아직 모습을 드러내지 않았다.',
-      '잠시 축제의 소란을 피해 홀로 산책하던 중, 왕자가 들려주었던 바다 이야기가 떠올랐다.',
-    ],
-    choices: [
-      { label: '선택 A', body: '집이 그리워진다',
-        result: '',
-        stats: [3,0,0,0,0], next: 's4' },
-      { label: '선택 B', body: '생각보다 재밌는 이야기였다',
-        result: '',
-        stats: [0,1,0,1,0], next: 's4' },
-      { label: '선택 C', body: '잘 모르겠다....',
-        result: '',
-        stats: [0,0,1,0,0], next: 's4' },
-    ]
-  },
-
-  /* ══ P3 씬 4-1 ~ 4-2 : 공주 첫 대면 ══ */
-  /* 이미지: p3_scene_04.png */
-  's4': {
-    img: 'p3_scene_04.png',
-    lines: [
-      '그렇게 영원히 흐르지 않을 것 같던 시간이 지나고, 마침내 공주가 그 모습을 드러냈다.',
-      '에메랄드보다 청아하고 깊은 푸른색 눈동자는 보는 사람의 넋을 빼놓기에 충분했다.',
+      '눈을 뜬 뒤에도 그 잔상이 쉽게 사라지지 않는다.',
+      '가슴 한편이 묘하게 가라앉은 채로 이유 모를 답답함이 남아 있다.',
+      '나는 잠시 숨을 고르다가, 아무도 없는 곳으로 걸음을 옮긴다.',
     ],
     choices: [],
-    next: 's4b'
+    next: 's1b'
+  },
+
+  's1b': {
+    img: 'p2_scene_01.png',
+    lines: [
+      '문을 지나, 길을 따라 걷다 보니 어느새 사람의 발길이 드문 숲 가장자리에 닿는다.',
+      '바람이 나뭇잎 사이를 스치고 멀리서 잔잔한 물소리가 들려온다.',
+      '그곳에서 눈앞에 슬픈 눈동자를 한 한 소녀를 발견한다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '"누구냐."',
+        result: '소녀는 잠시 멈칫하지만 아무 말도 하지 않는다.',
+        stats: [0,0,1,0,0], next: 's1c' },
+      { label: '선택 B', body: '"이곳엔 어떻게 왔지?"',
+        result: '그녀는 시선을 피하며 조용히 숨을 골랐다.',
+        stats: [0,0,2,0,0], next: 's1c' },
+      { label: '선택 C', body: '"...어디가 아픈 건가?"',
+        result: '미세하게 고개를 젓는다.',
+        stats: [0,0,0,2,0], next: 's1c' },
+      { label: '선택 D', body: '"혹시, 전에 본 적이..."',
+        result: '소녀의 눈이 순간 흔들린다. 살짝 기뻐보이는 듯 하다.',
+        stats: [0,0,1,2,0], next: function(){ goTo1X(); } },
+    ]
+  },
+
+  /* 씬 1-X: 조개 껍데기 — 엔딩5 직행 */
+  's1X': {
+    img: 'p2_scene_01.png',
+    lines: [
+      '눈 앞에 소녀는 품에서 빛나는 조개 껍데기를 꺼내서 보여준다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '"이건...!"',
+        result: '',
+        stats: [0,0,0,2,0], next: function(){ triggerEnding(5); } },
+    ]
+  },
+
+  's1c': {
+    img: 'p2_scene_01.png',
+    lines: [
+      '말을 걸었지만 소녀는 아무 대답도 하지 않는다.',
+      '낯선 옷차림, 어딘가 어색한 걸음걸이.',
+      '보호하지 않으면 안 될 것 같은 묘한 감정이 스며든다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '손을 내밀어 이끈다',
+        result: '잠시 고민하다가 그녀를 성으로 데려가기로 한다. 소녀가 잠시 망설이다가 조심스럽게 따라온다.',
+        stats: [0,0,0,2,0], next: 's2' },
+      { label: '선택 B', body: '거리를 두고 안내한다',
+        result: '잠시 고민하다가 그녀를 성으로 데려가기로 한다. 소녀는 일정한 간격을 유지하며 뒤따라온다.',
+        stats: [0,0,1,0,0], next: 's2' },
+      { label: '선택 C', body: '주변을 먼저 살핀다',
+        result: '잠시 고민하다가 그녀를 성으로 데려가기로 한다. 위험 요소는 보이지 않는다.',
+        stats: [0,0,2,0,0], next: 's2X' },
+    ]
+  },
+
+  /* 씬 2-X: 의심 분기 */
+  's2X': {
+    img: 'p2_scene_01.png',
+    lines: [
+      '소녀에게 말을 걸었지만, 그녀가 입을 뻐끔거리자 말을 할 수 없는 상태인지',
+      '뽀글거리는 거품 소리만 목에서 울려퍼진다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '살짝 의심한다',
+        result: '타국에서 보낸 첩자일 수도 있다는 가능성을 배제하지 않기로 한다.',
+        stats: [0,0,2,-1,1], next: 's2' },
+      { label: '선택 B', body: '약간의 거리를 둔다',
+        result: '스파이라기엔 너무 허술해보이나, 작은 가능성을 배제하지 않았다.',
+        stats: [0,0,1,0,0], next: 's2' },
+      { label: '선택 C', body: '감정에 휘둘리지 말자',
+        result: '',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(6); } },
+      { label: '선택 D', body: '걱정이 앞선다',
+        result: '목을 다친 걸까? 성으로 돌아가서 의사를 불러봐야할 것 같아.',
+        stats: [0,0,0,2,0], next: 's2' },
+    ]
+  },
+
+  /* ══ P2 씬 2-1 ~ 2-3 : 성으로, 소녀의 상태 ══ */
+  /* 이미지: p2_scene_02.png */
+  's2': {
+    img: 'p2_scene_02.png',
+    lines: [
+      '계속해서 안내를 이어가기 얼마 지나지 않아, 소녀의 걸음이 불안정해진다.',
+      '몇 걸음마다 중심을 잃고 비틀거린다. 자세히 보니 발끝이 상처로 물들어 있다.',
+      '피가 천천히 모래 위로 번진다. 그럼에도 소녀는 아무 말 없이 계속 나를 따라온다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '급히 옆으로 가 부축해준다',
+        result: '몸이 가볍게 떨린다. 긴장하는 건가?',
+        stats: [0,0,0,3,0], next: 's3' },
+      { label: '선택 B', body: '근처의 그늘을 찾아 잠시 쉬게 한다',
+        result: '잠시 숨을 고르지만 여전히 불안정하다.',
+        stats: [0,0,1,2,0], next: 's3' },
+      { label: '선택 C', body: '걸음을 멈추고 이유를 묻는다',
+        result: '대답 대신 소녀는 발을 꼼지락거리며 시선이 흔들린다.',
+        stats: [0,0,2,0,0], next: 's3' },
+    ]
+  },
+
+  /* ══ P2 씬 3-1 ~ 3-2 : 궁정 의사, 소녀 머뭄 ══ */
+  /* 이미지: p2_scene_03.png */
+  's3': {
+    img: 'p2_scene_03.png',
+    lines: [
+      '왕궁에 도착한 뒤, 손님 방으로 소녀를 이끌고 궁정 의사를 불렀다.',
+      '',
+      '"죄송합니다, 왕자님. 사고가 있었는지 혀가 잘려있으시더군요.',
+      '또한... 아무래도 기억을 잃으신 듯합니다."',
+    ],
+    choices: [],
+    next: 's3b'
+  },
+
+  's3b': {
+    img: 'p2_scene_03.png',
+    lines: [
+      '반쯤 짐작하고 있었던 탓일까. 그리 놀라지 않았다.',
+      '나는 소녀에게 화려한 실크와 면사를 촘촘하게 엮어 만든 드레스를 내어주며',
+      '"길에서 찾은 사랑스러운 여인"이라 부르며 궁전에 머물게 했다.',
+      '그리고 소녀는 얼마 지나지 않아 성에서 가장 유명하고 아름다운 여인으로 불렸다.',
+    ],
+    choices: [],
+    next: 's4'
+  },
+
+  /* ══ P2 씬 4-1 ~ 4-3 : 연회 ══ */
+  /* 이미지: p2_scene_04.png */
+  's4': {
+    img: 'p2_scene_04.png',
+    lines: [
+      '연회날이 되자 소녀를 이끌고 무도회장으로 이끌었다.',
+      '내 옆을 거품처럼 가볍게 걷는 소녀에게서 모두 눈을 떼지 못하는 게 느껴진다.',
+      '앞에는 실크와 황금빛 옷을 입은 아름다운 무희들이 노래를 부르며 춤을 추기 시작했다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '흥에 맞춰 박수를 친다',
+        result: '어쩐지 소녀의 기분이 좋아보이지 않는다.',
+        stats: [0,1,0,0,0], next: 's4b' },
+      { label: '선택 B', body: '가만히 감상한다',
+        result: '소녀는 무언가를 생각하는 듯 나의 손을 힘을 주어 잡는다.',
+        stats: [0,0,1,1,0], next: 's4b' },
+    ]
   },
 
   's4b': {
-    img: 'p3_scene_04.png',
+    img: 'p2_scene_04.png',
     lines: [
-      '그런데 그녀를 바라보는 왕자의 모습이 심상치 않다.',
-      '무언가에 홀린 듯한 약한 떨림이 그의 전신에서 느껴졌다.',
-      '',
-      '"당신이었나요? 나를... 구해준 사람이."',
-      '',
-      '왕자의 입에서 터져 나온 그 외침은 나의 심장을 얼어붙게 만들었다.',
-    ],
-    choices: [
-      { label: '선택 A', body: '왕자가 확신했을 시 →',
-        result: '"당신이었군요! 내가 바닷가에 휩쓸려왔을 때 나를 구해준 사람이...!" 돌이킬 수 없는 선택을 했다는 것을 느꼈다.',
-        stats: [0,0,0,3,1], next: function(){ checkCount('s5'); } },
-      { label: '선택 B', body: '왕자가 의심했을 시 →',
-        result: '"전에... 어디에서 본 적 있지 않나요?" 눈 앞의 공주와 자신의 닮은 점이라곤 눈동자 색밖에 없다.',
-        stats: [0,0,3,0,0], next: function(){ checkCount('s5'); } },
-      { label: '선택 C', body: '왕자가 보류했을 시 →',
-        result: '"은인을 이렇게 뵙게 되다니. 운명이라는 건 실존하나봅니다." 생각보다 차분한 반응이다.',
-        stats: [0,1,1,0,0], next: function(){ checkCount('s5'); } },
-      { label: '선택 D', body: '왕자가 소녀를 봤을 시 →',
-        result: '왕자는 머뭇거리며 내쪽의 반응을 살핀다. 배려를 해주는 걸까.',
-        stats: [0,0,0,2,0], next: function(){ checkCount('s5'); } },
-    ]
-  },
-
-  /* ══ P3 씬 5-1 ~ 5-3 : 공주 소개, 첫날 연회 ══ */
-  /* 이미지: p3_scene_05.png */
-  's5': {
-    img: 'p3_scene_05.png',
-    lines: [
-      '이웃나라 공주는 잠시 놀란 듯 눈을 동그랗게 뜨더니, 환하게 웃으며 고개를 끄덕인다.',
-      '',
-      '"\'길에서 찾은 사랑스러운 여인\'이라... 정말 아름다운 소녀네요.',
-      '기억을 잃었으니 선뜻 이름을 지어 부르기도 그렇겠지요."',
-    ],
-    choices: [
-      { label: '선택 A', body: '밝게 답한다',
-        result: '이야기를 다 들은 후, 공주는 이해한다는 듯 고개를 끄덕인다.',
-        stats: [0,1,0,0,0], next: 's5b' },
-      { label: '선택 B', body: '주위의 눈치를 보며 움직인다',
-        result: '',
-        stats: [0,0,1,0,0], next: 's5b' },
-    ]
-  },
-
-  's5b': {
-    img: 'p3_scene_05.png',
-    lines: [
-      '그렇게 간단한 소개가 끝난 후, 화려한 연회가 열린다.',
-      '왕자는 공주와 대화하며 은인인지 확인하려 하는 것 같았다.',
-      '그 모습을 멀리서 지켜보다가, 연회장 홀 한 가운데에 서서',
-      '발 아래에서 기어오르는 고통을 참아내고 누구보다 강렬히, 화려하게 팔과 다리를 움직이며 춤을 춘다.',
+      '문득 소녀는 하얀 팔을 들고는 발끝으로 일어서 앞으로 걸어 나갔다.',
+      '한 걸음, 한 걸음 새의 깃털처럼 가볍게 신비로운 동작을 보여주었다.',
+      '이곳의 그 누구도 소녀보다 춤을 잘 추지는 못했다.',
+      '발걸음을 움직일 때마다 더 아름답게 춤추며 그 어떤 무희보다 눈으로, 마음으로 말하는 것 같았다.',
+      '모두가 소녀에게 넋을 잃고 말았다.',
     ],
     choices: [],
-    next: 's5c'
+    next: 's4c'
   },
 
-  's5c': {
-    img: 'p3_scene_05.png',
+  's4c': {
+    img: 'p2_scene_04.png',
     lines: [
-      '춤이 끝나고 사방에서 박수 소리가 들린다. 그러나 그다지 유쾌하진 않았다.',
-      '왕자가 나를 부르더니 공주와 둘만의 시간을 가지라며 바깥으로 에스코트했다.',
-      '그러나 공주는 맑은 얼굴로 손을 내밀었다.',
-      '',
-      '"제가 왕자님께 부탁드렸어요. 괜찮다면 저랑 같이 산책하러 갈래요?"',
+      '소녀 덕분에 연회는 성황리에 마무리 되었다.',
+      '밤이 깊어지고, 성 안은 고요해진다. 모두가 잠든 시간. 방으로 돌아가기 전에...',
     ],
     choices: [
-      { label: '선택 A', body: '꽃을 받는다',
-        result: '마녀의 저주로 걸을 때마다 느껴지던 날카로운 칼날 같은 고통이 잠시 사그라든 것 같다. 손에 쥔 꽃은 생각보다 차갑고, 또 따스했다.',
-        stats: [0,2,1,-1,0], next: 's6', flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.flowerFlag=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
-      { label: '선택 B', body: '정중하게 거절한다',
-        result: '공주는 아쉬운 듯 작게 미소 지으며 내밀었던 손을 천천히 거두었다.',
-        stats: [1,0,0,1,0], next: 's6' },
-      { label: '선택 C', body: '기분 나쁜 티를 낸다',
-        result: '공주는 당황한 듯 눈을 동그랗게 뜨더니, 이내 미안한 표정으로 고개를 숙였다.',
-        stats: [0,0,0,2,1], next: 's6' },
+      { label: '선택 A', body: '혼자만의 시간을 즐기며 복도를 걸어본다',
+        result: '조용한 복도를 걸으며 생각을 정리한다.',
+        stats: [0,1,0,0,0], next: 's5' },
+      { label: '선택 B', body: '인사를 하기 위해 소녀의 방으로 향한다',
+        result: '소녀의 방으로 향하지만 아무 응답이 없다.',
+        stats: [0,0,0,2,0], next: 's6' },
+      { label: '선택 C', body: '찾아볼 것이 생겨 잠깐 서재에 들린다',
+        result: '복도 끝에 있는 서재로 간다.',
+        stats: [0,0,2,0,0], next: 's7' },
     ]
   },
 
-  /* ══ P3 씬 6-1 ~ 6-2 : 시장 또는 부둣가 선택 ══ */
-  /* 이미지: p3_scene_06.png */
+  /* ══ P2 씬 5-1 : 복도, 소녀 발견 ══ */
+  /* 이미지: p2_scene_05.png */
+  's5': {
+    img: 'p2_scene_05.png',
+    lines: [
+      '문득 복도를 지나가다 창가 쪽에서 인기척이 느껴진다.',
+      '조심스럽게 다가가 보니, 소녀가 조용히 밖을 바라보고 있다.',
+      '달빛 아래에서 그녀의 모습은 어딘가 쓸쓸해 보인다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '조심스럽게 말을 건다. "저기..."',
+        result: '소녀가 내쪽으로 시선을 돌린다. 잠깐 놀란 눈으로 바라보더니, 작게 손을 흔들고 급히 내 옆을 지나쳐간다.',
+        stats: [0,0,0,2,0], next: 's8' },
+      { label: '선택 B', body: '조용히 뒷모습을 지켜본다',
+        result: '그녀는 달빛을 받으며 바다쪽으로 몸을 돌리고 있었다.',
+        stats: [0,0,1,1,0], next: 's8' },
+      { label: '선택 C', body: '자리를 비켜준다',
+        result: '왠지 모르겠지만 혼자만의 시간을 가질 수 있도록 자리를 피해주는 게 좋을 것 같다.',
+        stats: [1,0,0,0,0], next: 's8' },
+    ]
+  },
+
+  /* ══ P2 씬 6-1 : 방 노크 ══ */
+  /* 이미지: p2_scene_06.png */
   's6': {
-    img: 'p3_scene_06.png',
+    img: 'p2_scene_06.png',
     lines: [
-      '다음날부터 왕자는 여러 일정에 참여하느라 잘 보이지 않았다.',
-      '기분도 전환할 겸 이때를 기회삼아 몰래 성 밖으로 잠깐 나갔다 오자.',
-      '어디로 갈까? 시간상 한 군데만 들릴 수 있을 것 같다.',
+      '그녀의 방을 찾아가 두어번의 노크를 한다. ...',
+      '그러나 아무 응답이 없다. ...연회는 끝났는데, 이 시간에 어디에 있는 걸까.',
     ],
     choices: [
-      { label: '선택 A', body: '온갖 물건과 사람들이 제일 많이 왕래한다던 시장에 가보고 싶어',
-        result: '가벼운 발걸음으로 시장으로 걸음을 옮긴다.',
-        stats: [0,2,0,0,0], next: 's6_market',
-        flag: function(){ flags.visitedMarket = true; } },
-      { label: '선택 B', body: '물이 많은 곳에 가보고 싶어. 가까이에 부둣가가 있었던 것 같은데...',
-        result: '가벼운 발걸음으로 부둣가로 걸음을 옮긴다.',
-        stats: [0,1,1,0,0], next: 's6_dock',
-        flag: function(){ flags.visitedDock = true; } },
-      { label: '선택 C', body: '그냥 성 안에만 있을래. 그게 좋아',
-        result: '',
-        stats: [1,0,1,0,0], next: 's9',
-        flag: function(){ flags.visitedCastle = true; } },
+      { label: '선택 A', body: '방으로 돌아간다',
+        result: '이 시간에 찾아다니는 건 실례일 수도 있다.',
+        stats: [0,0,0,0,0], next: 's8' },
     ]
   },
 
-  /* ══ P3 씬 6-시장 ══ */
-  's6_market': {
-    img: 'p3_scene_06.png',
+  /* ══ P2 씬 7-1 ~ 7-4 : 서재 ══ */
+  /* 이미지: p2_scene_07.png */
+  's7': {
+    img: 'p2_scene_07.png',
     lines: [
-      '시장에 도착했다. 온갖 소리와 활기로 들끓는 시장은 그곳에 서 있는 것만으로도 묘하게 힘이 나게 했다.',
-      '화려하게 진열된 좌판 사이에서 여러 색의 실을 정교하게 꼬아 만든 팔찌가 시선을 붙잡았다.',
-      '그 팔찌의 색들은 바닷속 성에서 함께 지내던 언니들의 머리카락 색처럼 다채롭고 선명했다.',
-      '뒤에서 익숙한 다정한 목소리가 들려왔다.',
-      '',
-      '"눈썰미가 좋으시네요. 그거, 바다타고 건너온 실입니다."',
-      '',
-      '검은 눈동자인 왕자와 다르게 반짝이는 푸른 눈동자를 가진 청년이었다.',
-      '',
-      '"이것도 기념인데... 어떻습니까, 제가 아가씨께 하나 선물해드려도?"',
+      '복도 끝에 있는 서재로 간다.',
+      '낡고 두꺼운 문을 열고 들어가보면 책먼지 냄새가 코끝을 스친다.',
     ],
     choices: [
-      { label: '선택 A', body: '...돈 있는데? 들고 온 은화가 들어있는 주머니를 보여준다',
-        result: '당당한 태도에 청년은 잠시 멍한 표정을 짓더니, 이내 유쾌하게 웃음을 터뜨린다.',
-        stats: [0,1,0,0,0], next: 's6_market2',
-        flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.marketMan=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
-      { label: '선택 B', body: '지상에서는 이런 일이 흔한 걸까...? 경계하며 거절의 의사를 표한다',
-        result: '청년은 무안한 듯 뒷머리를 긁적이다가도 이내 수긍하며 물러난다.',
-        stats: [1,0,1,0,0], next: 's8' },
-      { label: '선택 C', body: '냉큼 끄덕인다. 사준다는데 거절할 필욘 없지',
-        result: '청년이 가장 선명한 푸른색 실 팔찌를 골라 당신의 손목에 직접 묶어준다.',
-        stats: [0,3,0,0,0], next: 's6_market2',
-        flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.marketMan=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
+      { label: '선택 A', body: '오래된 설화집을 찾는다',
+        result: '낡은 삽화가 그려진 설화집 한 권이 눈에 들어온다. "바다 사람들은 삼백 년을 살지만 죽으면 거품이 되어 사라진다"는 구절 위로 누군가의 손때가 묻어 있다.',
+        stats: [0,0,2,0,0], next: 's7b' },
+      { label: '선택 B', body: '이웃나라와 관련된 서신을 검토한다',
+        result: '접혀있던 종이를 펼치자 은인을 찾기 위해 기억에 의존하여 화가에게 의뢰했던 초상화가 나온다.',
+        stats: [0,0,3,1,0], next: 's7c' },
+      { label: '선택 C', body: '오래된 항해 일지를 찾는다',
+        result: '"바다 거품 속에서 하얀 팔이 바다속에서 나오는 것을 보았다"는 선원의 증언. 문득 낮에 본 소녀의 가냘픈 팔이 떠오른다.',
+        stats: [0,0,3,0,0], next: 's7' },
     ]
   },
 
-  's6_market2': {
-    img: 'p3_scene_06.png',
+  's7b': {
+    img: 'p2_scene_07.png',
     lines: [
-      '대답을 재촉하는 대신 시장 구석구석의 재미있는 이야기들을 들려주었다.',
-      '저곳의 과일은 맛이 없는데, 아주머니는 친절하다는 거. 저쪽의 영감은 가짜 보석으로 여행객을 낚는다는 것 등등.',
-      '왕궁의 엄격한 예법이나 왕자의 무심함과는 다른 그의 생동감 넘치는 눈빛에,',
-      '나도 모르게 미묘한 흥미를 느끼며 조용히 귀를 기울였다.',
+      '책을 덮는다. 시간이 늦었으니 이만 자러 가야겠지.',
+      '책장에 다시 책을 넣어두고 소득 없이 서재를 떠나려던 찰나,',
+      '창문 밖의 파도 소리가 날카롭게 귓가를 스친다.',
     ],
     choices: [
-      { label: '선택 A', body: '바다 밖 세상 이야기에 관심을 가진다',
-        result: '청년은 바다 건너 대륙에는 눈이 녹지 않는 산과 거대한 사막이 있다는 이야기를 들려준다.',
-        stats: [0,3,0,0,0], next: 's8' },
-      { label: '선택 B', body: '손짓과 몸짓으로 그의 질문에 답하려 노력한다',
-        result: '"말하지 않아도 다 느껴집니다. 당신의 눈이 세상 누구보다 많은 것을 말해주고 있거든요."',
-        stats: [0,1,1,0,0], next: 's8' },
-      { label: '선택 C', body: '성으로 돌아가야 할 시간을 생각하며 초조해한다',
-        result: '"누군가 당신을 아주 애타게 기다리고 있나 봅니다."',
-        stats: [0,0,0,3,0], next: 's8' },
+      { label: '선택 A', body: '방으로 돌아간다',
+        result: '서재의 문을 닫고 방으로 돌아가서 잠을 청한다.',
+        stats: [0,0,0,0,0], next: 's8' },
     ]
   },
 
-  /* ══ P3 씬 6-부둣가 ══ */
-  's6_dock': {
-    img: 'p3_scene_07.png',
+  's7c': {
+    img: 'p2_scene_07.png',
     lines: [
-      '늦은 오후라서 그런지, 사람이 많진 않았다.',
-      '파도 소리를 따라 부둣가를 천천히 걷는다.',
-      '잠시 걸음을 멈추어 바다를 바라보던 순간, 시야 한쪽에 누군가가 들어온다.',
-      '검은 머리의 한 청년이 자리에 서서 수평선을 바라보고 있다.',
+      '서신을 챙기고 서재를 떠나려던 찰나,',
+      '창문 밖의 파도 소리가 날카롭게 귓가를 스친다.',
     ],
     choices: [
-      { label: '선택 A', body: '남자에게 다가간다',
-        result: '발소리를 들은 남자가 천천히 고개를 돌린다. 잠시 눈이 마주친다.',
-        stats: [0,2,0,0,0], next: 's6_dock2',
-        flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.marketMan=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
-      { label: '선택 B', body: '조금 더 지켜본다',
-        result: '남자는 한동안 같은 자세로 바다만 바라본다. 마치 무언가를 고민하는 사람처럼 보인다.',
-        stats: [0,0,2,0,0], next: 's6_dock2',
-        flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.marketMan=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
-      { label: '선택 C', body: '다른 곳으로 이동한다',
-        result: '굳이 말을 걸 필요는 없을 것이다. 발걸음을 돌린다.',
-        stats: [1,0,0,0,0], next: 's8' },
+      { label: '선택 A', body: '방으로 돌아간다',
+        result: '서재의 문을 닫고 방으로 돌아가서 잠을 청한다.',
+        stats: [0,0,0,0,0], next: 's8' },
     ]
   },
 
-  's6_dock2': {
-    img: 'p3_scene_07.png',
-    lines: [
-      '얼마 지나지 않아 상대가 먼저 다가와 말을 건넨다.',
-      '',
-      '"좋은 풍경이죠." 그는 여전히 바다를 바라보고 있다.',
-      '',
-      '"이상하게 볼 때마다 눈을 못 떼겠더라고요.',
-      '당신은 어떤 이유로 이곳에 온 건가요?"',
-    ],
-    choices: [
-      { label: '선택 A', body: '남자 옆에 선다',
-        result: '남자는 잠시 놀란 듯하다가 옅게 웃는다. 잠시 말없이 나란히 바다를 바라본다.',
-        stats: [0,1,0,0,0], next: 's6_dock3' },
-      { label: '선택 B', body: '바다를 가리킨다',
-        result: '남자는 손끝이 향한 곳을 따라 시선을 옮긴다. "그럴 수도 있겠네요."',
-        stats: [0,0,2,0,0], next: 's6_dock3' },
-      { label: '선택 C', body: '시선을 피한다',
-        result: '그러나 눈치 빠른 상대는 더 이상 묻지 않는다.',
-        stats: [1,0,0,0,0], next: 's6_dock3' },
-    ]
-  },
-
-  's6_dock3': {
-    img: 'p3_scene_07.png',
-    lines: [
-      '잠시 침묵이 흐른다. 이상하게도 어색하지는 않다.',
-      '남자는 근처에 세워 둔 작은 수레에서 작은 꽃팔찌 하나를 집어 든다.',
-      '',
-      '"잘 하는 게 이런 것밖에 없지만... 이번에도 기념품이라고 생각해주세요."',
-    ],
-    choices: [
-      { label: '선택 A', body: '꽃팔찌를 받는다',
-        result: '청년은 만족스러운 듯 웃는다. "끈팔찌랑은 또 다른 느낌이네요. 이것도 잘 어울릴 줄 알았습니다." 손목에서 꽃향기가 은은하게 풍겨온다.',
-        stats: [0,3,0,0,0], next: 's8',
-        flag: function(){ var f=JSON.parse(sessionStorage.getItem('flags')||'{}'); f.flowerFlag=true; sessionStorage.setItem('flags',JSON.stringify(f)); } },
-      { label: '선택 B', body: '잠시 망설인다',
-        result: '청년은 당신의 표정을 살피더니 어깨를 으쓱이며 한 발자국 물러난다. "부담 가질 필요는 없어요."',
-        stats: [0,0,1,0,0], next: 's8' },
-      { label: '선택 C', body: '경계하며 거절의 의사를 표한다',
-        result: '청년은 아쉽다는 듯 웃으며 꽃팔찌를 다시 수레 위에 올려놓는다.',
-        stats: [1,0,0,0,0], next: 's8' },
-    ]
-  },
-
-  /* ══ P3 씬 8-1 : 성으로 귀환 ══ */
-  /* 이미지: p3_scene_08.png */
+  /* ══ P2 씬 8-1 ~ 8-3 : 밤의 노래 ══ */
+  /* 이미지: p2_scene_08.png */
   's8': {
-    img: 'p3_scene_08.png',
+    img: 'p2_scene_08.png',
     lines: [
-      '이윽고 저 멀리 교회에서 종이 세 번 울리는 소리가 들려온다.',
-      '즐거웠던 짧은 만남을 뒤로하고 다시 적막한 궁성으로 발걸음을 옮겨야 할 때다.',
+      '방으로 돌아와 침대에 몸을 눕혔지만 쉽게 잠들 수 없었다.',
+      '낮 동안 쫓아다닌 흔적들과 사람들의 말이 머릿속을 맴돌다 이내 파도 소리에 묻혀 사라진다.',
+    ],
+    choices: [],
+    next: 's8b'
+  },
+
+  's8b': {
+    img: 'p2_scene_08.png',
+    lines: [
+      '연회가 있던 그날 이후로, 밤이 되면 어딘가에서 노래 같은 소리가 들려온다.',
+      '정확히 들리는 것은 아니고, 물결처럼 부서지는 음이 귓가를 스친다.',
+      '분명히 기억 어딘가를 건드리는 소리인데 붙잡히지 않는다.',
+      '밤마다 그 방향을 향해 몇 번이나 발걸음을 옮긴다.',
     ],
     choices: [
-      { label: '선택 A', body: '가볍게 손을 흔들고 작별인사를 한다',
-        result: '청년은 당신이 인파 속으로 사라질 때까지 그 자리에 서서 미소를 지으며 손을 흔들어 주었다.',
-        stats: [0,1,0,0,0], next: 's9' },
-      { label: '선택 B', body: '답례로 머리에 꽂았던 작은 장식을 건넨다',
-        result: '"내일도, 그다음 날도 여기서 기다리겠습니다!" 그 외침이 성문 안으로 들어서는 당신의 귓가에 오래도록 맴돌았다.',
-        stats: [0,3,0,0,0], next: 's9' },
+      { label: '선택 A', body: '소리를 따라간다',
+        result: '소리는 점점 희미해진다. 그럼에도 놓치지 않고 끝까지 따라간다.',
+        stats: [0,0,2,1,0], next: 's8c' },
+      { label: '선택 B', body: '포기하고 방으로 돌아간다',
+        result: '내일의 일정을 생각해보면 오늘은 조금 일찍 자는 게 좋을 것 같았다. 그러나 왠지 모르게 마음 한 구석이 불편한 밤을 보낸다.',
+        stats: [1,0,0,0,0], next: 's9' },
+      { label: '선택 C', body: '소녀를 떠올린다',
+        result: '문득 전에 복도에서 본 소녀의 모습이 허공에 겹쳐졌다. 어쩌면, 하는 생각을 하기도 전에 발은 이미 그곳으로 향했다.',
+        stats: [0,0,0,3,0], next: 's8c' },
     ]
   },
 
-  /* ══ P3 씬 9-1 ~ 9-3 : 성 안 선택 ══ */
-  /* 이미지: p3_scene_09.png */
+  's8c': {
+    img: 'p2_scene_08.png',
+    lines: [
+      '소리의 끝에는... 활짝 열린 창문 너머를 바라보고 있는 소녀의 뒷모습이 있었다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '전에 하지 못했던 이야기를 꺼낸다',
+        result: '지금이 가장 최적의 타이밍인 것 같다는 생각과 함께, 소녀를 왕궁으로 데려온 이유를 설명한다.',
+        stats: [0,0,1,2,0], next: 's9' },
+      { label: '선택 B', body: '조용히 뒷모습을 지켜보며 방으로 돌아간다',
+        result: '그녀는 달빛을 받으며 바다쪽으로 몸을 돌리고 있었다. 혼자만의 시간을 가질 수 있도록 자리를 피해주는 게 좋을 것 같다.',
+        stats: [1,0,0,0,0], next: 's9' },
+    ]
+  },
+
+  /* ══ P2 씬 9-1 ~ 9-3 : 은인 이야기 ══ */
+  /* 이미지: p2_scene_09.png */
   's9': {
-    img: 'p3_scene_09.png',
+    img: 'p2_scene_09.png',
     lines: [
-      '성은 언제나 고요했고, 적적했다.',
-      '복도에는 화려한 장식과 그림들이 벽을 가득 메우고 있다.',
-      '문득, 눈앞에 갈림길이 눈에 들어온다.',
+      '시간이 조금 흐른 어느 날, 나는 소녀에게 이야기를 꺼낸다.',
+      '',
+      '"...그때의 감각은 분명한데, 얼굴만은 떠오르지 않아."',
+      '"젊은 여인들이 나를 살리기 위해 열심히 간호해주었지.',
+      '가장 어린 소녀가 바닷가에서 나를 찾아서 목숨을 구해줬다고 해."',
+      '',
+      '"아마 그 소녀가 내가 사랑할 수 있는 이 세상의 유일한 여인일 거야."',
+      '',
+      '말을 하며도 스스로 답답함이 밀려온다.',
     ],
     choices: [
-      { label: '선택 A', body: '왼쪽의 초상화가 걸린 복도로 향한다',
-        result: '',
-        stats: [0,0,2,0,0], next: 's10' },
-      { label: '선택 B', body: '오른쪽의 정원으로 나가는 길로 향한다',
-        result: '',
-        stats: [0,1,1,0,0], next: 's11' },
-      { label: '선택 C', body: '지친다. 방으로 돌아가자',
-        result: '',
-        stats: [1,0,0,0,0], next: 's12' },
+      { label: '선택 A', body: '소녀의 반응을 지켜본다',
+        result: '이야기를 듣던 소녀의 표정이 미묘하게 흔들린다.',
+        stats: [0,0,2,1,0], next: 's9b' },
     ]
   },
 
-  /* ══ P3 씬 10-1 ~ 10-3 : 초상화 복도 ══ */
-  /* 이미지: p3_scene_10.png */
-  's10': {
-    img: 'p3_scene_10.png',
+  's9b': {
+    img: 'p2_scene_09.png',
     lines: [
-      '오래된 왕족들의 초상화가 눈에 들어온다.',
-      '대부분 눈부신 금발과 푸른 눈을 가지고 있다.',
-      '그중에는 이번 약혼식의 주인공인 공주의 초상화도 걸려 있다.',
-      '바라보던 중, 문득 무언가 떠올라 걸음을 멈춘다.',
+      '"네가 그 사람과 닮아서 이상하게 마음이 가는 것 같아."',
+      '',
+      '그 순간, 소녀는 작게 숨을 들이쉰다.',
+      '그러나 이내 아무 일도 없다는 듯 시선을 돌린다.',
     ],
     choices: [
-      { label: '선택 A', body: '그러고보니...',
+      { label: '선택 A', body: '이유를 묻는다',
+        result: '소녀는 약하게 고개를 저었다.',
+        stats: [0,0,0,0,0], next: 's9c' },
+      { label: '선택 B', body: '잠시 침묵한다',
+        result: '........',
+        stats: [0,0,0,1,0], next: 's9c' },
+    ]
+  },
+
+  's9c': {
+    img: 'p2_scene_09.png',
+    lines: [
+      '대화가 끝난 후 소녀의 옆에 나란히 서며 같은 곳을 바라본다.',
+      '다만 한 가지 알 수 있었던 것은, 그녀는 내가 모르는 무언가를 알고 있을지도 모른다는 것이었다.',
+    ],
+    choices: [],
+    next: 's10'
+  },
+
+  /* ══ P2 씬 10-1 ~ 10-3 : 여행 준비 ══ */
+  /* 이미지: p2_scene_10.png */
+  's10': {
+    img: 'p2_scene_10.png',
+    lines: [
+      '며칠 뒤, 부모님의 명으로 이웃 왕국에 다녀와야 한다는 소식을 들었다.',
+      '정치적인 이유가 담긴 방문. 나는 준비를 하며도 어딘가 마음이 무겁다.',
+      '마음 한 구석에서는 수도원에서 본 소녀보다, 옆에 있는 소녀가 신경 쓰였다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '짧지 않은 일정이므로 방문 목적까지 함께 알린다',
+        result: '소녀는 조용히 고개를 끄덕인다. 나는 이상하게도 안심이 된다.',
+        stats: [0,0,1,2,0], next: 's10b' },
+      { label: '선택 B', body: '괜히 걱정시킬 필욘 없다. 자세하게 말하지 않는다',
         result: '',
-        stats: [0,0,2,0,0], next: 's10b' },
-      { label: '선택 B', body: '이상한 기시감이 든다',
+        stats: [0,0,0,0,0], next: 's11' },
+      { label: '선택 C', body: '함께 갈지 말지 고민한다',
         result: '',
-        stats: [0,0,3,0,0], next: 's10b' },
-      { label: '선택 C', body: '문득 바다 속의 가족들이 떠오른다. 잘 지내려나...',
-        result: '',
-        stats: [3,0,0,0,0], next: 's10b' },
+        stats: [0,1,1,1,0], next: 's10b' },
     ]
   },
 
   's10b': {
-    img: 'p3_scene_10.png',
+    img: 'p2_scene_10.png',
     lines: [
-      '공주의 초상화를 자세히 살펴본다.',
-      '공주의 부친이자 현왕은 금발이지만, 모친은 흑발을 가지고 있었다.',
-      '처음에는 별생각이 없었지만, 이상하게도 자꾸만 누군가의 얼굴이 떠오른다.',
-      '성 밖에서 마주친 남자와 매우 닮아있는 것 같은 기분이 든다.',
+      '"여행을 떠나야 해. 이웃나라의 공주를 보러 가야 하거든. 부모님의 바람이야.',
+      '하지만 신부가 내 뜻과 다르다면 난 공주를 집으로 데려오지 않을 거야.',
+      '그래서 말인데..."',
     ],
     choices: [
-      { label: '선택 A', body: '다시 방으로 돌아간다',
-        result: '',
-        stats: [0,0,0,0,0], next: 's12' },
+      { label: '선택 A', body: '같이 가자고 권유한다',
+        result: '그러자 소녀는 전보다 밝아진 표정으로 고갤 끄덕인다. 나는 소녀의 머리카락에 입을 맞추고 머리카락을 쓰담아주었다.',
+        stats: [0,1,0,3,0], next: 's11' },
+      { label: '선택 B', body: '소녀를 이곳에 두고 혼자 간다',
+        result: '소녀는 아직 기억을 못 찾았기 때문에 궁에 있는 편이 더 안전할 수 있다. 소녀의 슬퍼하는 눈을 바라보며, 걱정하지 말라는 뜻으로 머리카락에 입을 맞추었다.',
+        stats: [1,0,0,1,0], next: function(){ triggerEnding(7); } },
     ]
   },
 
-  /* ══ P3 씬 11-1 : 정원 ══ */
-  /* 이미지: p3_scene_11.png */
+  /* ══ P2 씬 11-1 ~ 11-5 : 배 위에서 ══ */
+  /* 이미지: p2_scene_11.png */
   's11': {
-    img: 'p3_scene_11.png',
+    img: 'p2_scene_11.png',
     lines: [
-      '정원은 지난밤 보았던 모습과는 사뭇 달랐다.',
-      '달빛 아래에서는 신비롭게 느껴졌던 꽃들도 지금은 평범한 색을 띠고 있다.',
-      '문득, 성 밖에서 만난 그 남자가 떠올라 팔찌를 매만진다.',
-      '...나는 여기서 뭘 하고 있는 걸까.',
+      '날이 밝자 결국 소녀와 함께 배에 오른다.',
+      '파도가 잔잔히 흔들리는 가운데, 바다는 평온하다.',
+      '바람이 불어와 머리칼을 스친다. 문득, 익숙한 느낌이 스쳐 지나간다.',
     ],
     choices: [
-      { label: '선택 A', body: '이곳을 떠나고 싶다',
-        result: '',
-        stats: [0,3,0,0,0], next: 's12' },
-      { label: '선택 B', body: '그 남자가 궁금해진다',
-        result: '',
-        stats: [0,1,1,0,0], next: 's12' },
-      { label: '선택 C', body: '...방으로 돌아가자',
-        result: '',
-        stats: [1,0,0,0,0], next: 's12' },
+      { label: '선택 A', body: '바다를 본다',
+        result: '바다를 바라보니 문득 전의 서재에서 읽었던 재미난 얘기들이 떠오른다.',
+        stats: [0,0,2,0,0], next: 's11b' },
+      { label: '선택 B', body: '소녀를 본다',
+        result: '바다와 닮은 눈동자를 보니 문득 전의 서재에서 읽었던 재미난 얘기들이 떠오른다.',
+        stats: [0,0,0,2,0], next: 's11b' },
+      { label: '선택 C', body: '앞으로의 일을 생각한다',
+        result: '배에 파도가 부딪히는 소리로 모든 생각이 허물없어진다. 전의 서재에서 읽었던 재미난 얘기들이 떠오르며 소녀를 바라본다.',
+        stats: [0,1,1,0,0], next: 's11b' },
     ]
   },
 
-  /* ══ P3 씬 12-1 : 방에서 잠들다 ══ */
-  /* 이미지: p3_scene_12.png */
+  's11b': {
+    img: 'p2_scene_11.png',
+    lines: [
+      '바다와 관련된 여러 이야기를 들려준다.',
+      '무서운 폭풍과 신비로운 전설, 깊은 곳의 이야기들.',
+      '소녀는 말을 하지 않지만 조용히 듣고 있다. 그리고 아주 미묘하게 빙그레 미소 짓는다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '계속 얘기한다',
+        result: '나는 신이나서 얘기를 이어갔다. 배보다 더 큰 고래가 물을 뿜는 풍경, 멋부리기 위해 굴껍질을 비늘에 붙이는 물고기들의 이야기들... 소녀는 계속해서 빙그레 웃을 뿐이었지만, 그것이 이야기에 대한 감탄이라 생각했다.',
+        stats: [0,1,0,1,0], next: 's11c' },
+      { label: '선택 B', body: '반응을 살핀다',
+        result: '평소보다 차분한 반응에 이야기를 멈추고 소녀의 눈을 가만히 들여보았다. 그곳에는 가늠할 수 없는 고요한 무언가가 잠겨 있는 듯 했다.',
+        stats: [0,0,3,0,0], next: 's11c' },
+      { label: '선택 C', body: '화제를 바꾼다',
+        result: '곧 있을 꽃 축제 이야기를 하자 아이처럼 반짝이는 눈으로 바라보았다. ...내 바다 이야기는 재미가 없던 걸까?',
+        stats: [0,1,0,1,0], next: 's11c' },
+    ]
+  },
+
+  's11c': {
+    img: 'p2_scene_11.png',
+    lines: [
+      '밤이 되면 소녀는 늘 난간 근처에 서 있다.',
+      '바다를 바라보며, 손을 살짝 내민다.',
+      '마치 무언가를 그리워하는 듯한 모습이다.',
+    ],
+    choices: [],
+    next: 's12'
+  },
+
+  /* ══ P2 씬 12-1 ~ 12-3 : 이웃나라 도착, 공주 등장 ══ */
+  /* 이미지: p2_scene_12.png */
   's12': {
-    img: 'p3_scene_12.png',
+    img: 'p2_scene_12.png',
     lines: [
-      '얼마 지나지 않아 방에 도착한다. 창문 너머로 보이는 바다는 오늘도 잔잔하다.',
-      '침대에 몸을 눕혔지만 쉽게 잠이 오지 않는다.',
-      '머릿속에는 오늘 보고 들은 것들이 뒤섞인 채 맴돌 뿐이다.',
-      '결국 언제 잠들었는지도 모른 채 눈을 감는다.',
+      '그리고 얼마 지나지 않아 배는 이웃 왕국의 항구에 도착했다.',
+      '무도회와 알현식이 이어졌지만 며칠이 지나도 공주는 여전히 나타나지 않았다.',
+      '사람들이 말하기를, 멀리 있는 수도원에서 예의범절을 배우고 있다고 했다.',
     ],
     choices: [],
-    next: 's13'
+    next: 's12b'
   },
 
-  /* ══ P3 씬 13-1 : 두 번째 외출 ══ */
-  /* 이미지: p3_scene_13.png */
-  's13': {
-    img: 'p3_scene_13.png',
+  's12b': {
+    img: 'p2_scene_12.png',
     lines: [
-      '다음 날. 약혼식이 한 걸음 더 가까워졌다.',
-      '그 때문인지 성 안은 어제보다도 분주하고, 사람들의 표정에도 묘한 긴장감이 감돈다.',
-      '방 안에만 머물러 있기에는 마음이 답답하다.',
-      '다시 한번 성 밖으로 나가보자.',
+      '그리고 마침내, 이웃 나라의 공주가 돌아오고 마주한다.',
+      '눈부시게 아름다운 모습. 그 순간, 머릿속에 번개처럼 스치는 생각이 있다.',
+      '이 사람이 나를 구해준 사람이 아닐까. 확신에 가까운 착각이 마음속에서 빠르게 자리 잡는다.',
     ],
     choices: [
-      { label: '선택 A', body: '시장에 가보고 싶어 (전에 들르지 않은 곳)',
-        result: '가벼운 발걸음으로 시장으로 걸음을 옮긴다.',
-        stats: [0,2,0,0,0], next: 's6_market',
-        excludeIf: function(){ return flags.visitedMarket; } },
-      { label: '선택 B', body: '부둣가에 가고 싶어 (전에 들르지 않은 곳)',
-        result: '가벼운 발걸음으로 부둣가로 걸음을 옮긴다.',
-        stats: [0,1,1,0,0], next: 's6_dock',
-        excludeIf: function(){ return flags.visitedDock; } },
-      { label: '선택 C', body: '그냥 성 안에 있을래',
-        result: '',
-        stats: [1,0,1,0,0], next: 's14' },
+      { label: '선택 A', body: '확신한다',
+        result: '"당신이었군요! 내가 바닷가에 휩쓸려왔을 때 나를 구해준 사람이...!"',
+        stats: [0,0,0,-1,1], next: 's13' },
+      { label: '선택 B', body: '의심한다',
+        result: '"전에... 어디에서 본 적 있지 않나요?"',
+        stats: [0,0,3,0,0], next: 's13' },
+      { label: '선택 C', body: '보류한다',
+        result: '"은인을 이렇게 뵙게 되다니. 운명이라는 건 실존하나봅니다."',
+        stats: [0,0,1,0,0], next: 's13' },
+      { label: '선택 D', body: '소녀의 반응을 살핀다',
+        result: '왕자는 머뭇거리며 내쪽의 반응을 살핀다. 배려를 해주는 걸까.',
+        stats: [0,0,2,1,0], next: 's13' },
     ]
   },
 
-  /* ══ P3 씬 14-1 ~ 14-2 : 약혼식 전날 밤 ══ */
-  /* 이미지: p3_scene_14.png */
-  's14': {
-    img: 'p3_scene_14.png',
+  /* ══ P2 씬 13-1 ~ 13-3 : 소개, 연회 ══ */
+  /* 이미지: p2_scene_13.png */
+  's13': {
+    img: 'p2_scene_13.png',
     lines: [
-      '...해가 저물 무렵이 되어서야 발걸음을 멈춘다.',
-      '하지만 아무리 둘러보아도 바뀌지 않는 사실이 있다.',
-      '왕자는 내일 약혼식을 올린다는 것.',
-      '그 사실을 곱씹으며 천천히 방으로 돌아간다.',
+      '이웃나라 공주는 잠시 놀란 듯 눈을 동그랗게 뜨더니, 환하게 웃으며 고개를 끄덕인다.',
+      '공주는 소개를 부탁한다는 듯 눈을 접어 웃었다.',
     ],
-    choices: [],
-    next: 's14b'
+    choices: [
+      { label: '선택 A', body: '곧장 소개한다',
+        result: '"\'길에서 찾은 사랑스러운 여인\'이라... 정말 아름다운 소녀네요."',
+        stats: [0,0,0,2,0], next: 's13b' },
+      { label: '선택 B', body: '머뭇거린다',
+        result: '옆에서 소녀가 내 소매를 잡아당기자 그제서야 소개했다.',
+        stats: [0,0,1,1,0], next: 's13b' },
+    ]
+  },
+
+  's13b': {
+    img: 'p2_scene_13.png',
+    lines: [
+      '공주가 돌아온 뒤 이웃 나라 성에서의 첫날 밤, 화려한 연회가 열린다.',
+      '공주와 대화하며 은인인지 확인하려 하지만, 시선은 자꾸만 구석에서 홀로 춤추는 소녀에게 향한다.',
+      '그녀의 춤은 지금까지 보았던 것 중에서 가장 멋지고 아름다운 춤을 추고 있었다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '공주와 과거 이야기를 나눈다',
+        result: '수도원에서 들었던 은인과 인상착의가 동일한 것을 알게 된다.',
+        stats: [0,0,2,-1,1], next: 's13c' },
+      { label: '선택 B', body: '소녀와 대화할 수 있도록 자리를 만든다',
+        result: '두 여인은 정원을 산책하러 잠시 자리를 떠났다.',
+        stats: [0,1,0,1,0], next: 's13c' },
+      { label: '선택 C', body: '무언가의 위화감을 느낀다',
+        result: '그러나 그 기시감은 다른 사람들과 얘기하는 사이 물 녹듯 사라진다.',
+        stats: [0,0,2,0,0], next: 's13c' },
+    ]
+  },
+
+  's13c': {
+    img: 'p2_scene_13.png',
+    lines: [
+      '날이 밝고 본격적으로 결혼 이야기가 오가는 며칠을 보낸다.',
+      '분명 공주는 자신의 은인이 맞고, 나라에도 좋을 선택이라는 것을 알고 있지만',
+      '왠지 모르게 가슴이 답답해져 잠이 오지 않았다.',
+      '복도를 걸어가고 있었다. 그때, 쨍그랑! 공주의 방 날카로운 소리가 들린다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '확인하러 가볼까?',
+        result: '',
+        stats: [0,0,2,0,1], next: 's14' },
+      { label: '선택 B', body: '창문 너머 익숙한 인영을 바라본다. 저 사람은...',
+        result: '성벽 너머에서 훤칠한 청년과 즐겁게 대화하는 소녀를 바라보며 이율 모를 답답함은 더 커져만갔다.',
+        stats: [0,0,0,2,0], next: 's15' },
+    ]
+  },
+
+  /* ══ P2 씬 14-1 ~ 14-2 : 공주의 방 ══ */
+  /* 이미지: p2_scene_14.png */
+  's14': {
+    img: 'p2_scene_14.png',
+    lines: [
+      '문앞에 다다르자 반사적으로 숨을 죽였다.',
+      '무거운 무언가가 떨어지는 둔탁한 소리가 들려오자',
+      '새어나오는 호기심을 억지로 억누르고 조심스럽게 문고리를 돌려 아주 작은 틈을 만들었다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '문고리 안을 바라본다',
+        result: '',
+        stats: [0,0,3,0,1], next: 's14b' },
+      { label: '선택 B', body: '염탐하는 건 실례다. 돌아가자',
+        result: '아무리 결혼할 사이라고 해도 비밀은 존중해줘야하는 법.',
+        stats: [1,0,0,0,0], next: 's15' },
+    ]
   },
 
   's14b': {
-    img: 'p3_scene_14.png',
+    img: 'p2_scene_14.png',
     lines: [
-      '창밖으로 달빛이 바다를 비춘다.',
-      '푹신한 침대에서 잠을 청해보지만 쉽게 눈을 감을 수 없었다.',
-      '이제는 선택해야 한다는 생각이 든다. 시간이 얼마 남지 않았다.',
+      '방 안에는 화려한 비단 옷들이 바닥에 어지럽게 널려 있었다.',
+      '거울 앞에 서 있는 것은 천사처럼 환하게 웃던 이웃 나라의 공주였다.',
+      '하지만 그녀는 평소 입던 신부의 치맛자락을 거칠게 걷어내고 있었는데,',
+      '곧이어 눈을 의심케 하는 광경이 펼쳐졌다.',
+      '',
+      '"그래서, 왕자는 아직 모른다는 거지? 이 거추장스러운 연극도 며칠 남지 않았군."',
+      '',
+      '낮에 들려준 가냘픈 목소리와는 전혀 다른, 낮고 굵직한 남성의 목소리였다.',
+      '거울 속에는 부드러운 여인의 곡선 대신 탄탄한 근육이 잡힌 남성의 상체가 있었다.',
     ],
     choices: [
-      { label: '선택 A', body: '왕자를 떠올린다',
-        result: '이런 와중에도 왕자의 얼굴이 떠올랐다. 내일이 지나면, 모든 것이 달라질 것이다.',
-        stats: [0,0,0,3,0], next: 's15' },
-      { label: '선택 B', body: '바다의 가족을 떠올린다',
-        result: '언니들은 지금 무엇을 하고 있을까. 아버지는 여전히 엄한 표정으로 왕국을 다스리고 있을까.',
-        stats: [3,0,0,0,0], next: 's15' },
-      { label: '선택 C', body: '지금까지 있었던 일을 떠올린다 (개척 8 이상)',
-        result: '예상했던 일도, 예상하지 못했던 일도 많았다. 부디 후회없는 선택을 할 수 있길.',
-        stats: [0,0,3,0,0], next: 's15' },
-      { label: '선택 D', body: '앞으로의 일을 떠올린다',
-        result: '약혼식이 끝난 뒤에는 어떻게 될까. 그럼에도 지금까지 봐 온 육지 세상의 아름다움을 떠올리며 앞으로의 삶을 상상하며 눈을 감는다.',
-        stats: [0,3,0,0,0], next: 's15' },
+      { label: '선택 A', body: '당장 문을 열고 들어가 진실을 추궁한다',
+        result: '',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(8); } },
+      { label: '선택 B', body: '아무 말 없이 물러나 파혼을 계획한다',
+        result: '',
+        stats: [0,0,0,0,0], next: function(){ triggerEnding(9); } },
     ]
   },
 
-  /* ══ P3 씬 15-1 ~ 15-4 : 약혼식 날 아침 ══ */
-  /* 이미지: p3_scene_15.png */
+  /* ══ P2 씬 15-1 ~ 15-4 : 약혼식 ══ */
+  /* 이미지: p2_scene_15.png */
   's15': {
-    img: 'p3_scene_15.png',
+    img: 'p2_scene_15.png',
     lines: [
-      '이러나저러나 시간은 속절없이 흘러가고, 눈을 감았다 뜨자 약혼식 날이 도래했다.',
+      '이튿날 망설임은 줄어들었다. 부모님의 뜻을 따라, 마음의 움직임을 따라',
+      '이웃 나라 공주와의 결혼을 추진하기로 한다.',
+      '그러자 주변은 빠르게 움직이기 시작한다. 모든 것이 순식간에 진행된다.',
     ],
     choices: [],
-    next: function(){ checkFinalRoute(); }
+    next: 's15b'
   },
 
-  /* ══ P3 씬 16-1 ~ 16-2 : 언니들 등장 ══ */
-  /* 이미지: p3_scene_16.png */
-  's16': {
-    img: 'p3_scene_16.png',
+  's15b': {
+    img: 'p2_scene_15.png',
     lines: [
-      '자정이 지나 모두가 잠든 시간, 갑자기 창문에서 소리가 들린다.',
-      '언니들이었다.',
-      '머리카락이 잘려있다. 그들은 떨리는 목소리로 말한다.',
-      '',
-      '"마녀에게서 칼을 받아왔어. 해가 뜨기 전, 왕자의 심장에 칼날을 꽂으면',
-      '네 몸이 다시 인어로 돌아올 수 있어."',
+      '약혼식 준비는 순식간에 끝난다.',
+      '도시 전체에 종소리가 울려 퍼지고, 축하의 분위기가 가득하다.',
     ],
     choices: [
-      { label: '선택 A', body: '칼을 받아들고 왕자의 방으로 향한다',
-        result: '언니들의 간절한 목소리가 귓가를 맴돌았다. 살아남을 수 있는 방법은 단 하나뿐이었다.',
-        stats: [2,0,0,0,0], next: 's17' },
-      { label: '선택 B', body: '칼을 손에 쥐지만 망설인다',
-        result: '왕자를 사랑했다. 그래서 끝내 그를 죽일 수 없었다.',
-        stats: [0,0,0,2,0], next: 's17' },
+      { label: '선택 A', body: '공주의 손을 잡는다',
+        result: '그것을 무시하며, 눈 앞의 은인의 손을 잡아 손등에 부드럽게 입을 맞춘다.',
+        stats: [1,0,0,-1,0], next: 's15c' },
+      { label: '선택 B', body: '바쁘게 움직이는 사람 사이로 소녀를 찾는다',
+        result: '그러나 바람과 달리 소녀는 끝내 보이지 않았다. 약혼식이 시작되기 전까지.',
+        stats: [0,0,0,3,0], next: 's15c' },
     ]
   },
 
-  /* ══ P3 씬 17-1 : 최후의 선택 (여명) ══ */
-  /* 이미지: p3_scene_17.png */
-  's17': {
-    img: 'p3_scene_17.png',
+  's15c': {
+    img: 'p2_scene_15.png',
     lines: [
-      '왕자의 방. 그는 잠들어 있다.',
-      '해는 곧 뜰 것이다. 선택의 시간이 얼마 남지 않았다.',
-      '칼을 손에 쥔 채, 마지막으로 결정을 내려야 한다.',
+      '그리고 다가온 약혼식 날, 도시는 온통 금빛과 은빛으로 물들었다.',
+      '교회 종소리가 수평선 끝까지 울려 퍼졌고 제단마다 값비싼 향유가 피어오른다.',
+      '정작 제단 앞에 선 나의 가슴 속에는 설명할 수 없는 공허함이 자리 잡았다.',
+      '하루동안 이어진 성대한 약혼식이 끝나고, 나는 공주와 함께 귀환하기 위해 배에 올랐다.',
+    ],
+    choices: [],
+    next: 's16'
+  },
+
+  /* ══ P2 씬 16-1 & 16-X : 귀환 밤, 최종 분기 ══ */
+  /* 이미지: p2_scene_16.png */
+  's16': {
+    img: 'p2_scene_16.png',
+    lines: [
+      '밤이 깊어지자 뱃사람들의 축제가 시작된다.',
+      '문득 한 가지 장면이 뇌리를 스쳤다. 항상 조용히 내 곁을 지키던 존재, 그 소녀.',
+      '그녀가 추는 춤은 평소보다 더 아름답고 처절해 보였다.',
     ],
     choices: [
-      { label: '선택 A', body: '왕자를 찌른다 (원형 ≥ 8)',
-        result: '언니들의 간절한 목소리가 귓가를 맴돌았다. 살아남을 수 있는 방법은 단 하나뿐이었다.',
-        stats: [0,0,0,0,0], next: function(){ triggerEnding(16); } },
-      { label: '선택 B', body: '공주를 찌른다 (원형 ≥ 8)',
-        result: '왕자를 사랑했기에 도저히 그를 찌를 수 없었다.',
-        stats: [0,0,0,0,0], next: function(){ triggerEnding(17); } },
-      { label: '선택 C', body: '스스로를 찌른다',
-        result: '이미 예견된 결말이라면, 마지막은 스스로가 선택할 수 있지 않을까.',
-        stats: [0,0,0,0,0], next: function(){ triggerEnding(18); } },
-      { label: '선택 D', body: '칼을 바다에 던진다 (원형 ≥ 12)',
-        result: '살아남기 위해 누군가를 희생시키는 방법도 있었다. 하지만 그것은 자신이 원하던 결말이 아니었다.',
-        stats: [0,0,0,0,0], next: function(){ triggerEnding(19); } },
-      { label: '선택 E', body: '왕자를 깨운다 (통찰 ≥ 10 + 애정 ≥ 12 + 해피엔딩 선택지 클리어)',
-        result: '마지막 용기를 내어 그의 어깨를 흔들었다.',
-        stats: [0,0,0,0,0], next: function(){ triggerEnding(20); } },
+      { label: '선택 A', body: '뒤늦게 소녀가 머물던 자리를 살핀다',
+        result: '뒤늦게 소녀를 찾았지만, 그녀가 떠나간 자리엔 아무 것도 남지 않았다.',
+        stats: [0,0,1,2,0], next: 's16b' },
+    ]
+  },
+
+  's16b': {
+    img: 'p2_scene_16.png',
+    lines: [
+      '에스코트하듯 공주의 손을 잡고 천막 안으로 들어가 푹신한 침대에 몸을 눕는다.',
+      '침대에 몸을 눕자마자 몰려오는 잠을 이기지 못하고 눈을 감는다.',
+    ],
+    choices: [],
+    next: function(){ goTo16X(); }
+  },
+
+  /* 씬 16-X: 해피엔딩 선택지 4회 이상일 때만 등장 */
+  's16X': {
+    img: 'p2_scene_16.png',
+    lines: [
+      '얼마나 시간이 흘렀을까. 파도에 부딪히는 물결 소리에 문득 눈이 떠진다.',
+      '옆을 돌아보니 공주는 이미 깊은 잠에 빠져 있다.',
+      '오늘 하루는 분명 행복해야 할 날이었다.',
+      '하지만 이상하게도 마음 한구석이 계속 무거웠다. 자꾸만 한 사람이 떠오른다.',
+      '나는 계속 그녀를 찾고 있었다.',
+      '...이건 아니다. 소녀에게도, 공주에게도. 그리고 나 자신에게도.',
+      '왕자는 마지막으로 공주를 바라본 뒤, 조용히 천막 밖으로 발걸음을 옮겼다.',
+    ],
+    choices: [
+      { label: '선택 A', body: '소녀를 찾으러 간다',
+        result: '반드시 확인해야 할 것이 있다.',
+        stats: [0,0,0,2,0], next: 'p2end' },
     ]
   },
 
 };
 
-
 /* ════════════════════════════════════════════════════
    분기 함수들
 ════════════════════════════════════════════════════ */
 
-/* 카운트 누적 체크 — 3이상: 엔딩10, 4이상: 엔딩11 강제 */
-function checkCount(nextScene) {
-  if (stats.count >= 4) {
-    triggerEnding(11);
-  } else if (stats.count >= 3) {
-    triggerEnding(10);
+/* 씬 1-X 분기: 조개 껍데기 플래그 있으면 엔딩5 루트 */
+function goTo1X() {
+  var savedFlags = JSON.parse(sessionStorage.getItem('flags') || '{}');
+  if (savedFlags.shellGiven) {
+    loadScene('s1X');
   } else {
-    loadScene(nextScene);
+    loadScene('s1c');
   }
 }
 
-/* 최종 분기 — 수치·플래그에 따라 엔딩 루트 결정 */
-function checkFinalRoute() {
-  var f = JSON.parse(sessionStorage.getItem('flags') || '{}');
+/* 씬 16-X 분기: 해피엔딩 선택지 횟수 4 이상이면 16-X */
+function goTo16X() {
+  var savedFlags = JSON.parse(sessionStorage.getItem('flags') || '{}');
+  var happyCount = savedFlags.happyCount || 0;
+  if (happyCount >= 4) {
+    loadScene('s16X');
+  } else {
+    p2end();
+  }
+}
 
-  /* 개척 10↑ + 통찰 7↑ + 애정 5↓ → 엔딩12 */
-  if (stats.B >= 10 && stats.C >= 7 && stats.D <= 5) { triggerEnding(12); return; }
-
-  /* 개척 10↑ + 애정 7↓ + 시장/부둣가 플래그 → 엔딩13 */
-  if (stats.B >= 10 && stats.D <= 7 && f.marketMan) { triggerEnding(13); return; }
-
-  /* 개척 10↑ + 통찰 10↑ + 꽃 + 시장 → 엔딩14 */
-  if (stats.B >= 10 && stats.C >= 10 && f.flowerFlag && f.marketMan) { triggerEnding(14); return; }
-
-  /* 개척 8↑ + 공주(꽃) 플래그 → 엔딩15 */
-  if (stats.B >= 8 && f.flowerFlag) { triggerEnding(15); return; }
-
-  /* 그 외 → 씬16(언니들 등장) */
-  loadScene('s16');
+/* P2 완료 → 파트 완료 오버레이 */
+function p2end() {
+  var savedFlags = JSON.parse(sessionStorage.getItem('flags') || '{}');
+  var summary = '왕자는 소녀를 곁에 두고 이웃 나라로의 여행을 마쳤습니다.';
+  if (savedFlags.shellGiven) {
+    summary = '조개 껍데기의 비밀을 품은 채 여행을 마친 왕자는, 언젠가 그 기억이 되살아오리라 믿었습니다.';
+  }
+  showPartEnd(2, summary, 'library.html');
 }
 
 
+
+/* ════════════════════════════════════════════════════
+   파트 완료 처리
+   - 현재 방을 cleared로 변경 + 최종 수치/플래그 저장
+   - 같은 lineage_id로 다음 파트 방을 새로 생성(waiting)
+════════════════════════════════════════════════════ */
+async function showPartEnd(partNum, choiceSummary, nextHref) {
+  endingReached = true;
+  if (heartbeatTimer) clearInterval(heartbeatTimer);
+
+  sessionStorage.setItem('stats', JSON.stringify(stats));
+  sessionStorage.setItem('flags', JSON.stringify(flags));
+
+  partEndNextHref = nextHref || 'library.html';
+
+  document.getElementById('part-end-label').textContent = 'PART ' + partNum + ' — END';
+  document.getElementById('part-end-summary').innerHTML = choiceSummary;
+  document.getElementById('part-end-notice').innerHTML =
+    '파트 ' + partNum + '이 마무리되었습니다.<br>' +
+    '당신의 이야기와 선택의 결과는 다음 플레이어에게 계승됩니다.<br>' +
+    '완료 버튼을 눌러 이야기 선택창으로 나갈 수 있습니다.';
+
+  document.getElementById('part-end-overlay').classList.add('active');
+  window.onbeforeunload = null;
+
+  var btn = document.getElementById('btn-part-end-complete');
+  btn.disabled = true;
+  btn.innerHTML = '✦ &nbsp;기록하는 중...&nbsp; ✦';
+
+  try {
+    if (ROOM_ID) {
+      await db.from('rooms')
+        .update({
+          status: 'cleared',
+          stats_a: stats.A,
+          stats_b: stats.B,
+          stats_c: stats.C,
+          stats_d: stats.D,
+          stats_count: stats.count,
+          flags: flags
+        })
+        .eq('id', ROOM_ID);
+    }
+
+    if (LINEAGE_ID && partNum < 3) {
+      await db.from('rooms').insert({
+        lineage_id: LINEAGE_ID,
+        part: partNum + 1,
+        status: 'waiting',
+        stats_a: stats.A,
+        stats_b: stats.B,
+        stats_c: stats.C,
+        stats_d: stats.D,
+        stats_count: stats.count,
+        flags: flags
+      });
+    }
+  } catch (err) {
+    console.error('파트 완료 DB 처리 실패:', err);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✦ &nbsp;완료&nbsp; ✦';
+}
+
+/* 파트 완료 화면의 "완료" 버튼 클릭 → library.html로 이동 */
+function goToLibraryFromPartEnd() {
+  location.href = partEndNextHref || 'library.html';
+}
 
 /* ════════════════════════════════════════════════════
    엔딩 데이터
 ════════════════════════════════════════════════════ */
 var ENDINGS = {
-  10: {
-    label: 'ENDING 10', title: '세상 그 누구보다 당신을 사랑하는',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed10.png',
+  5: {
+    label: 'ENDING 05', title: '약속된 재회',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed5.png',
     paragraphs: [
-      '사랑에 빠진 사람은 종종 아무것도 보지 못한다. 인어 공주 역시 마찬가지였다.',
-      '언니들은 그런 막내를 보며 가만히 있을 수 없었다.\n머리카락을 희생하고, 마녀를 찾아가고, 수많은 대가를 치르면서까지 그녀를 구할 방법을 찾았다.',
-      '세상에서 가장 사랑하는 동생을 위해.\n언니들은 마지막까지 그녀의 손을 놓지 않았다.',
+      '인어 공주는 누구보다 빠르게 왕자와 재회했다.',
+      '망설임 없이 기회를 붙잡았고, 왕자 역시 그녀를 특별하게 여기기 시작했다.\n함께 보내는 시간은 점점 늘어났고, 두 사람은 서로를 당연한 존재처럼 받아들이게 되었다.',
+      '수많은 선택과 우연이 겹친 끝에, 마침내 두 사람은 결혼에 이르렀다.\n약속대로 인어 공주의 목소리도 돌아왔다.\n처음으로 자신의 목소리로 왕자의 이름을 부르는 순간, 그녀는 긴 여정이 끝났음을 실감했다.',
     ]
   },
-  11: {
-    label: 'ENDING 11', title: '이른 귀환',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed11.png',
+  6: {
+    label: 'ENDING 06', title: '독이 된 조심성',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed6.png',
     paragraphs: [
-      '왕자의 태도에 지쳐버린 것은 하루아침의 일이 아니었다.',
-      '언니들은 아무 말 없이 손을 내밀었다. 언제든 돌아올 수 있다고, 아직 늦지 않았다고.',
-      '인어 공주는 한참 동안 바다를 바라보았다. 결국 그녀는 언니들의 손을 잡았다.\n차가운 바닷물이 몸을 감싸고, 잊고 있던 고향의 향기가 폐부 깊숙이 스며든다.',
+      '왕자는 끝내 소녀에게 다가가지 않았다.',
+      '처음에는 그저 조심스러운 성격 때문이었다. 정체를 알 수 없는 소녀를 경계했고, 괜한 오해를 만들고 싶지 않았다.',
+      '하지만 시간은 생각보다 빠르게 흘러갔다.\n그렇게 평범한 하루들이 쌓여갔고,\n훗날 왕자가 타고 있던 배는 예상치 못한 폭풍우를 만나 크게 파손되었다.\n그를 구해줄 소녀는 더 이상 곁에 없었다.',
     ]
   },
-  12: {
-    label: 'ENDING 12', title: '사랑이 정답은 아니니까',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed12.png',
+  7: {
+    label: 'ENDING 07', title: '직면의 중요성',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed7.png',
     paragraphs: [
-      '왕자를 사랑했던 마음이 거짓은 아니었다. 하지만 시간이 흐를수록 인어 공주는 깨닫게 되었다. 세상은 생각보다 넓었다.',
-      '결국 인어 공주는 언니들에게 부탁해 마녀와 다시 거래를 했다.\n처음과는 다른 조건으로, 처음과는 다른 선택을 하기 위해서.',
-      '사랑을 위해 얻었던 다리는 이제 자신만의 삶을 위해 사용될 것이다.\n오히려 지금부터가 진짜 시작이었다.',
+      '이웃 나라에서 공주를 만난 순간, 왕자는 확신했다. 눈앞의 공주야말로 자신을 구해준 은인이라고.',
+      '의심할 사람도, 그의 착각을 바로잡아줄 사람도 없었다. 이야기는 놀라울 정도로 빠르게 진행되었다.',
+      '하지만 모든 일이 끝난 뒤 문득 소녀가 떠올랐다.\n뒤늦게 그녀를 찾았을 때, 이미 그녀는 흔적도 없이 사라진 뒤였다.\n그리고 훗날, 왕자는 다시 바다를 건너기 위해 배에 올랐다.\n그 사고가 우연이었는지, 운명이었는지는 끝내 아무도 알지 못했다.',
     ]
   },
-  13: {
-    label: 'ENDING 13', title: '사랑이 죄는 아니니까',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed13.png',
+  8: {
+    label: 'ENDING 08', title: '감이 좋았던 왕자',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed8.png',
     paragraphs: [
-      '왕자의 마음은 바람에 흔들리는 갈대와 같았다.\n기대했다가 실망하고, 희망을 품었다가 상처받는 일을 반복하면서 인어 공주의 마음도 조금씩 지쳐갔다.',
-      '그러던 어느 날, 예상치 못한 인연이 그녀의 삶에 스며들었다.\n처음에는 그저 우연이었다. 잠시 나눈 대화와 사소한 친절, 그리고 가볍게 건네받은 작은 선물 하나.',
-      '인어 공주는 조심스럽게 앞으로 나아가 보기로 했다.\n이번에는 누군가를 위해 자신을 희생하는 사랑이 아니라, 함께 웃을 수 있는 사랑을 꿈꾸며.',
+      '왕자는 쉽게 납득하지 못했다. 그는 끈질기게 의문을 품었고, 결국 스스로 진실을 확인하기 위해 움직이기 시작했다.',
+      '그러나 모든 진실이 밝혀져야만 하는 것은 아니었다.\n어떤 사실은 알지 못하는 편이 더 안전할 수도 있다.',
+      '왕자는 자신의 호기심이 향하는 곳을 끝까지 따라갔고,\n결국 타국에서 목숨을 잃고 말았다. 원인조차 명확히 밝혀지지 않은 갑작스러운 죽음이었다.',
     ]
   },
-  14: {
-    label: 'ENDING 14', title: '진정한 왕자님',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed14.png',
+  9: {
+    label: 'ENDING 09', title: '한정된 결말',
+    archImg: 'arch_ed1.png', illustImg: 'game_ed9.png',
     paragraphs: [
-      '기시감의 정체를 깨닫는 데에는 생각보다 오랜 시간이 걸리지 않았다.\n수많은 단서와 우연들이 이어지며 마침내 진실이 모습을 드러냈다.',
-      '둘은 많은 이야기를 나누었다. 각자가 품고 있던 고민과, 앞으로 살아가고 싶은 미래에 대해서.\n그리고 끝내 같은 결론에 도달했다. 누군가가 정해준 삶이 아니라 자신이 원하는 삶을 살고 싶다고.',
-      '두 사람은 모든 것을 뒤로한 채 여행을 떠났다. 세상은 넓고, 아직 가보지 못한 곳은 너무나 많았으니까.\n그들의 새로운 이야기는 그렇게 시작되었다.',
-    ]
-  },
-  15: {
-    label: 'ENDING 15', title: '새 정원을 찾아서',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed15.png',
-    paragraphs: [
-      '결혼식을 앞둔 왕자를 뒤로한 채, 두 사람은 조용히 성을 떠났다.\n누군가는 무책임하다고 말할지도 모른다. 하지만 둘에게는 그것이 가장 솔직한 선택이었다.',
-      '어디로 향할지, 앞으로 어떤 관계가 될지는 아무도 알 수 없었다.',
-      '확실한 것은 단 하나뿐이었다. 이제 그들은 자신들만의 새로운 정원을 찾아 나선다는 사실이었다.',
-    ]
-  },
-  16: {
-    label: 'ENDING 16', title: '사랑했어요',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed16.png',
-    paragraphs: [
-      '살아남을 수 있는 방법은 단 하나뿐이었다. 그를 죽이는 것.',
-      '수없이 망설였다. 수없이 스스로를 설득하려 했다. 하지만 결국 마지막 순간, 인어 공주는 칼을 들어 올렸다.',
-      '다섯 갈래로 나뉘어 있던 발은 서서히 하나로 이어졌고, 목에는 익숙한 아가미가 되살아났다.\n인어 공주는 비틀거리며 창가로 달려갔다. 그리고 망설임 없이 바다로 몸을 던졌다.\n살아남았다. 하지만 영원히 되돌릴 수 없는 것을 남겨둔 채로.',
-    ]
-  },
-  17: {
-    label: 'ENDING 17', title: '눈 먼 선택',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed17.png',
-    paragraphs: [
-      '왕자를 사랑했다. 그래서 끝내 그를 죽일 수 없었다.',
-      '고민 끝에 인어 공주의 시선이 향한 곳에는 잠든 공주가 있었다.\n칼이 공주의 몸을 꿰뚫는 순간, 공주는 놀란 눈으로 그녀를 바라보았다.\n비명을 지르지도, 원망하지도 않았다. 오히려 천천히 손을 뻗어 그녀의 손을 감싸 쥐었다.',
-      '결국 그녀는 살아남았다. 하지만 그 대가로 누군가의 미래를 빼앗아야 했다.\n과연 이것이 최선의 선택이었는지는 끝내 알 수 없었다.',
-    ]
-  },
-  18: {
-    label: 'ENDING 18', title: '그럼에도 사랑했기에',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed18.png',
-    paragraphs: [
-      '언니들은 간절하게 그녀를 설득했다. 아직 늦지 않았다고. 지금이라면 모든 것을 되돌릴 수 있다고.',
-      '하지만 인어 공주는 끝내 왕자를 죽일 수 없었다. 공주 역시 마찬가지였다. 그녀는 누구의 목숨도 빼앗고 싶지 않았다.',
-      '이미 예정된 결말이라면, 적어도 마지막 선택만큼은 자신의 의지로 하고 싶었다.\n사랑은 이루어지지 못했지만, 적어도 후회는 없었다. 그녀는 그렇게 조용히 눈을 감았다.',
-    ]
-  },
-  19: {
-    label: 'ENDING 19', title: '눈 먼 자의 희곡',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed19.png',
-    paragraphs: [
-      '그를 사랑했다. 너무 오랫동안, 너무 깊게. 그래서 그를 죽일 수 없었다. 공주 역시 그저 자신의 삶을 살아왔을 뿐이었다.',
-      '인어 공주는 칼을 힘껏 바다를 향해 던졌다. 은빛 궤적을 그린 칼날은 파도 사이로 사라져 버렸다.',
-      '그 순간, 그녀의 몸은 발끝부터 천천히 하얀 포말로 부서지기 시작했다.\n잠시 후 그곳에는 아무것도 남지 않았다. 한 사람을 뜨겁게 사랑했던 흔적조차.\n오직 새벽바람만이 조용히 바다를 스쳐 지나갈 뿐이었다.',
-    ]
-  },
-  20: {
-    label: 'ENDING 20', title: '해피엔딩',
-    archImg: 'arch_ed1.png', illustImg: 'game_ed20.png',
-    paragraphs: [
-      '왕자를 깨우려던 손끝이 떨렸다. 지금이라면 모든 것을 끝낼 수도 있었다.\n하지만 인어 공주는 마지막 용기를 내어 그의 어깨를 흔들었다.',
-      '잠에서 깨어난 왕자는 처음에는 상황을 이해하지 못했다.\n하지만 눈앞에 선 그녀를 바라보는 순간, 이상할 정도로 마음이 복잡해졌다.',
-      '기쁘거나 슬플 때 가장 먼저 떠오르는 사람. 무언가를 이야기하고 싶을 때 가장 먼저 찾게 되는 사람.\n그 사람은 언제나 그녀였다.',
-      '그날 새벽, 예정되어 있던 결혼은 취소되었다.\n인어 공주는 처음으로 미래를 두려워하지 않았다.\n이것은 동화의 끝이 아니라, 두 사람이 함께 써 내려갈 새로운 이야기의 시작이었다.',
+      '사랑은 성별을 넘어설 수 있을까. 왕자는 후자를 선택했다.',
+      '이웃 나라의 공주와 예정되어 있던 결혼은 조용히 무산되었다.',
+      '그 빈자리는 자연스럽게 인어 공주에게 돌아왔다.\n오랫동안 왕자의 곁을 지켜온 사람도, 누구보다 많은 애정을 받아온 사람도 그녀였기 때문이다.\n하지만 그것이 진정한 사랑의 결말이었는지는 아무도 알 수 없다.',
     ]
   },
   1: {
@@ -1861,26 +2174,12 @@ function loadScene(sceneId) {
   /* 본문 타이핑 시작 */
   startTyping(scene.lines, function() {
     typingDone = true;
-
-    /* excludeIf 조건이 true인 선택지는 제외 */
-    var visibleChoices = (scene.choices || []).filter(function(ch) {
-      return !(ch.excludeIf && ch.excludeIf());
-    });
-
-    if (visibleChoices.length > 0) {
+    if (scene.choices && scene.choices.length > 0) {
       /* 선택지 렌더링 */
-      renderChoices(visibleChoices);
+      renderChoices(scene.choices);
       setTimeout(function() {
         choicesWrap.classList.add('reveal');
       }, 300);
-    } else if (scene.choices && scene.choices.length > 0) {
-      /* 선택지가 있었는데 전부 필터링된 경우: 안전장치로 next-hint 표시
-         (이 케이스는 씬 설계상 발생하지 않아야 하지만, 만약을 위해 처리) */
-      console.warn('모든 선택지가 필터링됨:', sceneId);
-      var nxt = scene.next;
-      nextTarget = nxt;
-      document.getElementById('next-hint').classList.add('visible');
-      waitingForNext = true;
     } else {
       /* 선택지 없으면 "클릭해서 다음으로" */
       var nxt = scene.next;
@@ -1912,6 +2211,19 @@ function renderChoices(choices) {
 }
 
 /* 선택지 클릭 처리 */
+/* ════════════════════════════════════════════════════
+   다음 대상으로 이동하는 공통 헬퍼
+════════════════════════════════════════════════════ */
+function goToNext(target) {
+  if (typeof target === 'function') {
+    target();
+  } else if (typeof target === 'string' && !SCENES[target] && typeof window[target] === 'function') {
+    window[target]();
+  } else if (target) {
+    doSceneTransition(target);
+  }
+}
+
 function onChoiceSelect(choice, idx) {
   /* 수치 추가 */
   if (choice.stats) addStats(choice.stats[0], choice.stats[1], choice.stats[2], choice.stats[3], choice.stats[4]);
@@ -1933,19 +2245,6 @@ function onChoiceSelect(choice, idx) {
   } else {
     /* 결과 없으면 바로 다음 */
     goToNext(choice.next);
-  }
-}
-
-/* ════════════════════════════════════════════════════
-   다음 대상으로 이동하는 공통 헬퍼
-════════════════════════════════════════════════════ */
-function goToNext(target) {
-  if (typeof target === 'function') {
-    target();
-  } else if (typeof target === 'string' && !SCENES[target] && typeof window[target] === 'function') {
-    window[target]();
-  } else if (target) {
-    doSceneTransition(target);
   }
 }
 
@@ -2205,6 +2504,8 @@ function triggerEnding(num) {
 
 /* ════════════════════════════════════════════════════
    최초 달성자 판단 + endings 테이블 등록 시도
+   - ending_number에 unique 제약이 걸려있으므로,
+     insert 성공 = 최초 달성, 실패(중복) = 이미 누군가 달성함
 ════════════════════════════════════════════════════ */
 async function resolveEndingAchievement(num, data) {
   var nickname = sessionStorage.getItem('playerName') || '플레이어';
@@ -2254,7 +2555,6 @@ async function resolveEndingAchievement(num, data) {
 
 /* ════════════════════════════════════════════════════
    "완료" / "이야기 완료하기" 버튼
-   - P3는 마지막 파트이므로, 방을 삭제하고 계보 완전 종료
 ════════════════════════════════════════════════════ */
 async function completeEnding() {
   var btn = isFirstAchiever
