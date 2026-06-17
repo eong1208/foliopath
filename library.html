@@ -890,19 +890,38 @@
 </div><!-- /popup-overlay -->
 
 
-<!-- 도움말 오버레이 -->
-<div id="overlay-help" class="overlay" style="
-  display:none; position:fixed; top:0; left:0;
-  width:100%; height:100%; background:rgba(0,0,0,0.6);
-  z-index:200; justify-content:center; align-items:center;">
-  <div style="background:#f5ead0; border:3px solid #8b6914; border-radius:12px;
-              padding:40px; min-width:300px; text-align:center;
-              font-family:'Nanum Myeongjo',serif; color:#3a2a00; position:relative;">
-    <button onclick="closeOverlay('overlay-help')" style="
-      position:absolute; top:12px; right:16px; background:none;
-      border:none; font-size:1.5rem; cursor:pointer; color:#8b6914;">✕</button>
-    <h2 style="margin-bottom:16px;">도움말</h2>
-    <p>여기에 도움말 내용을 넣을 예정</p>
+<!-- ━━━━ 도움말 오버레이 ━━━━ -->
+<div id="overlay-help" class="overlay-panel">
+  <div class="overlay-box" style="max-width: 520px; width: 90%; max-height: 85vh; overflow-y: auto; text-align: left; padding: 32px 28px;">
+    <button class="overlay-close" onclick="closeOverlay('overlay-help')">✕</button>
+    <h2 style="margin-bottom: 20px;">도움말</h2>
+
+    <!-- 시작 방법 -->
+    <h3 style="font-size: 0.85rem; color: #8b6914; margin-bottom: 10px; letter-spacing: 0.05em;">✶ 시작 방법</h3>
+    <ol style="padding-left: 1.2em; margin-bottom: 20px; line-height: 1.9; font-size: 0.92rem;">
+      <li>서재에서 원하는 <strong>동화책</strong>을 선택하세요.</li>
+      <li>진행할 수 있는 <strong>파트(방)</strong>를 클릭해서 이야기를 시작합니다.</li>
+      <li>이야기 속 선택지를 골라가며 나만의 <strong>엔딩</strong>을 완성하세요.</li>
+    </ol>
+
+    <!-- 진행 방식 -->
+    <h3 style="font-size: 0.85rem; color: #8b6914; margin-bottom: 10px; letter-spacing: 0.05em;">✶ 진행 방식</h3>
+    <ul style="padding-left: 1.2em; margin-bottom: 12px; line-height: 1.9; font-size: 0.92rem;">
+      <li>이야기는 <strong>1번 → 2번 → 3번</strong> 순서로만 진행됩니다. 앞 단계 없이 다음 단계로 건너뛸 수 없습니다.</li>
+      <li>방의 <strong>기록</strong>과 <strong>플레이어</strong>는 묶여 있지 않습니다. 이전 단계를 완료한 분이 나가도, 클리어 기록이 남은 방에 새로운 분이 들어와 이어갈 수 있습니다.</li>
+      <li><strong>1번 방</strong>은 누구나 언제든 새로 시작할 수 있어, 고유한 줄기(A, B, C…)가 계속 생겨납니다.</li>
+    </ul>
+
+    <!-- 구분선 -->
+    <hr style="border: none; border-top: 1px solid #d4b87a; margin: 20px 0;" />
+
+    <!-- 유의사항 -->
+    <h3 style="font-size: 0.85rem; color: #8b6914; margin-bottom: 10px; letter-spacing: 0.05em;">⚠️ 유의사항</h3>
+    <ul style="padding-left: 1.2em; line-height: 1.9; font-size: 0.92rem;">
+      <li>진행 중 <strong>새로고침</strong>을 하면 저장되지 않습니다. 한 파트를 끝내거나 엔딩을 봐야 기록이 남습니다.</li>
+      <li>이야기 중 <strong>뒤로가기</strong>는 불가합니다. 선택지를 고를 때 신중히 생각해 주세요.</li>
+      <li>다른 이용자에게 불쾌함을 줄 수 있는 <strong>이름 사용은 금지</strong>됩니다.</li>
+    </ul>
   </div>
 </div>
 
